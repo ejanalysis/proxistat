@@ -32,7 +32,7 @@ By default, returns a matrix of numbers, with columns fromrow, n indexing which 
 This function returns a vector of distances,
 which are the distances from one set of points to the nearest single member (if any) of another set of points.
 Points are specified using latitude and longitude in decimal degrees.
-Relies on the sp package for the \code{\link{spDists}} and \code{\link{SpatialPoints}} functions.
+Relies on the \pkg{sp} package for the \code{\link{sp}{spDists}} and \code{\link{sp}{SpatialPoints}} functions.
 A future version may use get.distances.all() but for performance only use it for distance pairs (pairs of points) that have been initially
 quickly filtered using lat/lon to be not too far, in an attempt to go much faster in an initial pass.
 }
@@ -46,8 +46,8 @@ test.to <- structure(list(tolat = c(38.9575019287, 38.9507043428, 38.9514152435)
 get.nearest(test.from, test.to)
 }
 \seealso{
-\code{\link{get.distances}} for get.distances() which gets distances between all points (within an optional search radius),
-  \code{\link{get.distances.all}} for get.distances.all() which allows you to get distances between all points,
+\code{\link{get.distances}} which gets distances between all points (within an optional search radius),
+  \code{\link{get.distances.all}} which allows you to get distances between all points,
   \code{\link{get.distances.prepaired}} for finding distances when data are already formatted as pairs of points, and
   \code{\link{proxistat}} which calculates a proximity score for each spatial unit based on distances to nearby points.
 }

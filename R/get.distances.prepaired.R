@@ -8,13 +8,13 @@
 #' This function returns a matrix or vector of distances, 
 #' between points specified as pairs of lat/lon values.
 #' Points are specified using latitude and longitude in decimal degrees.
-#' Relies on the sp package for the spDistsN1() and SpatialPoints() functions.
+#' Relies on the \pkg{sp} package for the \code{\link{sp}{spDists}} and \code{\link{sp}{SpatialPoints}} functions.
 #'
 #' @param pts A matrix or data.frame that has columns names 'fromlon', 'fromlat', 'tolon', 'tolat' with datum=WGS84 assumed.
 #' @return Returns a vector of distances as numbers, in kilometers. Each element corresponds to one row in pts.
 #' @seealso \code{\link{get.distances.all}} for a useful general function, \code{\link{get.distances}} for get.distances() which allows you to specify a search radius and 
 #'   get distances only within that radius which can be faster,
-#'   \code{\link{get.nearest}} for get.nearest() which finds the distance to the single nearest point 
+#'   \code{\link{get.nearest}} which finds the distance to the single nearest point 
 #'   within a specified search radius instead of all topoints, and 
 #'   \code{\link{proxistat}} which calculates a proximity score for each spatial unit
 #'   based on distances to nearby points.

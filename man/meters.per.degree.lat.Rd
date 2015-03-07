@@ -19,10 +19,10 @@ Returns meters traveled N-S, as a number or vector of numbers the same length as
 This function returns the meters traveled North-South per decimal degree latitude, at a given latitude (Northern Hemisphere).
 This is an approximation and is less accurate further from the given latitude.
 Based on
-http://en.wikipedia.org/wiki/Latitude#Length_of_a_degree_of_latitude
-http://en.wikipedia.org/wiki/Longitude#Length_of_a_degree_of_longitude
+\url{http://en.wikipedia.org/wiki/Latitude#Length_of_a_degree_of_latitude}
+\url{http://en.wikipedia.org/wiki/Longitude#Length_of_a_degree_of_longitude}
 Input theta is latitude on WGS84.
-Also see http://en.wikipedia.org/wiki/Longitude and http://en.wikipedia.org/wiki/Decimal_degrees
+Also see \url{http://en.wikipedia.org/wiki/Longitude} and \url{http://en.wikipedia.org/wiki/Decimal_degrees}
 }
 \examples{
 meters.per.degree.lat(32)

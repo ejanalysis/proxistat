@@ -55,7 +55,8 @@ The distance is capped to be no less than 0.9 * radius of a circle of area equal
 This approximation treats unit as if it were a circle and assumes pop is evenly distributed within that circle's area, since
   0.9r = 0.9 * sqrt(area/pi()) = approx solution to dist from avg point (resident) in circle
 to a random point in the circle (facility or point of interest).
-Relies on the sp package for the spDists() and SpatialPoints() functions.
+Relies on the \pkg{sp} package for the \code{\link{sp}{spDists}} and \code{\link{sp}{SpatialPoints}} functions.
+\cr\cr
 IMPORTANT:
 Each spatial unit with a FIPS.score is assigned a proximity score that is the population weighted arithmetic
 average of scores assigned to the subunits with FIPS.pop, each of which must have pop or use the default of 1 (unweighted).

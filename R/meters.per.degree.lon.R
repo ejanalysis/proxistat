@@ -7,8 +7,8 @@
 #' This function returns the meters traveled East-West per decimal degree longitude, at a given latitude (Northern Hemisphere).
 #' This is an approximation and is less accurate further from the given latitude.
 #' Based on 
-#' http://en.wikipedia.org/wiki/Latitude#Length_of_a_degree_of_latitude
-#' http://en.wikipedia.org/wiki/Longitude#Length_of_a_degree_of_longitude
+#' \url{http://en.wikipedia.org/wiki/Latitude#Length_of_a_degree_of_latitude}
+#' \url{http://en.wikipedia.org/wiki/Longitude#Length_of_a_degree_of_longitude}
 #' Input theta is latitude on WGS84.
 #' Function is as follows:
 #'   theta.r <- 0.01745329 * theta
@@ -23,7 +23,7 @@
 #' ecc2 <- (equatorial.radius^2 - b^2)/equatorial.radius^2 
 #' ecc2 <- (6378137.0^2 - 6356752.3142^2) / 6378137.0^2
 #' pi * equatorial.radius = 20037508
-#' Also see http://en.wikipedia.org/wiki/Longitude and http://en.wikipedia.org/wiki/Decimal_degrees
+#' Also see \url{http://en.wikipedia.org/wiki/Longitude} and \url{http://en.wikipedia.org/wiki/Decimal_degrees}
 #' @param theta The decimal degrees of latitude of the Northern Hemisphere location(s) of interest, as number or vector of numbers.
 #' @return Returns meters traveled East-West per decimal degree longitude, as a number or vector of numbers the same length as the input.
 #' @seealso \code{\link{meters.per.degree.lat}} for a similar function but for travel North-South,

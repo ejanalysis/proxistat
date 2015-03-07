@@ -7,7 +7,7 @@
 #' This function returns a matrix or vector of distances, 
 #' from each of the first set of points to each of the second set of points, 
 #' where points are specified using latitude and longitude.
-#' Relies on the sp package for the spDists() and SpatialPoints() functions.
+#' Relies on the \pkg{sp} package for the \code{\link{sp}{spDists}} and \code{\link{sp}{SpatialPoints}} functions.
 #'
 #' @param frompoints A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed.
 #' @param topoints A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed.
@@ -21,10 +21,10 @@
 #'   showing fromlat, fromlon, tolat, tolon.
 #' @return By default, returns a matrix that has 3 columns: fromrow, torow, distance 
 #'   (where fromrow or torow is the row number of the corresponding input, starting at 1).
-#' @seealso \code{\link{get.distances}} for get.distances() which allows you to specify a search radius and 
+#' @seealso \code{\link{get.distances}} which allows you to specify a search radius and 
 #'   get distances only within that radius which can be faster,
 #'   \code{\link{get.distances.prepaired}} for finding distances when data are already formatted as pairs of points,
-#'   \code{\link{get.nearest}} for get.nearest() which finds the distance to the single nearest point 
+#'   \code{\link{get.nearest}} which finds the distance to the single nearest point 
 #'   within a specified search radius instead of all topoints, and 
 #'   \code{\link{proxistat}} which calculates a proximity score for each spatial unit
 #'   based on distances to nearby points.

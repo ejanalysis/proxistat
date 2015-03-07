@@ -23,7 +23,8 @@
 #' This approximation treats unit as if it were a circle and assumes pop is evenly distributed within that circle's area, since 
 #'   0.9r = 0.9 * sqrt(area/pi()) = approx solution to dist from avg point (resident) in circle 
 #' to a random point in the circle (facility or point of interest).
-#' Relies on the sp package for the spDists() and SpatialPoints() functions.
+#' Relies on the \pkg{sp} package for the \code{\link{sp}{spDists}} and \code{\link{sp}{SpatialPoints}} functions.
+#' \cr\cr
 #' IMPORTANT:
 #' Each spatial unit with a FIPS.score is assigned a proximity score that is the population weighted arithmetic 
 #' average of scores assigned to the subunits with FIPS.pop, each of which must have pop or use the default of 1 (unweighted).
@@ -232,23 +233,23 @@ while (length(zero.near) > 0) {
 #   but AK/HI are further.
 
 #######################################################################################
-# examples of distance functions - but see get.distance() etc. now
+# old examples of distance functions - but see get.distance() etc. now
 #######################################################################################
-
-get.distance <- function(lat1, lon1, lat2, lon2) { 
-  sqrt( (lat2-lat1)^2 + (lon2-lon1)^2) 
-  # this could return a single number or vectorized should return a vector, but 
-  # all 4 inputs have to be same length 
-  # or if one is a single point it will be recycled.
-  # *** Replace this with the more accurate formula for spheroid
-} 
-
-get.distance.matrix <- function(frompoints, topoints) {
-  apply(frompoints, 1, FUN=function(x) get.distance(x$lat, x$lon, topoints$lat, topoints$lon) )
-  # This can return a matrix of all pairs, where it returns one row for each combo of frompoints & topoints.
-  # It loops over the rows in frompoints[,c('lat', 'lon')] and for each finds the distances to all the points in topoints[,c('lat','lon')]
-  # frompoints$lat1 & frompoints$lon1 can be different length than topoints$lat2, topoints$lon2
-}
+# 
+# get.distance <- function(lat1, lon1, lat2, lon2) { 
+#   sqrt( (lat2-lat1)^2 + (lon2-lon1)^2) 
+#   # this could return a single number or vectorized should return a vector, but 
+#   # all 4 inputs have to be same length 
+#   # or if one is a single point it will be recycled.
+#   # *** Replace this with the more accurate formula for spheroid
+# } 
+# 
+# get.distance.matrix <- function(frompoints, topoints) {
+#   apply(frompoints, 1, FUN=function(x) get.distance(x$lat, x$lon, topoints$lat, topoints$lon) )
+#   # This can return a matrix of all pairs, where it returns one row for each combo of frompoints & topoints.
+#   # It loops over the rows in frompoints[,c('lat', 'lon')] and for each finds the distances to all the points in topoints[,c('lat','lon')]
+#   # frompoints$lat1 & frompoints$lon1 can be different length than topoints$lat2, topoints$lon2
+# }
 
 
 ################# ################# ################# ################# ################# ################# ################# 

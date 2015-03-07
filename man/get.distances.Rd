@@ -48,8 +48,8 @@ which are the distances from one set of points to the nearby members of another 
 It searches within a circle (of radius max.miles or max.km, defining what is considered nearby),
 to calculate distance (in miles or km) from each of frompoints to each of topoints that is within the specified radius.
 Points are specified using latitude and longitude in decimal degrees.
-Relies on the sp package for the spDists() and SpatialPoints() functions.
-Uses get.distances.all() but for performance it only uses it for distance pairs (pairs of points) that have been initially
+Relies on the \pkg{sp} package for the \code{\link{sp}{spDists}} and \code{\link{sp}{SpatialPoints}} functions.
+Uses \code{\link{get.distances.all}} but for performance it only uses it for distance pairs (pairs of points) that have been initially
 quickly filtered using lat/lon to be not much more than max.km or max.miles, in an attempt to go
 much faster than finding every distance pair and then dropping all outside the search radius.
 Finding distance to all of the 11 million census blocks in usa within 5 km, for 100 points, can take a while... maybe >1 minute?
@@ -126,9 +126,9 @@ get.distances(test.from[1:2,],test.to[1:3, ], max.km=0.7, return.crosstab=TRUE)
   # Ignoring return.crosstab because max.miles was specified
 }
 \seealso{
-\code{\link{get.distances.all}} for get.distances.all() which allows you to get distances between all points,
+\code{\link{get.distances.all}} which allows you to get distances between all points,
   \code{\link{get.distances.prepaired}} for finding distances when data are already formatted as pairs of points,
-  \code{\link{get.nearest}} for get.nearest() which finds the distance to the single nearest point
+  \code{\link{get.nearest}} which finds the distance to the single nearest point
   within a specified search radius instead of all topoints, and
   \code{\link{proxistat}} which calculates a proximity score for each spatial unit based on distances to nearby points.
 }
