@@ -66,17 +66,14 @@
 #' 
 proxistat <- function(censuspoints, topoints, FIPS.pop, FIPS.score, area=1, pop=1, radius=5, units='miles', decay='1/d') {
 
-
   stop('THIS IS NOT WORKING YET -- WORK IN PROGRESS')
-  
-  
-	# Value returned also could include county of points nearby (within radius).??
+
+	# Value returned also could include count of points nearby (within radius).??
 	#
 	# pop can be used later to roll up results of small units (e.g. blocks) to larger (e.g. block group or tract) 
 	# using population weighted mean of scores in larger unit.
   # but need to have 2 more parameters: FIPS.pop and FIPS.score
 
-  
   frompoints <- censuspoints; rm(censuspoints)
 
   # Error checking
@@ -97,8 +94,9 @@ proxistat <- function(censuspoints, topoints, FIPS.pop, FIPS.score, area=1, pop=
 	#n2 <- length(topoints[,1])
 
 	# INSERT CODE HERE
-	#  USE get.distances() etc. related functions I have defined 
-
+	#  USE get.distances() etc. related functions I have defined.
+	
+  # topoints, FIPS.pop, FIPS.score, area=1, pop=1, radius=5, units='miles', decay='1/d'
 
 
 

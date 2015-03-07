@@ -7,7 +7,7 @@
 #' This function returns a vector of distances, 
 #' which are the distances from one set of points to the nearest single member (if any) of another set of points.
 #' Points are specified using latitude and longitude in decimal degrees.
-#' Relies on the sp package for the spDists() and SpatialPoints() functions.
+#' Relies on the sp package for the \code{\link{spDists}} and \code{\link{SpatialPoints}} functions.
 #' A future version may use get.distances.all() but for performance only use it for distance pairs (pairs of points) that have been initially 
 #' quickly filtered using lat/lon to be not too far, in an attempt to go much faster in an initial pass.
 #'
