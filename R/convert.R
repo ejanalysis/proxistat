@@ -27,7 +27,7 @@
 #' @param towhat A strings specifying new units to convert to. Default is 'mi' which is miles.
 #' @return Returns a number or vector of numbers then length of the input x, 
 #'   with each element corresponding to an input element converted to new units.
-#' @seealso \code{\link{get.distances}} for get.distances() which allows you to specify a search radius and 
+#' @seealso \code{\link{get.distances}} which allows you to specify a search radius and 
 #'   get distances only within that radius, and related functions.
 #' @concept proximity
 #' @examples
@@ -36,40 +36,26 @@
 #' @export
 convert <- function(x, from='km', towhat='mi') {
 
-  warning('these draft conversion factors have some errors as of 1/2015 - need to be corrected!!')
-
-  mult <- structure(list(from = c("mm", "cm", "m", "km", "sqmm", "sqcm", 
-  "sqm", "sqkm", "in", "ft", "yd", "mi", "sqin", "sqft", "sqyd", 
-  "sqmi"), mm = c(1L, 10L, 1000L, 1000000L, NA, NA, NA, NA, 25L, 
-  300L, 900L, 1609300L, NA, NA, NA, NA), cm = c(0.1, 1, 100, 1e+05, 
-  NA, NA, NA, NA, 2.5, 30, 90, 160930, NA, NA, NA, NA), m = c(0.001, 
-  0.01, 1, 1000, NA, NA, NA, NA, 0.025, 0.3, 0.9, 1609.3, NA, NA, 
-  NA, NA), km = c(1e-06, 1e-05, 0.001, 1, NA, NA, NA, NA, 2.5e-05, 
-  3e-04, 9e-04, 1.6093, NA, NA, NA, NA), 
-  sqmm = c(NA, NA, NA, NA, 
-  1, 100, 1e+06, 1e+12, NA, NA, NA, NA, 625, 90000, 810000, 2.50906e+12), 
-  sqcm = c(NA, NA, NA, NA, 0.01, 1, 10000, 1e+10, NA, NA, NA, 
-  NA, 6.25, 900, 8100, 25090560000), sqm = c(NA, NA, NA, NA, 1e-06, 
-  1e-04, 1, 1e+06, NA, NA, NA, NA, 0.000625, 0.09, 0.81, 2509056
-  ), sqkm = c(NA, NA, NA, NA, 1e-12, 1e-10, 1e-06, 1, NA, NA, NA, 
-  NA, 6.25e-10, 9e-08, 8.1e-07, 2.509056), `in` = c(0.04, 0.4, 
-  40, 40000, NA, NA, NA, NA, 1, 12, 36, 63360, NA, NA, NA, NA), 
-  ft = c(0.003333333, 0.033333333, 3.333333333, 3333.333333, 
-  NA, NA, NA, NA, 0.083333333, 1, 3, 5280, NA, NA, NA, NA), 
-  yd = c(0.001111111, 0.011111111, 1.111111111, 1111.111111, 
-  NA, NA, NA, NA, 0.027777778, 0.333333333, 1, 1760, NA, NA, 
-  NA, NA), mi = c(6.213882e-07, 6.213882e-06, 0.0006213882, 
-  0.6213882, NA, NA, NA, NA, 1.57828e-05, 0.000189394, 0.000568182, 
-  1, NA, NA, NA, NA), sqin = c(NA, NA, NA, NA, 0.0016, 0.16, 
-  1600, 1.6e+09, NA, NA, NA, NA, 1, NA, NA, NA), sqft = c(NA, 
-  NA, NA, NA, 1.11111e-05, 0.001111111, 11.11111111, 11111111.11, 
-  NA, NA, NA, NA, NA, 1, NA, NA), sqyd = c(NA, NA, NA, NA, 
-  1.23457e-06, 0.000123457, 1.234567901, 1234567.901, NA, NA, 
-  NA, NA, NA, NA, 1, NA), sqmi = c(NA, NA, NA, NA, 3.98556e-13, 
-  3.98556e-11, 3.98556e-07, 0.39855627, NA, NA, NA, NA, NA, 
-  NA, NA, 1)), .Names = c("from", "mm", "cm", "m", "km", "sqmm", 
-  "sqcm", "sqm", "sqkm", "in", "ft", "yd", "mi", "sqin", "sqft", 
-  "sqyd", "sqmi"), class = "data.frame", row.names = c(NA, -16L))
+  mult <- structure(list(
+    from = c("mm", "cm", "m", "km", "sqmm", "sqcm", "sqm", "sqkm", "in", "ft", "yd", "mi", "sqin", "sqft", "sqyd", "sqmi"), 
+    mm = c(1, 10, 1000, 1e+06, NA, NA, NA, NA, 25.4, 304.8, 914.4, 1609344, NA, NA, NA, NA), 
+    cm = c(0.1, 1, 100, 1e+05, NA, NA, NA, NA, 2.54, 30.48, 91.44, 160934.4, NA, NA, NA, NA), 
+    m = c(0.001, 0.01, 1, 1000, NA, NA, NA, NA, 0.0254, 0.3048, 0.9144, 1609.344, NA, NA, NA, NA), 
+    km = c(1e-06, 1e-05, 0.001, 1, NA, NA, NA, NA, 2.54e-05, 0.0003048, 0.0009144, 1.609344, NA, NA, NA, NA), 
+    sqmm = c(NA, NA, NA, NA, 1, 100, 1e+06, 1e+12, NA, NA, NA, NA, 645.16, 92903.04, 836127.36, 2.589988e+12), 
+    sqcm = c(NA, NA, NA, NA, 0.01, 1, 10000, 1e+10, NA, NA, NA, NA, 6.4516, 929.0304, 8361.2736, 25899881103), 
+    sqm = c(NA, NA, NA, NA, 1e-06, 1e-04, 1, 1e+06, NA, NA, NA, NA, 0.00064516, 0.09290304, 0.83612736, 2589988.11034), 
+    sqkm = c(NA, NA, NA, NA, 1e-12, 1e-10, 1e-06, 1, NA, NA, NA, NA, 6.4516e-10, 9.290304e-08, 8.3612736e-07, 2.5899881034), 
+    `in` = c(0.0393700787402, 0.393700787402, 39.3700787402, 39370.0787402, NA, NA, NA, NA, 1, 12, 36, 63360, NA, NA, NA, NA), 
+    ft = c(0.00328083989501, 0.0328083989501, 3.28083989501, 3280.83989501, NA, NA, NA, NA, 0.083333333, 1, 3, 5280, NA, NA, NA, NA), 
+    yd = c(0.00109361329834, 0.0109361329834, 1.09361329834, 1093.61329834, NA, NA, NA, NA, 0.027777778, 0.333333333, 1, 1760, NA, NA, NA, NA), mi = c(6.21371192237, 6.21371192237e-06, 0.000621371192237, 0.6213711192237, NA, NA, NA, NA, 1.57828e-05, 0.000189394, 0.000568182, 1, NA, NA, NA, NA), 
+    sqin = c(NA, NA, NA, NA, 0.0015500031, 0.15500031, 1550.0031, 1550003100, NA, NA, NA, NA, 1, NA, NA, NA), 
+    sqft = c(NA, NA, NA, NA, 1.07639104167e-05, 0.00107639104167, 10.7639104167, 10763910.4167, NA, NA, NA, NA, NA, 1, NA, NA), 
+    sqyd = c(NA, NA, NA, NA, 1.23457e-60, 0.00011959852573, 1.1959852573, 1195985.2573, NA, NA, NA, NA, NA, NA, 1, NA), 
+    sqmi = c(NA, NA, NA, NA, 3.86102158542e-13, 3.861021585e-11, 3.86102158542e-07, 0.386102158542, NA, NA, NA, NA, NA, NA, NA, 1)), 
+    .Names = c("from", "mm", "cm", "m", "km", "sqmm", "sqcm", "sqm", "sqkm", "in", "ft", "yd", "mi", "sqin", "sqft", "sqyd", "sqmi"), 
+    row.names = c(NA, 16L), class = "data.frame"
+  )
 
   # synonyms
   
