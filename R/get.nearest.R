@@ -7,19 +7,21 @@
 #' This function returns a vector of distances, 
 #' which are the distances from one set of points to the nearest single member (if any) of another set of points.
 #' Points are specified using latitude and longitude in decimal degrees.
-#' Relies on the \pkg{sp} package for the \code{\link{sp}{spDists}} and \code{\link{sp}{SpatialPoints}} functions.
+#' Relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
 #' A future version may use get.distances.all() but for performance only use it for distance pairs (pairs of points) that have been initially 
 #' quickly filtered using lat/lon to be not too far, in an attempt to go much faster in an initial pass.
 #'
 #' @param frompoints A matrix or data.frame with two cols, 'lat' and 'lon' (or only 2 cols that are lat and lon in that order) with datum=WGS84 assumed.
 #' @param topoints A matrix or data.frame with two cols, 'lat' and 'lon' (or only 2 cols that are lat and lon in that order) with datum=WGS84 assumed.
+#' @param ignore0 A logical, default is FALSE, specifying whether to ignore distances that are zero and report only the minimum nonzero distance. 
+#'   Useful if nearest point other than self, where frompoints=topoints, for example.
 #' @param return.rownums Logical value, TRUE by default. If TRUE, value returned also includes these 2 columns:
 #'   a col named fromrow of index numbers starting at 1 specifying the frompoint and a similar col named n specifying the row of the nearest topoint.
 #' @param return.latlons Logical value, FALSE by default. If TRUE, value returned also includes four extra columns,
 #'   showing fromlat, fromlon, tolat, tolon.
-#' @param return.units A string that is 'miles' by default, or 'km' for kilometers, specifying units for distances returned.
-#' @return By default, returns a matrix of numbers, with columns fromrow, n indexing which is nearest of topoints, and d (distance).
-#'   Distance returned is in miles by default, but with option to set return.units='km' to get kilometers.
+#' @param units A string that is 'miles' by default, or 'km' for kilometers, specifying units for distances returned.
+#' @return By default, returns a matrix of numbers, with columns fromrow, torow indexing which is nearest of topoints, and d (distance).
+#'   Distance returned is in miles by default, but with option to set units='km' to get kilometers.
 #'   See parameters for details on other formats that may be returned if specified.
 #' @seealso \code{\link{get.distances}} which gets distances between all points (within an optional search radius),
 #'   \code{\link{get.distances.all}} which allows you to get distances between all points,
@@ -28,15 +30,15 @@
 #' @concept proximity
 #' @import sp
 #' @examples
-#' test.from <- structure(list(fromlat = c(38.9567309094, 38.9507043428), 
-#'  fromlon = c(-77.0896572305, -77.0896199948)), .Names = c("lat", "lon"), 
-#'  row.names = c("6054762", "6054764"), class = "data.frame")
-#' test.to <- structure(list(tolat = c(38.9575019287, 38.9507043428, 38.9514152435), 
-#'  tolon = c(-77.0892818598, -77.0896199948, -77.0972395245)), .Names = c("lat", "lon"),
-#'  class = "data.frame", row.names = c("6054762", "6054763", "6054764"))
+# test.from <- structure(list(fromlat = c(38.9567309094, 38.9507043428), 
+#  fromlon = c(-77.0896572305, -77.0896199948)), .Names = c("lat", "lon"), 
+#  row.names = c("6054762", "6054764"), class = "data.frame")
+# test.to <- structure(list(tolat = c(38.9575019287, 38.9507043428, 38.9514152435), 
+#  tolon = c(-77.0892818598, -77.0896199948, -77.0972395245)), .Names = c("lat", "lon"),
+#  class = "data.frame", row.names = c("6054762", "6054763", "6054764"))
 #' get.nearest(test.from, test.to)
 #' @export
-get.nearest <- function(frompoints, topoints, return.units='miles', return.rownums=TRUE, return.latlons=FALSE) {
+get.nearest <- function(frompoints, topoints, units='miles', ignore0=FALSE, return.rownums=TRUE, return.latlons=FALSE, radius=Inf) {
 
   # ***** Notes on performance/ speed: ******
   # It should be easy to speed this up (for very large numbers of topoints) by using a box to search within (as get.distances does) and only enlarge the search box if no topoints are found in it.
@@ -54,7 +56,8 @@ get.nearest <- function(frompoints, topoints, return.units='miles', return.rownu
   # This formula (using SpatialPoints() & spDists() ) is the best method I've tried so far.
   # [DIRECTLY USING MY OWN DISTANCE FORMULA WITH sin cos etc. was even faster, but results appeared to be wrong - not sure if units or formula were the problem.]
 
-  if (!(return.units %in% c('miles', 'km'))) {stop('return.units must be unspecified (i.e., miles) or miles or km')}
+  if (!(units %in% c('miles', 'km'))) {stop('units must be unspecified (i.e., miles) or miles or km')}
+  if (units=='miles' & !missing(radius) ) {radius <- convert( radius, 'miles', 'km') }
   
   # Here, May need to fix cases where only a single row is in frompoints or topoints ( get.distances() handles that well.)
     
@@ -86,7 +89,11 @@ get.nearest <- function(frompoints, topoints, return.units='miles', return.rownu
   
   for (i in 1:n.from) {
     distances <- sp::spDists(frompoints[i], topoints, longlat=TRUE)
-    distances[i] <- Inf
+    #distances[i] <- Inf # was trying to remove distance to self but only relevant if frompoints=topoints
+    if (ignore0) {
+      distances[distances==0] <- Inf
+    }
+    distances <- distances[distances <= radius]
     nearest[i, 1] <- which.min(distances)
     nearest[i, 2] <- distances[ nearest[i, 1] ]
     if (return.latlons) {
@@ -97,17 +104,17 @@ get.nearest <- function(frompoints, topoints, return.units='miles', return.rownu
   }
 
   if (return.latlons) {
-    colnames(nearest) <- c('n', 'd', 'fromlat', 'fromlon', 'tolat', 'tolon')
+    colnames(nearest) <- c('torow', 'd', 'fromlat', 'fromlon', 'tolat', 'tolon')
   } else {
-    colnames(nearest) <- c('n', 'd')
+    colnames(nearest) <- c('torow', 'd')
   }
-  if (return.units=='miles') {
+  if (units=='miles') {
     nearest[ , 'd'] <- convert( nearest[ , 'd'], 'km', 'miles')
   }
   if (return.rownums) {
     nearest <- cbind(fromrow=1:n.from, nearest)
   } else {
-    nearest[ , 'n'] <- NULL #drop the undesired column
+    nearest[ , 'torow'] <- NULL #drop the undesired column
     # probably need to make it a vector if it doesn't have latlons cols, here.
   }
   # nearest <- as.data.frame(nearest) # prior version
