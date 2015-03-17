@@ -6,85 +6,88 @@
 #' Calculate proximity statistic for each location,
 quantifying number of and proximities of nearby points.}
 \usage{
-proxistat(censuspoints, topoints, FIPS.pop, FIPS.score, area = 1, pop = 1,
-  radius = 5, units = "miles", decay = "1/d")
+proxistat(frompoints, topoints, area = 0, radius = 5, units = "miles",
+  decay = "1/d", FIPS, pop)
 }
 \arguments{
-\item{censuspoints}{A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed. Decimal degrees. Required.}
+\item{frompoints}{Locations of internal points of Census subunits. A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed. Decimal degrees. Required.}
 
-\item{topoints}{A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed. Decimal degrees. Required.}
+\item{topoints}{Locations of nearby points of interest, proximity to which is the basis of each Census unit's score. A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed. Decimal degrees. Required.}
 
-\item{FIPS.pop}{A vector of strings, where each is the Census FIPS code or ID for the smaller spatial units that have censuspoints, area, & pop information.}
+\item{area}{A number or vector of numbers giving size of each spatial unit with FIPS.pop, in square miles by default (or square kilometers if units is 'km'). Optional. Default is 0, in which case no adjustment is made for small or even zero distance, which can cause unrealistically large or even infinite/undefined scores. For zero distance if area=0, Inf will be returned for the score.}
 
-\item{FIPS.score}{A vector of strings designating places that will be assigned scores where each is the Census FIPS code or ID for the larger spatial units that will be given proximity scores.}
-
-\item{area}{A number or vector of numbers giving size of each spatial unit with FIPS.pop, in square miles by default (or square kilometers if units is 'km'). Default is 1.}
-
-\item{pop}{A number or vector of numbers giving population count of each spatial unit. Default is 1.}
-
-\item{radius}{A number giving distance defining nearby, in miles by default (or kilometers if units is 'km'). Default is 5.}
+\item{radius}{A number giving distance defining nearby, i.e. the search radius, in miles by default (or kilometers if units is 'km'). Default is 5.}
 
 \item{units}{A string that is 'miles' by default, or 'km' for kilometers, specifying units for distances returned and for radius input.}
 
 \item{decay}{A string specifying type of function to use when weighting by distance. Default is '1/d'
 For '1/d' decay weighting (default), score is count of points within radius, divided by harmonic mean of distances (when count>0).
 Decay weighting also can be '1/d^2' or '1/1' to represent decay by inverse of squared distance, or no decay (equal weighting for all points).}
+
+\item{FIPS}{NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE. A vector of strings designating places that will be assigned scores where each is the Census FIPS code or other ID. Optional.}
+
+\item{pop}{NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE. A number or vector of numbers giving population count of each spatial unit. Default is 1, which would give the unweighted average.}
 }
 \value{
-By default, returns a vector of numbers, the proximity scores, one for each of the censuspoints. Based on miles by default, or km depending on units.
+By default, returns a vector of numbers, the proximity scores, one for each of the frompoints. Based on miles by default, or km depending on units. Returns +Inf for a unit if that area's area and distance are both zero.
 }
 \description{
-\code{proxistat} returns a proximity statistic (score) for each location (e.g., Census block group), quantifying the number of and proximities of nearby points.
+\code{proxistat} returns a proximity statistic (score) for each location (e.g., Census block), quantifying the number of and proximities of nearby points.
 }
 \details{
-This function returns a vector of proximity scores, one for each location such as a Census block group.
+This function returns a vector of proximity scores, one for each location such as a Census block.
 For example, the proximity score may be used to represent how many hazardous waste sites are near any given neighborhood and how close they are.
 A proximity score quantifies the proximity and count of nearby points using a specified formula.
+\cr
 Proximity Score = distance-weighted count of points nearby (within search radius)
+\cr
 (or weighted distance to nearest single point if there are none within the radius).
+\cr
 This is the sum of 1/d or 1/d^2 or 1/1, depending on the decay weighting,
-where d is the distance from census unit's internal point to user-defined point,
-The default proximity score is the count of nearby points divided by the harmonic mean of their distances
+where d is the distance from census unit's internal point to user-defined point.
+The default proximity score, using 1/d, is the count of nearby points divided by the harmonic mean of their distances
 (but adjusted when distance is very small, and using the nearest single one if none are nearby). This is the same as the sum of inverse distances.
 Nearby is defined as a user-specified parameter, so only points within the specified distance are counted, except if none are nearby,
 the single nearest point (at any distance) is used.
-The adjustment for small distances ensure that each distance represents roughly the distance to the average resident within a spatial unit like a tract,
+\cr\cr
+The adjustment for small distances ensure that each distance represents roughly the distance to the average resident within a spatial unit like a block,
 rather than just the distance to the center or internal point. The adjustment uses the area of the spatial unit and assumes residents are evenly spread across the unit.
 Distance is adjusted in each place if area of each spatial unit is specified, to ensure it represents roughly distance to average resident in the unit:
 The distance is capped to be no less than 0.9 * radius of a circle of area equal to census unit's area.
 This approximation treats unit as if it were a circle and assumes pop is evenly distributed within that circle's area, since
+\cr
   0.9r = 0.9 * sqrt(area/pi()) = approx solution to dist from avg point (resident) in circle
 to a random point in the circle (facility or point of interest).
+\cr\cr
 Relies on the \pkg{sp} package for the \code{\link{sp}{spDists}} and \code{\link{sp}{SpatialPoints}} functions.
 \cr\cr
 IMPORTANT:
-Each spatial unit with a FIPS.score is assigned a proximity score that is the population weighted arithmetic
-average of scores assigned to the subunits with FIPS.pop, each of which must have pop or use the default of 1 (unweighted).
-To create scores for all block groups, with populations and points known for all blocks within each block group,
-FIPS.pop is for blocks and FIPS.score is for block groups.
-However, it is important that the function be able to know which blocks are in which block groups.
-This may for now assume bg and block FIPS conventions, but more flexibly
-later could have an input param that is the length of pop and area and censuspoints, with 2 cols, FIPS.pop and FIPS.score.
-FIPS.score would have a lot of redundancy and perhaps could be input as a factor in a 2 col data.frame.
-}
-\note{
-**** TO BE DONE:
-proxistat(censuspoints=test.from, topoints=test.to,
- FIPS.score=c('012','013'),
- FIPS.pop=c('01245','01346','01347'),
- area=rep(0.2, length(testfrom[,1])), pop=rep(1000, length(testfrom[,1])))
+\cr
+To create a proximity score for a block group, one can find the score for each block in the block group
+and then find the population-weighted average of those block scores, for a single block group.
+\cr
+FIPS for blocks can be used to find FIPS for block groups. FIPS for block groups can be used to find FIPS for tracts.
 }
 \examples{
-test.from <- structure(list(fromlat = c(38.9567309094, 38.9507043428),
-  fromlon = c(-77.0896572305, -77.0896199948)), .Names = c("lat", "lon"),
-  row.names = c("6054762", "6054764"), class = "data.frame")
-test.to <- structure(list(tolat = c(38.9575019287, 38.9507043428, 38.9514152435),
-  tolon = c(-77.0892818598, -77.0896199948, -77.0972395245)), .Names = c("lat", "lon"),
-  class = "data.frame", row.names = c("6054762", "6054763", "6054764"))
+n=1000
+test1000 <- structure(list(fromlat = runif(n, min=25,max=48),
+  fromlon = runif(n,min=-125,max=-70) ),
+  .Names = c("lat", "lon"), row.names = 1:n, class = "data.frame")
+
+subunitscores = proxistat(frompoints=test.from, topoints=test.to,
+ area=rep(0.2, length(testfrom[,1])), radius=1, units='km')
+ print(subunitscores)
+
+subunitpop = rep(1000, length(test.from$lat))
+subunits = data.frame(FIPS=substr(rownames(test.from), 1, 5), pop=subunitpop, stringsAsFactors=FALSE )
+unitscores = aggregate(subunits,
+  by=list(subunits$FIPS), FUN=function(x) {wtd.mean(x$score, wts=x$pop, na.rm=TRUE)}
+)
+print(unitscores)
 }
 \seealso{
 \code{\link{get.distances}} and \code{\link{get.distances.all}} for distances between points, and
-  \code{\link{get.nearest}} for get.nearest() which finds the distance to the single nearest point
+  \code{\link{get.nearest}} which finds the distance to the single nearest point
   within a specified search radius instead of all topoints.
 }
 \concept{
