@@ -44,7 +44,7 @@ convert(1, 'mi', 'km')
 convert(c(1e6, 1), 'sqm', 'sqkm')
 }
 \seealso{
-\code{\link{get.distances}} for get.distances() which allows you to specify a search radius and
+\code{\link{get.distances}} which allows you to specify a search radius and
   get distances only within that radius, and related functions.
 }
 \concept{

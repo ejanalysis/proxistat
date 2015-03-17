@@ -3,7 +3,7 @@
 \docType{package}
 \name{proxistat-package}
 \alias{proxistat-package}
-\title{Find distances between lat lon points or create proximity scores.}
+\title{Find Distances between lat lon Points or Create Proximity Scores.}
 \description{
 This package has functions helping to calculate distances between points,
 such as the distances between all points,

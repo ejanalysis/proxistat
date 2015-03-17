@@ -19,14 +19,14 @@ Returns decimal degrees longitude per km traveled E-W, as a number or vector of 
 This function returns the change in decimal degrees longitude per kilometer moving East-West, at a given latitude (N. Hemisphere).
 This is an approximation and is less accurate further from the given latitude.
 The degrees of longitude per km traveled East-West is larger closer to the poles, and smallest at the equator.
-See http://en.wikipedia.org/wiki/Longitude and http://en.wikipedia.org/wiki/Decimal_degrees
-Not using meters.per.degree.lon() the results would be roughly ( 1 / ((pi/180) * 6378.137 * cos(lat * 0.01745329)) )
-where 0.01745329 is pi/180 to convert to radians. see http://en.wikipedia.org/wiki/Decimal_degrees
+See \url{http://en.wikipedia.org/wiki/Longitude} and \url{http://en.wikipedia.org/wiki/Decimal_degrees}
+Not using \code{meters.per.degree.lon} the results would be roughly ( 1 / ((pi/180) * 6378.137 * cos(lat * 0.01745329)) )
+where 0.01745329 is pi/180 to convert to radians. see \url{http://en.wikipedia.org/wiki/Decimal_degrees}
 The equator is divided into 360 degrees of longitude, so
 each degree at the equator represents 111,319.9 metres or approximately 111.32 km.
 As one gets further from the equator, one degree of longitude
 must be multiplied by the cosine of the latitude, decreasing distance per degree lon, approaching zero at the pole.
-For most northern point of USA http://en.wikipedia.org/wiki/Extreme_points_of_the_United_States, where
+For most northern point of USA \code{http://en.wikipedia.org/wiki/Extreme_points_of_the_United_States}, where
 one finds maximum degrees lon per mile, latitude is just under 72, and cos of 72 degrees= cos(72 * pi/180) = 0.309 ,
 so miles/degrees is about 111.32 km * 0.309 = 34.4 km = 21.4 miles roughly.
 }
@@ -38,7 +38,7 @@ deltalon.per.km(c(0,45,72))
 }
 \seealso{
 \code{\link{meters.per.degree.lon}} for the inverse of this function (other than a factor of 1000),
-  and \code{\link{get.distances}} for get.distances() which allows you to specify a search radius and
+  and \code{\link{get.distances}} which allows you to specify a search radius and
   get distances only within that radius, and related functions.
 }
 \concept{

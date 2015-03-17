@@ -20,7 +20,7 @@ May need to fix cases where only a single row is input.
 This function returns a matrix or vector of distances,
 between points specified as pairs of lat/lon values.
 Points are specified using latitude and longitude in decimal degrees.
-Relies on the \pkg{sp} package for the \code{\link{sp}{spDists}} and \code{\link{sp}{SpatialPoints}} functions.
+Relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
 }
 \examples{
 test.from <- structure(list(fromlat = c(38.9567309094, 38.9507043428, 38.0),

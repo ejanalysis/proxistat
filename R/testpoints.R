@@ -33,7 +33,6 @@ testpoints <- function(n, minlat=40,maxlat=42, minlon=-125,maxlon=-70) {
   if ( minlat < -90 || maxlat < -90 || minlat > 90 || maxlat > 90 )     {stop('minlat and maxlat must be from -90 through 90 decimal degrees')}
   if ( minlon < -180 || maxlon < -180 || minlon > 180 || maxlon > 180 ) {stop('minlon and maxlon must be from -180 through 180 decimal degrees')}
   
-  
   structure( c(runif(n, min=minlat, max=maxlat), runif(n, min=minlon, max=maxlon) ),
     .Dim = c(n, 2L), .Dimnames = list( NULL, c("lat", "lon")))
 }
