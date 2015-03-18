@@ -81,41 +81,66 @@ get.nearest <- function(frompoints, topoints, units='miles', ignore0=FALSE, retu
   
   n.from <- length(frompoints[,1])
   n.to <- length(topoints[,1])
-  nearest <- matrix(nrow=n.from, ncol=2)
-  if (return.latlons) {nearest <- matrix(nrow=n.from, ncol=6)} # need fromlat, fromlon, tolat, tolon
+  
+  if (!return.latlons) {nearest <- matrix(nrow=n.from, ncol=2) } # will have 1 or 3, but 2 for now
+  if (return.latlons)  {nearest <- matrix(nrow=n.from, ncol=6)} # will have 5 or 7, but 6 for now. 
   
   frompoints <- sp::SpatialPoints(coords = data.frame(x = frompoints[,'lon'], y = frompoints[,'lat']), proj4string=sp::CRS("+proj=longlat +datum=WGS84"))
   topoints   <- sp::SpatialPoints(coords = data.frame(x = topoints[  ,'lon'], y = topoints[  ,'lat']), proj4string=sp::CRS("+proj=longlat +datum=WGS84"))
   
+  ###########################################################
+  
   for (i in 1:n.from) {
+    
     distances <- sp::spDists(frompoints[i], topoints, longlat=TRUE)
     #distances[i] <- Inf # was trying to remove distance to self but only relevant if frompoints=topoints
     if (ignore0) {
       distances[distances==0] <- Inf
     }
     distances <- distances[distances <= radius]
+    
+# cat('str distances is \n'); print(str(distances))
+    
     nearest[i, 1] <- which.min(distances)
     nearest[i, 2] <- distances[ nearest[i, 1] ]
+    
     if (return.latlons) {
       #need fromlat, fromlon, tolat, tolon
+# cat('str nearest is \n');print(str(nearest))
+# cat('str frompoints is \n');print(str(frompoints))
+      
       nearest[i, 3:4] <- frompoints@coords[i, c('y','x')]
-      nearest[i, 5:6] <- topoints@coords[ nearest[i,2], c('y','x')]
+      nearest[i, 5:6] <- topoints@coords[ nearest[i,1], c('y','x')]
+# cat('str nearest is \n');print(str(nearest))
     }
   }
-
+  ###########################################################
+  
   if (return.latlons) {
     colnames(nearest) <- c('torow', 'd', 'fromlat', 'fromlon', 'tolat', 'tolon')
   } else {
     colnames(nearest) <- c('torow', 'd')
   }
+  
   if (units=='miles') {
     nearest[ , 'd'] <- convert( nearest[ , 'd'], 'km', 'miles')
   }
+  
   if (return.rownums) {
     nearest <- cbind(fromrow=1:n.from, nearest)
   } else {
-    nearest[ , 'torow'] <- NULL #drop the undesired column
-    # probably need to make it a vector if it doesn't have latlons cols, here.
+    if (return.latlons) {
+      nearest <- nearest[ , colnames(nearest)!='torow']
+    } else {
+      # make it a vector if it shouldn't have any cols for fromrow torow lat lon
+      
+#      print(str(nearest))
+#       > get.nearest(testpoints(9), testpoints(20), return.rownums = FALSE, return.latlons=FALSE)
+#       Error in nearest$d : $ operator is invalid for atomic vectors
+#       
+      
+      as.vector( nearest <- nearest[ , 'd'] )
+    }
   }
   # nearest <- as.data.frame(nearest) # prior version
   return(nearest)

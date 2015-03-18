@@ -54,26 +54,20 @@
 #'   within a specified search radius instead of all topoints.
 #' @concept proximity
 #' @examples
-# test.from <- structure(list(fromlat = c(38.9567309094, 38.9507043428), 
-#   fromlon = c(-77.0896572305, -77.0896199948)), .Names = c("lat", "lon"), 
-#   row.names = c("6054762", "6054764"), class = "data.frame")
-# test.to <- structure(list(tolat = c(38.9575019287, 38.9507043428, 38.9514152435), 
-#   tolon = c(-77.0892818598, -77.0896199948, -77.0972395245)), .Names = c("lat", "lon"), 
-#   class = "data.frame", row.names = c("6054762", "6054763", "6054764"))
-#'   
-# n=100
-# test100 <- structure(list(fromlat = runif(n, min=25,max=48), 
-#   fromlon = runif(n,min=-125,max=-70) ), 
-#   .Names = c("lat", "lon"), row.names = 1:n, class = "data.frame")
-#' n=1000
-#' test1000 <- structure(list(fromlat = runif(n, min=25,max=48), 
-#'   fromlon = runif(n,min=-125,max=-70) ), 
-#'   .Names = c("lat", "lon"), row.names = 1:n, class = "data.frame")
+#' test.from <- structure(list(fromlat = c(38.9567309094, 38.9507043428), 
+#'   fromlon = c(-77.0896572305, -77.0896199948)), .Names = c("lat", "lon"), 
+#'   row.names = c("6054762", "6054764"), class = "data.frame")
+#' test.to <- structure(list(tolat = c(38.9575019287, 38.9507043428, 38.9514152435), 
+#'   tolon = c(-77.0892818598, -77.0896199948, -77.0972395245)), .Names = c("lat", "lon"), 
+#'   class = "data.frame", row.names = c("6054762", "6054763", "6054764"))
+#' set.seed(999)
+#' test10   <- testpoints(10)
+#' test100  <- testpoints(100)
+#' test1000 <- testpoints(1000)
 #' 
 #' subunitscores = proxistat(frompoints=test.from, topoints=test.to, 
-#'  area=rep(0.2, length(testfrom[,1])), radius=1, units='km')
-#'  print(subunitscores)
-#'  
+#'   area=rep(0.2, length(test.from[,1])), radius=1, units='km')
+#' print(subunitscores)
 #' subunitpop = rep(1000, length(test.from$lat))
 #' subunits = data.frame(FIPS=substr(rownames(test.from), 1, 5), pop=subunitpop, stringsAsFactors=FALSE )
 #' unitscores = aggregate(subunits, 
@@ -82,9 +76,9 @@
 #' print(unitscores)
 #' 
 #' @export
-#' 
 proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', decay='1/d', FIPS, pop) {
-  #stop('THIS IS NOT WORKING YET -- WORK IN PROGRESS')
+  
+  warning('THIS IS A WORK IN PROGRESS')
 
 	# Value returned also could include count of points nearby (within radius)?
   # One way to get that is specify decay='1/1'
@@ -108,68 +102,93 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
   )
 
   n <- length(frompoints[,1])
-
-  if (units=='miles') {
-	  ddf <- get.distances(frompoints, topoints, max.miles=radius, units='miles')
-	} else {
-	  # km
-	  ddf <- get.distances(frompoints, topoints, max.km=radius, units='km')
-	}
-  
-cat('\n\n ddf before fix min dist: \n\n');print(ddf);cat('\n\n')
-#   proxistat(test.from, test.to,radius=0)
-#   
-#   
-#   ddf before fix min dist: 
-#     
-#     [,1] [,2] [,3]
-#   [1,]   NA   NA   NA
-#   
-#   
-#   Error in ddf$fromrow : $ operator is invalid for atomic vectors
   
   #########################################
+  # Sequence of steps in finding d value(s):
+  #########################################
+  #
+  # 1) get distances that are <=radius using get.distances()
+  # 2) where d < min.dist, set d <- min.dist to adjust it upwards
+  # 3)     and for those, check again to see if new d is still <= radius. keep only if d<=radius now.
+  # 4) for each frompoints, if no distances were found, get nearest single d at any radius,
+  #       perhaps by expanding outwards step by step until at least one is found (if worth the overhead vs just finding ALL d and picking min)
+  
+  #########################################
+  # 1) get distances <= radius
+  #########################################
+  
+  ddf <- get.distances(frompoints, topoints, radius=radius, units=units, )
+
+cat('\n\n ddf before fix min dist: \n\n');print(ddf);cat('\n\n')
+  
+  #########################################
+  # 2) Set distance to minimum allowed distance or true distance, whichever is greater.
+  #########################################
+  
+  if (length(area)==1) {area <- rep(area, n) }
+  min.dist <- 0.9 * sqrt( area / pi )  # one per frompoints, not one per ddf row
+  ddf.min.dist <- min.dist[ddf$fromrow] # min.dist[match(ddf$fromrow , 1:length(area))]
+  ddf$d <- pmax(ddf$d, ddf.min.dist) # use d or min.dist, whichever is greater
+  
+  # *** May want to retain info on which distances were adjusted upwards based on min.dist?
+
+cat('ddf with d adjusted up if d<min.dist: \n\n');print(ddf);cat('\n\n')
+  
+  # WHERE area = 0 FOR ONE OR ALL UNITS, AND DISTANCE=0 from that unit to 1+ topoints, 
+  # THIS RETURNS +Inf FOR THE SCORE FOR THAT frompoint
+  #   (regardless of distances to any other topoints), unless no decay.
+  # i.e., just keep d=0 for those frompoint-topoint pairs, 
+  # and 1/d or 1/d^2 will return Inf as will score, which is sum of those for a frompoint.
+  # ddf$d[ddf$d==0 & area==0] <- 0
+  
+  #########################################
+  # 3) keep only if new adjusted d <=radius
+  #########################################
+  
+  ddf <- ddf[ddf$d <= radius, ] 
+  
+cat('ddf with final d adjusted up where was <min.dist, but dropped if adjusted to > radius: \n\n');print(ddf);cat('\n\n')
+  
+  #########################################
+  # 4) None within radius.... 
   # For any frompoint that had no topoint within radius,
   # use distance to nearest single topoint 
   #########################################
+  
   fromrow.0near <- which(!(1:n %in% ddf$fromrow))
+  
 cat('fromrow.0near = '); print(fromrow.0near)
 cat('\nlength of fromrow.0near = ');print(length(fromrow.0near));cat('\n\n')
+  
   if (length(fromrow.0near) > 0) {
-    d.nearest1 <- get.nearest(frompoints = frompoints[fromrow.0near, ], topoints, units = units)
-
-        d.nearest1 <- 0 #  ***** to be continued ******************* xxx
+    
+cat(' some fromrows were not in results of get.distances in ddf \n')
+    
+    d.nearest1 <- get.nearest(frompoints = frompoints[fromrow.0near, ], topoints, units = units, return.rownums = FALSE, return.latlons = FALSE)
+    
+    # Now have to check again to fix d < min.dist but radius is now irrelevant and even if adjusted d is no longer the nearest, it is the smallest d allowed.
+    
+    d.nearest1$d[d.nearest1$d < min.dist[fromrow.0near] ] <- min.dist[fromrow.0near] 
   }
   
+  # now merge ddf with d.nearest1
+  
+  ##################################################
   # *** NEED TO HANDLE CASES WHERE ddf and/or d.nearest1 HAVE ZERO ROWS HERE, OR JUST USE c() to combine vectors instead of using rbind to combine all the vectors at once in a data.frame
+  ##################################################
+  
   if (length(ddf$d)==0 & exists('d.nearest1')) {
     ddf <- d.nearest1
   } else {
     if (exists('d.nearest1')) {
       colnames(d.nearest) <- colnames(ddf)
 cat('d.nearest1 = ', d.nearest1,'\n')
-      ddf <- rbind(ddf, d.nearest1)   # STILL CRASHES HERE IN CERTAIN CASES ******
+      ddf <- rbind(ddf, d.nearest1)   # STILL CRASHES HERE IN CERTAIN CASES? ******
     } 
   }
   
   
   
-  #########################################
-  #  GET AREA of each areal unit to use in defining min.dist, minimum distance allowed.
-  # Set distance to minimum allowed distance or true distance, whichever is greater.
-  #########################################
-  if (length(area)==1) {area <- rep(area, n) }
-  min.dist <- 0.9 * sqrt( area / pi )  # one per frompoints, not one per ddf row
-  ddf.min.dist <- min.dist[ddf$fromrow] # min.dist[match(ddf$fromrow , 1:length(area))]
-  ddf$d <- pmax(ddf$d, ddf.min.dist)
-  
-  # *** May want to retain info on which distances were adjusted upwards based on min.dist?
-  
-  cat('ddf fixed: \n\n');print(ddf);cat('\n\n')
-  # WHERE area = 0 FOR ONE OR ALL UNITS, AND DISTANCE=0 from that unit to 1+ topoints, 
-  # THIS RETURNS +Inf FOR THE SCORE FOR THAT frompoint (regardless of distances to any other topoints), unless no decay.
-  # i.e., just keep d=0 for those frompoint-topoint pairs, and 1/d or 1/d^2 will return Inf as will score, which is sum of those for a frompoint.
-  # ddf$d[ddf$d==0 & area==0] <- 0
 
   ######################################
 
