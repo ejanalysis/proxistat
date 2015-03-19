@@ -30,13 +30,29 @@
 #' @concept proximity
 #' @import sp
 #' @examples
-# test.from <- structure(list(fromlat = c(38.9567309094, 38.9507043428), 
-#  fromlon = c(-77.0896572305, -77.0896199948)), .Names = c("lat", "lon"), 
-#  row.names = c("6054762", "6054764"), class = "data.frame")
-# test.to <- structure(list(tolat = c(38.9575019287, 38.9507043428, 38.9514152435), 
-#  tolon = c(-77.0892818598, -77.0896199948, -77.0972395245)), .Names = c("lat", "lon"),
-#  class = "data.frame", row.names = c("6054762", "6054763", "6054764"))
+#' set.seed(999)
+#' t1=testpoints(1)
+#' t10=testpoints(10)
+#' t100=testpoints(100)
+#' t1k=testpoints(1e3)
+#' t10k=testpoints(1e4)
+#' t100k=testpoints(1e5)
+#' t1m=testpoints(1e6)
+#' 
+#' get.nearest(t1, t1)
+#' get.nearest(t1, t10[2, ,drop=FALSE])
+#' get.nearest(t10, t1k)
+#' get.nearest(t10, t1k, radius=500, units='km')
+#' get.nearest(t10, t1k, radius=10, units='km')
+#' 
+#' # test.from <- structure(list(fromlat = c(38.9567309094, 38.9507043428), 
+#'  fromlon = c(-77.0896572305, -77.0896199948)), .Names = c("lat", "lon"), 
+#'  row.names = c("6054762", "6054764"), class = "data.frame")
+#' test.to <- structure(list(tolat = c(38.9575019287, 38.9507043428, 38.9514152435), 
+#'  tolon = c(-77.0892818598, -77.0896199948, -77.0972395245)), .Names = c("lat", "lon"),
+#'  class = "data.frame", row.names = c("6054762", "6054763", "6054764"))
 #' get.nearest(test.from, test.to)
+#' 
 #' @export
 get.nearest <- function(frompoints, topoints, units='miles', ignore0=FALSE, return.rownums=TRUE, return.latlons=FALSE, radius=Inf) {
 
@@ -74,13 +90,17 @@ get.nearest <- function(frompoints, topoints, units='miles', ignore0=FALSE, retu
       return(colnames(mypoints))
     }
   }
+  
+  if(is.vector(frompoints) & length(frompoints)==2) {frompoints <- matrix(frompoints, ncol=2) }
+  if(is.vector(topoints)   & length(topoints)==2)   {topoints   <- matrix(topoints,   ncol=2) }
+  
   colnames(frompoints) <- latlon.colnames.check(frompoints)
   colnames(topoints)   <- latlon.colnames.check(topoints)
   
   #require(sp)
   
-  n.from <- length(frompoints[,1])
-  n.to <- length(topoints[,1])
+  n.from <- NROW(frompoints[,1])
+  n.to   <- NROW(topoints[,1])
   
   if (!return.latlons) {nearest <- matrix(nrow=n.from, ncol=2) } # will have 1 or 3, but 2 for now
   if (return.latlons)  {nearest <- matrix(nrow=n.from, ncol=6)} # will have 5 or 7, but 6 for now. 
@@ -93,17 +113,18 @@ get.nearest <- function(frompoints, topoints, units='miles', ignore0=FALSE, retu
   for (i in 1:n.from) {
     
     distances <- sp::spDists(frompoints[i], topoints, longlat=TRUE)
-    #distances[i] <- Inf # was trying to remove distance to self but only relevant if frompoints=topoints
-    if (ignore0) {
-      distances[distances==0] <- Inf
-    }
-    distances <- distances[distances <= radius]
+    # result is a matrix    
+    if (ignore0) {distances[distances==0] <- Inf}
     
-# cat('str distances is \n'); print(str(distances))
+#cat('str distances is \n'); print(str(distances))
+#cat('\n str nearest is \n');print(str(nearest))
+    
+    # distances is just a 1 row and 1+column matrix now
+    distances[distances > radius] <- Inf
     
     nearest[i, 1] <- which.min(distances)
     nearest[i, 2] <- distances[ nearest[i, 1] ]
-    
+
     if (return.latlons) {
       #need fromlat, fromlon, tolat, tolon
 # cat('str nearest is \n');print(str(nearest))
@@ -127,10 +148,12 @@ get.nearest <- function(frompoints, topoints, units='miles', ignore0=FALSE, retu
   }
   
   if (return.rownums) {
-    nearest <- cbind(fromrow=1:n.from, nearest)
+    mynames <- colnames(nearest)
+    nearest <- matrix( c(fromrow=1:n.from, nearest), ncol=1+NCOL(nearest))
+    colnames(nearest) <- c('fromrow' , mynames)
   } else {
     if (return.latlons) {
-      nearest <- nearest[ , colnames(nearest)!='torow']
+      nearest <- nearest[ , colnames(nearest)!='torow', drop=FALSE]
     } else {
       # make it a vector if it shouldn't have any cols for fromrow torow lat lon
       

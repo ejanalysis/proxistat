@@ -38,6 +38,7 @@
 #' \cr
 #' FIPS for blocks can be used to find FIPS for block groups. FIPS for block groups can be used to find FIPS for tracts. 
 #' 
+#' @param testing Logical during work in progress
 #' @param frompoints Locations of internal points of Census subunits. A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed. Decimal degrees. Required.
 #' @param topoints Locations of nearby points of interest, proximity to which is the basis of each Census unit's score. A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed. Decimal degrees. Required.
 #' @param area A number or vector of numbers giving size of each spatial unit with FIPS.pop, in square miles by default (or square kilometers if units is 'km'). Optional. Default is 0, in which case no adjustment is made for small or even zero distance, which can cause unrealistically large or even infinite/undefined scores. For zero distance if area=0, Inf will be returned for the score.
@@ -60,10 +61,19 @@
 #' test.to <- structure(list(tolat = c(38.9575019287, 38.9507043428, 38.9514152435), 
 #'   tolon = c(-77.0892818598, -77.0896199948, -77.0972395245)), .Names = c("lat", "lon"), 
 #'   class = "data.frame", row.names = c("6054762", "6054763", "6054764"))
+#'   
 #' set.seed(999)
-#' test10   <- testpoints(10)
-#' test100  <- testpoints(100)
-#' test1000 <- testpoints(1000)
+#' t1=testpoints(1)
+#' t10=testpoints(10)
+#' t100=testpoints(100)
+#' t1k=testpoints(1e3)
+#' t10k=testpoints(1e4)
+#' t100k=testpoints(1e5)
+#' t1m=testpoints(1e6)
+#' 
+#' proxistat(t1, t10k, radius=1, units='km')
+#' 
+#' proxistat(t10, t10k)
 #' 
 #' subunitscores = proxistat(frompoints=test.from, topoints=test.to, 
 #'   area=rep(0.2, length(test.from[,1])), radius=1, units='km')
@@ -76,7 +86,7 @@
 #' print(unitscores)
 #' 
 #' @export
-proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', decay='1/d', FIPS, pop) {
+proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', decay='1/d', FIPS, pop, testing=FALSE) {
   
   warning('THIS IS A WORK IN PROGRESS')
 
@@ -100,6 +110,7 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
     '1/d^2' = function(d) sum(1/(d^2), na.rm=TRUE),
     '1/1'   = function(d) length(d)
   )
+  # For 1/d,  sum(1/d) is the same as n/harmean(d)
 
   n <- length(frompoints[,1])
   
@@ -119,8 +130,8 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
   
   ddf <- get.distances(frompoints, topoints, radius=radius, units=units, )
 
-cat('\n\n ddf before fix min dist: \n\n');print(ddf);cat('\n\n')
-  
+  if (testing) {cat('\n\n ddf before fix min dist: \n\n');print(ddf);cat('\n\n')}
+
   #########################################
   # 2) Set distance to minimum allowed distance or true distance, whichever is greater.
   #########################################
@@ -132,7 +143,7 @@ cat('\n\n ddf before fix min dist: \n\n');print(ddf);cat('\n\n')
   
   # *** May want to retain info on which distances were adjusted upwards based on min.dist?
 
-cat('ddf with d adjusted up if d<min.dist: \n\n');print(ddf);cat('\n\n')
+  if (testing) {cat('ddf with d adjusted up if d<min.dist: \n\n');print(ddf);cat('\n\n')}
   
   # WHERE area = 0 FOR ONE OR ALL UNITS, AND DISTANCE=0 from that unit to 1+ topoints, 
   # THIS RETURNS +Inf FOR THE SCORE FOR THAT frompoint
@@ -147,7 +158,7 @@ cat('ddf with d adjusted up if d<min.dist: \n\n');print(ddf);cat('\n\n')
   
   ddf <- ddf[ddf$d <= radius, ] 
   
-cat('ddf with final d adjusted up where was <min.dist, but dropped if adjusted to > radius: \n\n');print(ddf);cat('\n\n')
+  if (testing) {cat('ddf with final d adjusted up where was <min.dist, but dropped if adjusted to > radius: \n\n');print(ddf);cat('\n\n')}
   
   #########################################
   # 4) None within radius.... 
@@ -157,12 +168,12 @@ cat('ddf with final d adjusted up where was <min.dist, but dropped if adjusted t
   
   fromrow.0near <- which(!(1:n %in% ddf$fromrow))
   
-cat('fromrow.0near = '); print(fromrow.0near)
-cat('\nlength of fromrow.0near = ');print(length(fromrow.0near));cat('\n\n')
+  if (testing) {cat('fromrow.0near = '); print(fromrow.0near)}
+  if (testing) {cat('\nlength of fromrow.0near = ');print(length(fromrow.0near));cat('\n\n')}
   
   if (length(fromrow.0near) > 0) {
     
-cat(' some fromrows were not in results of get.distances in ddf \n')
+    if (testing) {cat(' some fromrows were not in results of get.distances in ddf \n')}
     
     d.nearest1 <- get.nearest(frompoints = frompoints[fromrow.0near, ], topoints, units = units, return.rownums = FALSE, return.latlons = FALSE)
     
@@ -182,11 +193,11 @@ cat(' some fromrows were not in results of get.distances in ddf \n')
   } else {
     if (exists('d.nearest1')) {
       colnames(d.nearest) <- colnames(ddf)
-cat('d.nearest1 = ', d.nearest1,'\n')
+      if (testing) {cat('d.nearest1 = ', d.nearest1,'\n')}
       ddf <- rbind(ddf, d.nearest1)   # STILL CRASHES HERE IN CERTAIN CASES? ******
     } 
   }
-  
+
   
   
 
@@ -238,7 +249,8 @@ if (1==0) {
   # each site is treated as a frompoint, so create one row per facility/site:
   #########################################
   
-  distances.to.blocks <- get.distances(frompoints=sites[,c('lat','lon')] , topoints=blocks[, c('lat', 'lon')] , max.miles=1.6, return.latlons=FALSE, return.rownums=TRUE) # CAN'T DO return.rownums=TRUE YET ??# use 5 kilometers, converted to miles
+  distances.to.blocks <- get.distances(frompoints=sites[,c('lat','lon')] , topoints=blocks[, c('lat', 'lon')] , radius=1.6, units='miles', return.latlons=FALSE, return.rownums=TRUE) 
+  # CAN'T DO return.rownums=TRUE YET ??# use 5 kilometers, converted to miles
   distances.to.blocks$FIPS.BG <- blocks$FIPS.BG[ distances.to.blocks$torow ] # not sure about this. CAN we get torownum back??
   
   #########################################
@@ -252,13 +264,13 @@ if (1==0) {
   # IF NO SITE NEARBY: (THIS WILL BE TRUE FOR THE VAST MAJORITY OF ALL BLOCK GROUPS IN THE US TYPICALLY!!)
   # AGAIN, LOOP THROUGH SITES, NOT BLOCK/BG LIST, AND CALC DISTANCES ONLY FOR A WINDOW (WIDER WINDOW NOW), UNTIL FIND ONE.
   zero.near <- 1
-  # starting search radius is max.miles
+  # starting search radius is original radius?
   current.max.miles <-  5 * 0.621371  # 5 kilometers = 3.10686 miles
   
   while (length(zero.near) > 0) {
     current.max.miles <- current.max.miles * 2
     zero.near <- which(nearest.pts==0)
-    nearest.pts[zero.near] <- min( get.distances( bg[zero.near, c("lat","lon")]  , max.miles=current.max.miles  ) )
+    nearest.pts[zero.near] <- min( get.distances( bg[zero.near, c("lat","lon")]  , radius = current.max.miles, units='miles'  ) )
   }
   
   
