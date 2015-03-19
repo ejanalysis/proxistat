@@ -54,7 +54,8 @@
 #' get.nearest(test.from, test.to)
 #' 
 #' @export
-get.nearest <- function(frompoints, topoints, units='miles', ignore0=FALSE, return.rownums=TRUE, return.latlons=FALSE, radius=Inf) {
+get.nearest <- function(frompoints, topoints, units='miles', ignore0=FALSE, 
+                        return.rownums=TRUE, return.latlons=FALSE, radius=Inf) {
 
   # ***** Notes on performance/ speed: ******
   # It should be easy to speed this up (for very large numbers of topoints) by using a box to search within (as get.distances does) and only enlarge the search box if no topoints are found in it.

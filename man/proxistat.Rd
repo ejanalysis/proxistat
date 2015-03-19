@@ -69,15 +69,20 @@ and then find the population-weighted average of those block scores, for a singl
 FIPS for blocks can be used to find FIPS for block groups. FIPS for block groups can be used to find FIPS for tracts.
 }
 \examples{
-n=1000
-test1000 <- structure(list(fromlat = runif(n, min=25,max=48),
-  fromlon = runif(n,min=-125,max=-70) ),
-  .Names = c("lat", "lon"), row.names = 1:n, class = "data.frame")
+test.from <- structure(list(fromlat = c(38.9567309094, 38.9507043428),
+  fromlon = c(-77.0896572305, -77.0896199948)), .Names = c("lat", "lon"),
+  row.names = c("6054762", "6054764"), class = "data.frame")
+test.to <- structure(list(tolat = c(38.9575019287, 38.9507043428, 38.9514152435),
+  tolon = c(-77.0892818598, -77.0896199948, -77.0972395245)), .Names = c("lat", "lon"),
+  class = "data.frame", row.names = c("6054762", "6054763", "6054764"))
+set.seed(999)
+test10   <- testpoints(10)
+test100  <- testpoints(100)
+test1000 <- testpoints(1000)
 
 subunitscores = proxistat(frompoints=test.from, topoints=test.to,
- area=rep(0.2, length(testfrom[,1])), radius=1, units='km')
- print(subunitscores)
-
+  area=rep(0.2, length(test.from[,1])), radius=1, units='km')
+print(subunitscores)
 subunitpop = rep(1000, length(test.from$lat))
 subunits = data.frame(FIPS=substr(rownames(test.from), 1, 5), pop=subunitpop, stringsAsFactors=FALSE )
 unitscores = aggregate(subunits,

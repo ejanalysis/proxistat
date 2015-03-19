@@ -16,6 +16,7 @@
 #' [1] 14:33:33 EDT  <30 seconds from 1 mill to 100 points, as in finding nearest of 100 sites for 9% of the US Census blocks.
 #' But R hung/crashed on 11mill frompoints.
 #' There are 11,078,297 blocks according to \url{http://www.census.gov/geo/maps-data/data/tallies/national_geo_tallies.html}
+#' 
 #' @param frompoints A matrix or data.frame with two cols, 'lat' and 'lon' (or only 2 cols that are lat and lon in that order) with datum=WGS84 assumed.
 #' @param topoints A matrix or data.frame with two cols, 'lat' and 'lon' (or only 2 cols that are lat and lon in that order) with datum=WGS84 assumed.
 #' @param ignore0 A logical, default is FALSE, specifying whether to ignore distances that are zero and report only the minimum nonzero distance. 
@@ -45,7 +46,8 @@
 #' get.nearest2(test.from, test.to)
 #' get.nearest2(testpoints(10), testpoints(30))
 #' @export
-get.nearest2 <- function(frompoints, topoints, units='miles', ignore0=FALSE, return.rownums=FALSE, return.latlons=FALSE, radius=Inf) {
+get.nearest2 <- function(frompoints, topoints, units='miles', ignore0=FALSE, 
+                         return.rownums=FALSE, return.latlons=FALSE, radius=Inf) {
   
   n.from <- length(frompoints[,1])
   n.to <- length(topoints[,1])

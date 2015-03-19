@@ -1,8 +1,8 @@
-#' @title THIS FUNCTION IS NOT YET COMPLETE - 
-#' #' Calculate proximity statistic for each location, 
+#' @title Proximity Statistic for Each Location and Nearby Points
+#' 
+#' @description Calculate proximity statistic for each location, 
 #' quantifying number of and proximities of nearby points.
-#' @description
-#' \code{proxistat} returns a proximity statistic (score) for each location (e.g., Census block), quantifying the number of and proximities of nearby points.
+#' \code{proxistat} returns a proximity statistic (score) for each location (e.g., Census block).
 #' 
 #' @details
 #' This function returns a vector of proximity scores, one for each location such as a Census block. 
