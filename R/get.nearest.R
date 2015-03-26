@@ -8,6 +8,9 @@
 #' which are the distances from one set of points to the nearest single member (if any) of another set of points.
 #' Points are specified using latitude and longitude in decimal degrees.
 #' Relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
+#' \cr\cr
+#' NOTE: *** This is OK for <100k frompoints and 100 topoints, but starts to get slow. 
+#' This method is MUCH slower than just using other version of get.nearest that gets full distance matrix via spDists() and then gets minima.
 #' A future version may use get.distances.all() but for performance only use it for distance pairs (pairs of points) that have been initially 
 #' quickly filtered using lat/lon to be not too far, in an attempt to go much faster in an initial pass.
 #'
@@ -38,6 +41,7 @@
 #' t10k=testpoints(1e4)
 #' t100k=testpoints(1e5)
 #' t1m=testpoints(1e6)
+#' #t10m=testpoints(1e7)
 #' 
 #' get.nearest(t1, t1)
 #' get.nearest(t1, t10[2, ,drop=FALSE])
@@ -45,7 +49,7 @@
 #' get.nearest(t10, t1k, radius=500, units='km')
 #' get.nearest(t10, t1k, radius=10, units='km')
 #' 
-#' # test.from <- structure(list(fromlat = c(38.9567309094, 38.9507043428), 
+#' test.from <- structure(list(fromlat = c(38.9567309094, 38.9507043428), 
 #'  fromlon = c(-77.0896572305, -77.0896199948)), .Names = c("lat", "lon"), 
 #'  row.names = c("6054762", "6054764"), class = "data.frame")
 #' test.to <- structure(list(tolat = c(38.9575019287, 38.9507043428, 38.9514152435), 
