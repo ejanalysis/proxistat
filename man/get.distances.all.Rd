@@ -32,10 +32,14 @@ By default, returns a dataframe that has 3 columns: fromrow, torow, distance
 \code{get.distances.all} returns all the distances from one set of points to another set of points.
 }
 \details{
+*** Probabyl slower than it needs to be because it uses expand.grid which creates a data.frame,
+which if very large is likely to be very slow vs a matrix
 This function returns a matrix or vector of distances,
 from each of the first set of points to each of the second set of points,
 where points are specified using latitude and longitude.
-Relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
+Lets you specify units and whether you need lat/lon etc, but essentially just a wrapper for
+the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
+\cr\cr
 }
 \examples{
 test.from <- structure(list(fromlat = c(38.9567309094, 38.9507043428),

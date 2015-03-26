@@ -4,11 +4,15 @@
 #' \code{get.distances.all} returns all the distances from one set of points to another set of points.
 #' 
 #' @details
+#' *** Probabyl slower than it needs to be because it uses expand.grid which creates a data.frame, 
+#' which if very large is likely to be very slow vs a matrix
 #' This function returns a matrix or vector of distances, 
 #' from each of the first set of points to each of the second set of points, 
 #' where points are specified using latitude and longitude.
-#' Relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
-#'
+#' Lets you specify units and whether you need lat/lon etc, but essentially just a wrapper for 
+#' the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
+#' \cr\cr
+#' 
 #' @param frompoints A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed.
 #' @param topoints A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed.
 #' @param units A string that is 'miles' by default, or 'km' for kilometers, 

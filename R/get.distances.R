@@ -1,19 +1,22 @@
 #' @title Find distances between nearby points, just searching within a specified maximum distance.
 #'
 #' @description
-#' \code{get.distances} returns the distances from one set of points to nearby members of another set of points.
+#' Returns the distances from one set of points to nearby members of another set of points.
 #' 
-#' @details
-#' This function returns a matrix or vector of distances, 
+#' @details This function returns a matrix or vector of distances, 
 #' which are the distances from one set of points to the nearby members of another set of points.
 #' It searches within a circle (of radius = radius, defining what is considered nearby), 
 #' to calculate distance (in miles or km) from each of frompoints to each of topoints that is within the specified radius.
 #' Points are specified using latitude and longitude in decimal degrees.
-#' #' \cr\cr
+#' \cr\cr
 #' Relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
 #' Uses \code{\link{get.distances.all}} but for performance it only uses it for distance pairs (pairs of points) that have been initially 
 #' quickly filtered using lat/lon to be not much more than radius, in an attempt to go 
 #' much faster than finding every distance pair and then dropping all outside the search radius.
+#' \cr\cr
+#' Regarding distance calculation, also see \url{http://en.wikipedia.org/wiki/Vincenty\%27s_formulae}, 
+#' \url{http://williams.best.vwh.net/avform.htm#Dist}, \url{http://sourceforge.net/projects/geographiclib/}, 
+#' and \url{http://www.r-bloggers.com/great-circle-distance-calculations-in-r/}.
 #' \cr\cr
 #' Finding distance to all of the 11 million census blocks in usa within 5 km, for 100 points, can take a while... maybe >1 minute?
 #' May need to switch to just use a js library like turf, or investigate using data.table to index and more quickly subset the (potentially 11 million Census blocks of) topoints
@@ -25,7 +28,7 @@
 #' @param units A string that is 'miles' by default, or 'km' for kilometers, specifying units for radius and distances returned.
 #' @param ignore0 A logical, default is FALSE, specifying whether to ignore distances that are zero and report only nonzero distances.
 #'   Useful if want distance to points other than self, where frompoints=topoints, for example. Ignored if return.crosstab = TRUE.
-##' @param return.crosstab Logical value, FALSE by default. If TRUE, value returned is a matrix of the distances, 
+#' @param return.crosstab Logical value, FALSE by default. If TRUE, value returned is a matrix of the distances, 
 #'   with a row per frompoint and col per topoint. (Distances larger than max search radius are not provided, even in this format).
 #' @param return.rownums Logical value, TRUE by default. If TRUE, value returned also includes two extra columns:
 #'   a col of index numbers starting at 1 specifying the frompoint and a similar col specifying the topoint.
@@ -37,9 +40,9 @@
 #' and speeds up the distance calculations closer to the equator, but takes a bit of time to define a custom box for each frompoint 
 #' so it might be slower overall in just very northern locations? Comprehensive speed tests have not been performed.
 #' 
-#' Just using get.distances.all is reasonably fast (30-40 seconds for 100 million distances, but slow working with results so large), 
+#' Just using get.distances.all is reasonably fast? (30-40 seconds for 100 million distances, but slow working with results so large), 
 #'   and could remove those outside the radius after that, skipping the searchbox approach:
-#' 
+#'  (or just use spDists)
 #' Sys.time(); x=get.distances.all(testpoints(1e5), testpoints(1000), return.crosstab=TRUE); Sys.time()
 #' [1] "2015-03-10 18:59:08 EDT"
 #' [1] "2015-03-10 18:59:31 EDT"  23 SECONDS  for 100 million distances IF NO PROCESSING OTHER THAN CROSSTAB
