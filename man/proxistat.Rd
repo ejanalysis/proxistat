@@ -2,12 +2,10 @@
 % Please edit documentation in R/proxistat.R
 \name{proxistat}
 \alias{proxistat}
-\title{THIS FUNCTION IS NOT YET COMPLETE -
-#' Calculate proximity statistic for each location,
-quantifying number of and proximities of nearby points.}
+\title{Proximity Statistic for Each Location and Nearby Points}
 \usage{
 proxistat(frompoints, topoints, area = 0, radius = 5, units = "miles",
-  decay = "1/d", FIPS, pop)
+  decay = "1/d", FIPS, pop, testing = FALSE)
 }
 \arguments{
 \item{frompoints}{Locations of internal points of Census subunits. A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed. Decimal degrees. Required.}
@@ -27,12 +25,16 @@ Decay weighting also can be '1/d^2' or '1/1' to represent decay by inverse of sq
 \item{FIPS}{NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE. A vector of strings designating places that will be assigned scores where each is the Census FIPS code or other ID. Optional.}
 
 \item{pop}{NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE. A number or vector of numbers giving population count of each spatial unit. Default is 1, which would give the unweighted average.}
+
+\item{testing}{Logical during work in progress}
 }
 \value{
 By default, returns a vector of numbers, the proximity scores, one for each of the frompoints. Based on miles by default, or km depending on units. Returns +Inf for a unit if that area's area and distance are both zero.
 }
 \description{
-\code{proxistat} returns a proximity statistic (score) for each location (e.g., Census block), quantifying the number of and proximities of nearby points.
+Calculate proximity statistic for each location,
+quantifying number of and proximities of nearby points.
+\code{proxistat} returns a proximity statistic (score) for each location (e.g., Census block).
 }
 \details{
 This function returns a vector of proximity scores, one for each location such as a Census block.
@@ -75,10 +77,19 @@ test.from <- structure(list(fromlat = c(38.9567309094, 38.9507043428),
 test.to <- structure(list(tolat = c(38.9575019287, 38.9507043428, 38.9514152435),
   tolon = c(-77.0892818598, -77.0896199948, -77.0972395245)), .Names = c("lat", "lon"),
   class = "data.frame", row.names = c("6054762", "6054763", "6054764"))
+
 set.seed(999)
-test10   <- testpoints(10)
-test100  <- testpoints(100)
-test1000 <- testpoints(1000)
+t1=testpoints(1)
+t10=testpoints(10)
+t100=testpoints(100)
+t1k=testpoints(1e3)
+t10k=testpoints(1e4)
+t100k=testpoints(1e5)
+t1m=testpoints(1e6)
+
+proxistat(t1, t10k, radius=1, units='km')
+
+proxistat(t10, t10k)
 
 subunitscores = proxistat(frompoints=test.from, topoints=test.to,
   area=rep(0.2, length(test.from[,1])), radius=1, units='km')

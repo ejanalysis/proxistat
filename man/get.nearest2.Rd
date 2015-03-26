@@ -40,13 +40,20 @@ Relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link
 \cr\cr
 A future version may use get.distances.all() but for performance only use it for distance pairs (pairs of points) that have been initially
 quickly filtered using lat/lon to be not too far, in an attempt to go much faster in an initial pass.
+*** get.nearest with loops takes 42 seconds vs 3 seconds for this version, for 100k frompoints and 100 topoints:  Sys.time(); x=get.nearest2(t100k, t100); Sys.time()
 > Sys.time(); x=get.nearest2(testpoints(1e6), testpoints(100)); Sys.time()
 [1] 14:33:05 EDT
 [1] 14:33:33 EDT  <30 seconds from 1 mill to 100 points, as in finding nearest of 100 sites for 9% of the US Census blocks.
-But R hung/crashed on 11mill frompoints.
+But R hung/crashed on 11mill frompoints -- Probably out of memory. *** Need to break it up into batches of maybe 1 to 100 million distances at a time?
 There are 11,078,297 blocks according to \url{http://www.census.gov/geo/maps-data/data/tallies/national_geo_tallies.html}
 }
 \examples{
+test.from <- structure(list(fromlat = c(38.9567309094, 38.9507043428),
+ fromlon = c(-77.0896572305, -77.0896199948)), .Names = c("lat", "lon"),
+ row.names = c("6054762", "6054764"), class = "data.frame")
+test.to <- structure(list(tolat = c(38.9575019287, 38.9507043428, 38.9514152435),
+ tolon = c(-77.0892818598, -77.0896199948, -77.0972395245)), .Names = c("lat", "lon"),
+ class = "data.frame", row.names = c("6054762", "6054763", "6054764"))
 get.nearest2(test.from, test.to)
 get.nearest2(testpoints(10), testpoints(30))
 }
