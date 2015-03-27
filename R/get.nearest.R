@@ -16,6 +16,7 @@
 #'
 #' @param frompoints A matrix or data.frame with two cols, 'lat' and 'lon' (or only 2 cols that are lat and lon in that order) with datum=WGS84 assumed.
 #' @param topoints A matrix or data.frame with two cols, 'lat' and 'lon' (or only 2 cols that are lat and lon in that order) with datum=WGS84 assumed.
+#' @param radius Optional number, default is Inf. Distance within which search should be limited, or max distance that will be returned.
 #' @param ignore0 A logical, default is FALSE, specifying whether to ignore distances that are zero and report only the minimum nonzero distance. 
 #'   Useful if nearest point other than self, where frompoints=topoints, for example.
 #' @param return.rownums Logical value, TRUE by default. If TRUE, value returned also includes these 2 columns:

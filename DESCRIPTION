@@ -2,7 +2,7 @@ Package: proxistat
 Type: Package
 Title: Create a proximity score for each Census unit, based on distances to nearby points of interest
 Version: 0.1.0
-Date: 2015-03-06
+Date: 2015-03-14
 Author: info@ejanalysis.com
 Maintainer: ejanalysis.com<info@ejanalysis.com>
 Description: This package has functions helping to calculate distances between
@@ -19,5 +19,9 @@ Description: This package has functions helping to calculate distances between
     score that quantifies, for each spatial unit like a Census block group, how
     many topoints are nearby and how close they are.
 License: Artistic-2.0
-Depends:
-    sp
+Depends: R (>= 3.1.2)
+Imports:
+    sp,
+    foreign
+URL: https://github.com/ejanalysis/ejanalysis/
+        http://www.ejanalysis.com/
