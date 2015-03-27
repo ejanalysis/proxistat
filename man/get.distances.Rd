@@ -34,33 +34,32 @@ rather than initially searching a conservatively large box. The large box is big
 Taking time to scale the box according to latitude makes it work for anywhere in the N. Hemisphere (Southern not tested),
 and speeds up the distance calculations closer to the equator, but takes a bit of time to define a custom box for each frompoint
 so it might be slower overall in just very northern locations? Comprehensive speed tests have not been performed.
-
 Just using get.distances.all is reasonably fast? (30-40 seconds for 100 million distances, but slow working with results so large),
-  and could remove those outside the radius after that, skipping the searchbox approach:
- (or just use spDists)
-Sys.time(); x=get.distances.all(testpoints(1e5), testpoints(1000), return.crosstab=TRUE); Sys.time()
-[1] "2015-03-10 18:59:08 EDT"
-[1] "2015-03-10 18:59:31 EDT"  23 SECONDS  for 100 million distances IF NO PROCESSING OTHER THAN CROSSTAB
-Sys.time(); x=get.distances.all(testpoints(1e6), testpoints(100), return.crosstab=TRUE); Sys.time()
-[1] "2015-03-10 21:54:11 EDT"
-[1] "2015-03-10 21:54:34 EDT"  23 SECONDS for 100 million distances (1m x 100, or 100k x 1000)
-Sys.time(); x=get.distances.all(testpoints(1e6), testpoints(300), return.crosstab=TRUE); Sys.time()
-[1] "2015-03-10 21:56:11 EDT"
-[1] "2015-03-10 21:57:18 EDT"  67 seconds for 300 million pairs.
-
-           #' so 11m blocks to 1k points could take >40 minutes!
-           >3 minutes per 100 sites?
-           About 2.6 seconds per site for 11m blocks?
-
-> Sys.time(); x=get.distances.all(testpoints(1e5), testpoints(1000), units='miles',return.rownums=TRUE); Sys.time()
-[1] "2015-03-09 21:23:04 EDT"
-[1] "2015-03-09 21:23:40 EDT"  36 SECONDS IF DATA.FRAME ETC. DONE TO FORMAT RESULTS AND GET ROWNUMS
-> Sys.time(); x=get.distances.all(testpoints(1e5), testpoints(1000), units='miles',return.rownums=TRUE)$d; Sys.time()
-[1] "2015-03-09 21:18:47 EDT"
-[1] "2015-03-09 21:19:26 EDT" 49 SECONDS IF DATA.FRAME ETC. DONE TO FORMAT RESULTS AND GET ROWNUMS IN get.distances.all
-
-get.distances using loop and searchbox is Too slow:
-
+  and could remove those outside the radius after that, skipping the searchbox approach: \cr
+ (or just use spDists) \cr
+Sys.time(); x=get.distances.all(testpoints(1e5), testpoints(1000), return.crosstab=TRUE); Sys.time() \cr
+[1] "2015-03-10 18:59:08 EDT" \cr
+[1] "2015-03-10 18:59:31 EDT"  23 SECONDS  for 100 million distances IF NO PROCESSING OTHER THAN CROSSTAB \cr
+Sys.time(); x=get.distances.all(testpoints(1e6), testpoints(100), return.crosstab=TRUE); Sys.time() \cr
+[1] "2015-03-10 21:54:11 EDT" \cr
+[1] "2015-03-10 21:54:34 EDT"  23 SECONDS for 100 million distances (1m x 100, or 100k x 1000) \cr
+Sys.time(); x=get.distances.all(testpoints(1e6), testpoints(300), return.crosstab=TRUE); Sys.time() \cr
+[1] "2015-03-10 21:56:11 EDT" \cr
+[1] "2015-03-10 21:57:18 EDT"  67 seconds for 300 million pairs.  \cr
+ \cr
+           #' so 11m blocks to 1k points could take >40 minutes!  \cr
+           >3 minutes per 100 sites? \cr
+           About 2.6 seconds per site for 11m blocks?  \cr
+            \cr
+> Sys.time(); x=get.distances.all(testpoints(1e5), testpoints(1000), units='miles',return.rownums=TRUE); Sys.time() \cr
+[1] "2015-03-09 21:23:04 EDT" \cr
+[1] "2015-03-09 21:23:40 EDT"  36 SECONDS IF DATA.FRAME ETC. DONE TO FORMAT RESULTS AND GET ROWNUMS \cr
+> Sys.time(); x=get.distances.all(testpoints(1e5), testpoints(1000), units='miles',return.rownums=TRUE)$d; Sys.time() \cr
+[1] "2015-03-09 21:18:47 EDT" \cr
+[1] "2015-03-09 21:19:26 EDT" 49 SECONDS IF DATA.FRAME ETC. DONE TO FORMAT RESULTS AND GET ROWNUMS IN get.distances.all \cr
+ \cr
+get.distances using loop and searchbox is Too slow:  \cr
+ \cr
 On a quadcore i7 MacBookPro10,1 2012 with 16GB RAM, it takes 2.5 minutes for 100k frompoints (like block groups not blocks) to 1k sites/topoints.
 > Sys.time(); x=get.distances(testpoints(1e5), testpoints(1000), units='miles',radius=5,return.rownums=TRUE)$d; Sys.time()
 [1] "2015-03-09 21:13:08 EDT"
@@ -101,9 +100,10 @@ May need to switch to just use a js library like turf, or investigate using data
 (or pre-index that block point dataset and allow this function to accept a data.table as input).
 }
 \examples{
-test.from <- structure(list(fromlat = c(38.9567309094, 45),
-    fromlon = c(-77.0896572305, -100)),
-    .Names = c("lat", "lon"), row.names = c("1", "2"), class = "data.frame")
+#
+   test.from <- structure(list(fromlat = c(38.9567309094, 45),
+     fromlon = c(-77.0896572305, -100)), .Names = c("lat", "lon"),
+     row.names = c("1", "2"), class = "data.frame")
 
    test.to <- structure(list(tolat = c(38.9575019287, 38.9507043428, 45),
     tolon = c(-77.0892818598, -77.2, -90)),

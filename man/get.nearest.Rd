@@ -22,6 +22,8 @@ a col named fromrow of index numbers starting at 1 specifying the frompoint and 
 
 \item{return.latlons}{Logical value, FALSE by default. If TRUE, value returned also includes four extra columns,
 showing fromlat, fromlon, tolat, tolon.}
+
+\item{radius}{Optional number, default is Inf. Distance within which search should be limited, or max distance that will be returned.}
 }
 \value{
 By default, returns a matrix of numbers, with columns fromrow, torow indexing which is nearest of topoints, and d (distance).
