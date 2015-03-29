@@ -13,7 +13,7 @@ compile.dbfs <- function(filepaths) {
 
   for (i in 1:length(filepaths)) {
     cat('Reading ', filepaths[i], '\n')
-    thisdbf = try( read.dbf(filepaths[i], as.is=TRUE) )
+    thisdbf = try( foreign::read.dbf(filepaths[i], as.is=TRUE) )
     if (class(thisdbf)!='try-error') {
       lastrow = length(thisdbf[,1]) - 1 + nextrow
       out[nextrow:lastrow, ] <-  thisdbf 

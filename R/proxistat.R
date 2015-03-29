@@ -15,9 +15,12 @@
 #' \cr
 #' This is the sum of 1/d or 1/d^2 or 1/1, depending on the decay weighting,
 #' where d is the distance from census unit's internal point to user-defined point.
-#' The default proximity score, using 1/d, is the count of nearby points divided by the harmonic mean of their distances
-#' (but adjusted when distance is very small, and using the nearest single one if none are nearby). This is the same as the sum of inverse distances.
-#' Nearby is defined as a user-specified parameter, so only points within the specified distance are counted, except if none are nearby,
+#' The default proximity score, using 1/d, is the count of nearby points divided by the harmonic mean of their distances (n/harmean), 
+#' (but adjusted when distance is very small, and using the nearest single one if none are nearby). 
+#' This is the same as the sum of inverse distances. 
+#' The harmonic mean distance (see \code{\link[proxistat]{harmean}}) is the inverse of the arithmetic mean of the inverses, or n / (sum of inverses).
+#' 
+#' "Nearby" is defined as a user-specified parameter, so only points within the specified distance are counted, except if none are nearby,
 #' the single nearest point (at any distance) is used.
 #' \cr\cr
 #' The adjustment for small distances ensure that each distance represents roughly the distance to the average resident within a spatial unit like a block,
@@ -26,10 +29,10 @@
 #' The distance is capped to be no less than 0.9 * radius of a circle of area equal to census unit's area.
 #' This approximation treats unit as if it were a circle and assumes pop is evenly distributed within that circle's area, since
 #' \cr
-#'   0.9r = 0.9 * sqrt(area/pi()) = approx solution to dist from avg point (resident) in circle
+#'   0.9r = 0.9 * sqrt(area/pi) = approx solution to dist from avg point (resident) in circle
 #' to a random point in the circle (facility or point of interest).
 #' \cr\cr
-#' Relies on the \pkg{sp} package for the \code{\link{sp}{spDists}} and \code{\link{sp}{SpatialPoints}} functions.
+#' Relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
 #' \cr\cr
 #' IMPORTANT:
 #' \cr

@@ -2,18 +2,18 @@
 % Please edit documentation in R/get.distances.R
 \name{get.distances}
 \alias{get.distances}
-\title{Find distances between nearby points, just searching within a specified maximum distance.}
+\title{Find distances between nearby points, just within specified radius. **work in progress}
 \usage{
 get.distances(frompoints, topoints, radius = 5, units = "miles",
   ignore0 = FALSE, return.rownums = TRUE, return.latlons = FALSE,
-  return.crosstab = FALSE, tailored.deltalon = TRUE)
+  return.crosstab = FALSE, tailored.deltalon = TRUE, as.df = FALSE)
 }
 \arguments{
 \item{frompoints}{A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed.}
 
 \item{topoints}{A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed.}
 
-\item{radius}{A single number defining nearby, the maximum distance searched for or recorded. Default is 5 miles, which is 8.0467 km, unless units or radius is specified.}
+\item{radius}{A single number defining nearby, the maximum distance searched for or recorded. Default is 5 miles, which is 8.0467 km, unless units or radius is specified. Must be <5,000 km.}
 
 \item{units}{A string that is 'miles' by default, or 'km' for kilometers, specifying units for radius and distances returned.}
 
@@ -70,6 +70,8 @@ On a quadcore i7 MacBookPro10,1 2012 with 16GB RAM, it takes 2.5 minutes for 100
 > Sys.time(); x=get.distances(testpoints(1e4), testpoints(1000), units='miles',radius=5,return.rownums=TRUE)$d; Sys.time()
 [1] "2015-03-09 21:12:40 EDT"
 [1] "2015-03-09 21:12:53 EDT" 13 SEC FOR SMALLER JOB of frompoints but same total points}
+
+\item{as.df}{Optional logical, default is TRUE}
 }
 \value{
 By default, returns a dataframe that has 3 columns: fromrow, torow, distance (where fromrow or torow is the row number of the corresponding input, starting at 1).
@@ -80,24 +82,28 @@ By default, returns a dataframe that has 3 columns: fromrow, torow, distance (wh
 Returns the distances from one set of points to nearby members of another set of points.
 }
 \details{
-This function returns a matrix or vector of distances,
-which are the distances from one set of points to the nearby members of another set of points.
-It searches within a circle (of radius = radius, defining what is considered nearby),
-to calculate distance (in miles or km) from each of frompoints to each of topoints that is within the specified radius.
-Points are specified using latitude and longitude in decimal degrees.
-\cr\cr
-Relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
-Uses \code{\link{get.distances.all}} but for performance it only uses it for distance pairs (pairs of points) that have been initially
-quickly filtered using lat/lon to be not much more than radius, in an attempt to go
-much faster than finding every distance pair and then dropping all outside the search radius.
-\cr\cr
-Regarding distance calculation, also see \url{http://en.wikipedia.org/wiki/Vincenty\%27s_formulae},
-\url{http://williams.best.vwh.net/avform.htm#Dist}, \url{http://sourceforge.net/projects/geographiclib/},
-and \url{http://www.r-bloggers.com/great-circle-distance-calculations-in-r/}.
-\cr\cr
-Finding distance to all of the 11 million census blocks in usa within 5 km, for 100 points, can take a while... maybe >1 minute?
-May need to switch to just use a js library like turf, or investigate using data.table to index and more quickly subset the (potentially 11 million Census blocks of) topoints
-(or pre-index that block point dataset and allow this function to accept a data.table as input).
+** note- provides incorrect search box if a point is within radius of max or min lat or lon allowed or where it is zero **
+  This function returns a matrix or vector of distances,
+ which are the distances from one set of points to the nearby members of another set of points.
+ It searches within a circle (of radius = radius, defining what is considered nearby),
+ to calculate distance (in miles or km) from each of frompoints to each of topoints that is within the specified radius.
+ Points are specified using latitude and longitude in decimal degrees.
+ \cr\cr
+ Uses \code{\link{get.distances.all}}. Relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
+ \cr\cr
+ ** Note this is work in progress - see notes on parameter \code{tailored.deltalon}.
+ For performance it only uses it for distance pairs (pairs of points) that have been initially
+ quickly filtered using lat/lon to be not much more than radius, in an attempt to go
+ much faster than finding every distance pair and then dropping all outside the search radius.
+ But it might be faster just to get all distances even outside box and then return only those within radius.
+ \cr\cr
+ Regarding distance calculation, also see \url{http://en.wikipedia.org/wiki/Vincenty\%27s_formulae},
+ \url{http://williams.best.vwh.net/avform.htm#Dist}, \url{http://sourceforge.net/projects/geographiclib/},
+ and \url{http://www.r-bloggers.com/great-circle-distance-calculations-in-r/}.
+ \cr\cr
+ Finding distance to all of the 11 million census blocks in usa within 5 km, for 100 points, can take a while... maybe >1 minute?
+ May need to switch to just use a js library like turf, or investigate using data.table to index and more quickly subset the (potentially 11 million Census blocks of) topoints
+ (or pre-index that block point dataset and allow this function to accept a data.table as input).
 }
 \examples{
 #
@@ -110,68 +116,58 @@ May need to switch to just use a js library like turf, or investigate using data
     .Names = c("lat", "lon"), class = "data.frame",
     row.names = c("1", "2", "3"))
 
-   testpoints <- function(n) {
-     structure(list(tolat = runif(n, min=40,max=42), tolon = runif(n,min=-125,max=-70) ),
-     .Names = c("lat", "lon"), row.names = 1:n, class = "data.frame")
-   }
-
    n=100
-   test.from2 <- testpoints(n)
+   t100 <- testpoints(n, minlat = 25, maxlat = 45, minlon = -100, maxlon = -60)
    n=1000
-   test.to2 <- testpoints(n)
+   t1000 <- testpoints(n, minlat = 25, maxlat = 45, minlon = -100, maxlon = -60)
 
    # see as map of many points
    #*** Can fail if radius=50 miles? ... Error in rbind() numbers of
    #  columns of arguments do not match !
-   #big = get.distances(test.from2, test.to2, radius=100, units='miles', return.latlons=TRUE)
-   big = get.distances(test.from2, test.to2, radius=100, units='miles', return.latlons=TRUE)
+   #big = get.distances(t100, t1000, radius=100, units='miles', return.latlons=TRUE)
+   big = get.distances(t100, t1000, radius=100, units='miles', return.latlons=TRUE)
    plot(big$fromlon, big$fromlat,main='from black circles...
      closest is red, others nearby are green ')
-   points(test.to2$lon, test.to2$lat, col='blue',pch='.')
+   points(t1000$lon, t1000$lat, col='blue',pch='.')
    points(big$tolon, big$tolat, col='green')
-   junk=as.data.frame( get.nearest(test.from2, test.to2) )
-   points(test.to2$lon[junk$n],test.to2$lat[junk$n],col='red')
-
+   junk=as.data.frame( get.nearest(t100, t1000, return.latlons=TRUE) )
+   points(junk$tolon, junk$tolat, col='red')
+   # Draw lines from frompoint to nearest: or say linesegments(fromlon, fromlat, tolon, tolat)
+   flon = with( junk, as.vector(t(matrix( c(fromlon, tolon, rep(NA, length(tolon))), ncol=3) )))
+   flat = with( junk, as.vector(t(matrix( c(fromlat, tolat, rep(NA, length(tolat))), ncol=3) )))
+   lines(flon, flat)
     # test cases
 
-get.distances(test.from[1,],test.to[1,],radius=999,return.rownums=FALSE,
-return.latlons=FALSE)
+get.distances(test.from[1,],test.to[1,],radius=999,return.rownums=F,return.latlons=F)
 get.distances(test.from[1,],test.to[1,],radius=999,return.rownums=FALSE,return.latlons=TRUE)
 get.distances(test.from[1,],test.to[1,],radius=999,return.rownums=TRUE,return.latlons=FALSE)
 get.distances(test.from[1,],test.to[1,],radius=999,return.rownums=TRUE,return.latlons=TRUE)
 
-get.distances(test.from[1,],test.to[1:3,],radius=999,return.rownums=FALSE,
-return.latlons=FALSE)
+get.distances(test.from[1,],test.to[1:3,],radius=999,return.rownums=F,return.latlons=F)
 get.distances(test.from[1,],test.to[1:3,],radius=999,return.rownums=FALSE,return.latlons=TRUE)
 get.distances(test.from[1,],test.to[1:3,],radius=999,return.rownums=TRUE,return.latlons=FALSE)
 get.distances(test.from[1,],test.to[1:3,],radius=999,return.rownums=TRUE,return.latlons=TRUE)
 
-get.distances(test.from[1:2,],test.to[1,],radius=999,return.rownums=FALSE,
-return.latlons=FALSE)
+get.distances(test.from[1:2,],test.to[1,],radius=999,return.rownums=F,return.latlons=F)
 get.distances(test.from[1:2,],test.to[1,],radius=999,return.rownums=FALSE,return.latlons=TRUE)
 get.distances(test.from[1:2,],test.to[1,],radius=999,return.rownums=TRUE,return.latlons=FALSE)
 get.distances(test.from[1:2,],test.to[1,],radius=999,return.rownums=TRUE,return.latlons=TRUE)
 
-get.distances(test.from[1:2,],test.to[1:3,],radius=999,return.rownums=FALSE,
-return.latlons=FALSE)
-get.distances(test.from[1:2,],test.to[1:3,],radius=999,return.rownums=FALSE,
-return.latlons=TRUE)
-get.distances(test.from[1:2,],test.to[1:3,],radius=999,return.rownums=TRUE,
-return.latlons=FALSE)
-get.distances(test.from[1:2,],test.to[1:3,],radius=999,return.rownums=TRUE,
-return.latlons=TRUE)
+get.distances(test.from[1:2,],test.to[1:3,],radius=999,return.rownums=F,return.latlons=F)
+get.distances(test.from[1:2,],test.to[1:3,],radius=999,return.rownums=FALSE,return.latlons=T)
+get.distances(test.from[1:2,],test.to[1:3,],radius=999,return.rownums=TRUE,return.latlons=F)
+get.distances(test.from[1:2,],test.to[1:3,],radius=999,return.rownums=TRUE,return.latlons=TRUE)
 get.distances(test.from[1:2,],test.to[1:3,], radius=0.7,return.rownums=TRUE,
-return.latlons=TRUE, units='km')
+  return.latlons=TRUE, units='km')
 get.distances(test.from[1:2,],test.to[1:3,], radius=0.7,return.rownums=TRUE,
-return.latlons=TRUE, units='miles')
+  return.latlons=TRUE, units='miles')
 
+  # Warning messages:
+  # Ignoring return.crosstab because radius was specified
 get.distances(test.from[1,],test.to[1:3, ], return.crosstab=TRUE)
 get.distances(test.from[1:2,],test.to[1, ], return.crosstab=TRUE)
 get.distances(test.from[1:2,],test.to[1:3, ], return.crosstab=TRUE)
 get.distances(test.from[1:2,],test.to[1:3, ], radius=0.7, return.crosstab=TRUE)
-  # Warning message:
-  # In get.distances(test.from[1:2, ], test.to[1:3, ], radius = 0.7,  :
-  # Ignoring return.crosstab because radius was specified
 }
 \seealso{
 \code{\link{get.distances.all}} which allows you to get distances between all points,

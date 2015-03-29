@@ -4,7 +4,8 @@
 \alias{testpoints}
 \title{Generate a number of randomly placed points, as latitude/longitude values.}
 \usage{
-testpoints(n, minlat = 40, maxlat = 42, minlon = -125, maxlon = -70)
+testpoints(n, minlat = 40, maxlat = 42, minlon = -125, maxlon = -70,
+  as.df = TRUE)
 }
 \arguments{
 \item{n}{Numeric value, required, TRUE by default. Specifies how many testpoints to return. Must be an integer between zero and 50 million, and not NA.}
@@ -16,9 +17,11 @@ testpoints(n, minlat = 40, maxlat = 42, minlon = -125, maxlon = -70)
 \item{minlon}{Default -125. A number that is the minimum longitude in decimal degrees to use for generating random points within some range.}
 
 \item{maxlon}{Default -70. A number that is the maximum longitude in decimal degrees to use for generating random points within some range.}
+
+\item{as.df}{Logical, default is TRUE, in which case returns a data.frame, otherwise a matrix.}
 }
 \value{
-By default, returns a dataframe that has 2 columns: lat and lon, in decimal degrees, with 1 row per point.
+By default, returns a data.frame (or matrix if as.df=FALSE) that has 2 columns: lat and lon, in decimal degrees, with 1 row per point.
 }
 \description{
 Generate a number of randomly placed points, as latitude/longitude values.
