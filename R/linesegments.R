@@ -22,8 +22,8 @@
 #'  linesegments(nears$fromlon, nears$fromlat, nears$tolon, nears$tolat)
 #' @export
 linesegments <- function(xfrom, yfrom, xto, yto, ...) {
-  xvals =  as.vector(t(matrix( c(xlon, xto, rep(NA, length(xto))), ncol=3) ))
-  yvals =  as.vector(t(matrix( c(ylon, yto, rep(NA, length(yto))), ncol=3) ))
+  xvals =  as.vector(t(matrix( c(xfrom, xto, rep(NA, length(xto))), ncol=3) ))
+  yvals =  as.vector(t(matrix( c(yfrom, yto, rep(NA, length(yto))), ncol=3) ))
   lines(xvals, yvals, ...)
   invisible(cbind(x=xvals, y=yvals))
 }

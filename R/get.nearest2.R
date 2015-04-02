@@ -65,7 +65,7 @@ get.nearest2 <- function(frompoints, topoints, units='miles', ignore0=FALSE,
   # Each of N topoints has box/A chance of being in box, and 
   # chance of at least one being in box is 1-(1-box/A)^N = 0.95, so box/A= 1 - (1-0.95)^(1/N)
   #
-  #   searchRadiuskm <- function(frompoints, topoints, prob) {
+  #   searchRadiuskm <- function(frompoints, topoints, prob=0.95) {
   #     meanlat = mean(topoints$lat)
   #     latrangekm = meters.per.degree.lat(meanlat ) * abs(diff(range(c(frompoints$lat, topoints$lat))))  / 1000
   #     lonrangekm = meters.per.degree.lon(meanlat ) * abs(diff(range(c(frompoints$lon, topoints$lon))))  / 1000
@@ -78,7 +78,8 @@ get.nearest2 <- function(frompoints, topoints, units='miles', ignore0=FALSE,
   #   searchRadius1 <- searchRadiuskm(frompoints, topoints, 0.95)
   #   searchRadiusLat <- searchRadius1 / ( meters.per.degree.lat(mean(topoints$lat))/1000 )
   #   searchRadiusLon <- searchRadius1 / ( meters.per.degree.lon(mean(topoints$lat))/1000 )
-  #   # There is a high probability that within ± this search radius you will find the nearest of topoints (at least one of the topoints)
+  #   # There is a high probability that within ± this search radius you will find
+  #   #   the nearest (at least one of) the topoints.
   #   if (usebox) {
   #     # would want to limit search for a given frompoint, using box, but that is slower than just getting ALL distances in sp package.
   #   }

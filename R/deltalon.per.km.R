@@ -28,7 +28,7 @@
 #' deltalon.per.km(0) 
 #'   # Roughly 111 km/degree moved East-West at the equator roughly, or around 21 miles.
 #' deltalon.per.km(c(0,45,72))
-#' #' @export
+#' @export
 deltalon.per.km <- function(lat) {
   return( 1000 / meters.per.degree.lon(lat))
 }

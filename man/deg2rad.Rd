@@ -7,10 +7,10 @@
 deg2rad(deg)
 }
 \arguments{
-\item{deg}{Degrees as decimal degrees}
+\item{deg}{Degrees as decimal degrees, required numeric vector}
 }
 \value{
-Radians
+Radians, as numeric vector same length as input
 }
 \description{
 From \url{http://www.r-bloggers.com/great-circle-distance-calculations-in-r/}

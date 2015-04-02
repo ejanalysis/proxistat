@@ -34,7 +34,6 @@ so miles/degrees is about 111.32 km * 0.309 = 34.4 km = 21.4 miles roughly.
 deltalon.per.km(0)
   # Roughly 111 km/degree moved East-West at the equator roughly, or around 21 miles.
 deltalon.per.km(c(0,45,72))
-#'
 }
 \seealso{
 \code{\link{meters.per.degree.lon}} for the inverse of this function (other than a factor of 1000),
