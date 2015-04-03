@@ -27,6 +27,8 @@ showing fromlat, fromlon, tolat, tolon.}
 }
 \value{
 By default, returns a matrix of numbers, with columns fromrow, torow indexing which is nearest of topoints, and d (distance).
+  ** Returns Inf when no topoints are found within the radius, and also when a distance to nearest is zero but ignore0=TRUE.
+  Future edit might want to return smallest nonzero distance.**
   Distance returned is in miles by default, but with option to set units='km' to get kilometers.
   See parameters for details on other formats that may be returned if specified.
 }

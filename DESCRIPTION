@@ -24,15 +24,10 @@ Description: This package has functions helping to calculate distances between
   "ejanalysis/ejanalysis", "ejanalysis/countyhealthrankings"))
 License: Artistic-2.0
 Depends:
-  R (>= 3.1.2),
-  analyze.stuff
+  R (>= 3.1.2)
 Imports:
-  sp,
-  foreign,
-  Hmisc
+  sp
 Suggests:
-  countyhealthrankings,
-  ejanalysis,
   data.table,
   matrixStats
 URL: https://github.com/ejanalysis/ejanalysis/
