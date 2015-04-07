@@ -23,6 +23,11 @@ BUT note this does not yet check to see if contents exist and zip does not, in w
 \description{
 Download, unzip, read, and assemble lat lon of internal points for US Census block groups.
 }
+\details{
+Note this is obsolete if used to create data() containing the results:
+  bg.pts = get.bg.latlons(mytempdir = getwd(), overwrite=FALSE, silent = TRUE)
+  save(bg.pts, file='bg.pts') # and then this can be saved in the data folder of a package, then build pkg, then access via data('bg.pts')
+}
 \examples{
 #get.bg.latlons(mystatenums=c('09','10'))
 }

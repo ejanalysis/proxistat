@@ -1,5 +1,8 @@
 #' @title Get block group internal points directly from Census shapefiles
 #' @description Download, unzip, read, and assemble lat lon of internal points for US Census block groups.
+#' @details Note this is obsolete if used to create data() containing the results:
+#'   bg.pts = get.bg.latlons(mytempdir = getwd(), overwrite=FALSE, silent = TRUE)
+#'   save(bg.pts, file='bg.pts') # and then this can be saved in the data folder of a package, then build pkg, then access via data('bg.pts')
 #' @param myyear Year such as 2014 (default)
 #' @param mytempdir Optional. Default is TIGERTEMP created inside the current working directory. Character string of path to where temporary directory is or will be, for downloaded zip and dbf files.
 #' @param mystatenums Optional, default is all including PR/VI/DC, etc. Vector of strings of 2-character FIPS codes for states to get data for.
@@ -50,6 +53,4 @@ get.bg.latlons <- function( myyear=2014, mytempdir, mystatenums, overwrite=FALSE
   names(out) <- c('FIPS', 'aland', 'awater', 'lat', 'lon')
   return(out)
   
-  # bg.pts = get.bg.latlons(mytempdir = getwd(), overwrite=FALSE, silent = TRUE)
-  # save(bg.pts, file='bg.pts')
 }
