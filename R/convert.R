@@ -7,7 +7,11 @@
 #' This function takes a number, or vector of numbers, representing distance/length or area
 #' in one type of specified units, such as miles, and returns the corresponding number(s)
 #' converted to some other units, such as kilometers. Units can be specified in various ways.
-#' All inputs must be in the same units. All outputs must be in a single set of units as well.
+#' All inputs must be in the same units. All outputs must be in a single set of units as well. \cr\cr
+#' NOTE: For some purposes, Census Bureau does this: "The ANSI standard for converting square kilometers into square miles was used ( 1 square mile = 2.58998811 square kilometers)." 
+#' (see \url{https://www.census.gov/geo/reference/state-area.html})
+#' but the conversions in this function use 2.5899881034 not 2.58998811 sqkm/sqmi. 
+#' The difference is only 6.6 per billion (roughly 1 in 152 million), which is less than one tenth of a square kilometer out the entire USA.
 #'
 #' @param x A number or vector of numbers to be converted.
 #' @param from A string specifying original units of input parameter. Default is 'km' which is kilometers.
