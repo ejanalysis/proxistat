@@ -30,6 +30,7 @@
 #' @param units A string that is 'miles' by default, or 'km' for kilometers, specifying units for distances returned.
 #' @return By default, returns a vector of distances, but can return a matrix of numbers, with columns that can include fromrow and torow indexing 
 #'   which is nearest (first if >1 match) of topoints, fromlat, fromlon, tolat, tolon, and d (distance).
+#'   ** Returns Inf when no topoints are found within the radius, and also when a distance to nearest is zero but ignore0=TRUE. 
 #'   Distance returned is in miles by default, but with option to set units='km' to get kilometers.
 #'   See parameters for details on other formats that may be returned if specified.
 #' @seealso \code{\link{get.distances}} which gets distances between all points (within an optional search radius),
@@ -39,6 +40,22 @@
 #' @concept proximity
 #' @import sp
 #' @examples
+#' set.seed(999)
+#' t1=testpoints(1)
+#' t10=testpoints(10)
+#' t100=testpoints(100)
+#' t1k=testpoints(1e3)
+#' t10k=testpoints(1e4)
+#' t100k=testpoints(1e5)
+#' t1m=testpoints(1e6)
+#' #t10m=testpoints(1e7)
+#' 
+#' get.nearest2(t1, t1)
+#' get.nearest2(t1, t10[2, ,drop=FALSE])
+#' get.nearest2(t10, t1k)
+#' get.nearest2(t10, t1k, radius=500, units='km')
+#' get.nearest2(t10, t1k, radius=10, units='km')
+#' 
 #' test.from <- structure(list(fromlat = c(38.9567309094, 38.9507043428), 
 #'  fromlon = c(-77.0896572305, -77.0896199948)), .Names = c("lat", "lon"), 
 #'  row.names = c("6054762", "6054764"), class = "data.frame")
@@ -56,7 +73,7 @@ get.nearest2 <- function(frompoints, topoints, units='miles', ignore0=FALSE,
   #frompoints and topoints each must be a matrix with 'lat' and 'lon' colnames (or only 2 cols that are lat and lon in that order)
   
   # ***** Notes on performance/ speed: ******
-  # It should be easy to speed this up (for very large numbers of topoints) by using a box to search within (as get.distances does) and only enlarge the search box if no topoints are found in it.
+  # It might be easy to speed this up (for very large numbers of topoints) by using a box to search within (as get.distances does) and only enlarge the search box if no topoints are found in it.
   # One could assume topoints are uniformly distributed in extent defined by range(c(frompoints$lat, topoints$lat)) and range(c(frompoints$lon, topoints$lon))
   # Then do initial search for nearest by using get.distances(frompoints, topoints, max.miles=x) 
   # where max.miles is chosen so there is a 95% chance that at least one topoint will be within max.miles ***
@@ -101,7 +118,7 @@ get.nearest2 <- function(frompoints, topoints, units='miles', ignore0=FALSE,
     d <- d * miles.per.km
   }
   
-  d[d > radius] <- NA
+  d[d > radius] <- Inf
   
   if (return.rownums || return.latlons) {
     #torow <- apply( distances, 1, which.min ) # this was slightly slower than line below approach

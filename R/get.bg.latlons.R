@@ -1,4 +1,4 @@
-#' @title Get block group internal points directly from Census shapefiles
+#' @title Was used to get block group internal points directly from Census shapefiles
 #' @description Download, unzip, read, and assemble lat lon of internal points for US Census block groups.
 #' @details Note this is obsolete if used to create data() containing the results:
 #'   bg.pts = get.bg.latlons(mytempdir = getwd(), overwrite=FALSE, silent = TRUE)

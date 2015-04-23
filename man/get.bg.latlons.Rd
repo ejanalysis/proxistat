@@ -2,7 +2,7 @@
 % Please edit documentation in R/get.bg.latlons.R
 \name{get.bg.latlons}
 \alias{get.bg.latlons}
-\title{Get block group internal points directly from Census shapefiles}
+\title{Was used to get block group internal points directly from Census shapefiles}
 \usage{
 get.bg.latlons(myyear = 2014, mytempdir, mystatenums, overwrite = FALSE,
   silent = FALSE)

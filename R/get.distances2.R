@@ -1,6 +1,7 @@
-#' @title Find distances between nearby points, just within specified radius. **work in progress
+#' @title Alt method faster/no loop - to Find distances between nearby points, just within specified radius. **work in progress
 #'
 #' @description Returns the distances from one set of points to nearby members of another set of points.
+#'   ** Documentation copied from get.distances, not edited to be relevant to this alt version.
 #' 
 #' @details ** note- provides incorrect search box if a point is within radius of max or min lat or lon allowed or where it is zero **
 #'   This function returns a matrix or vector of distances, 
@@ -59,6 +60,22 @@
 #'            >3 minutes per 100 sites? \cr
 #'            About 2.6 seconds per site for 11m blocks?  \cr
 #'             \cr
+#' **** get.distances.all scales linearly, more or less: *****
+#' IT TAKES ALMOST 30 (27) SECONDS FOR 10 POINTS and every Census Block in the US (11m).
+#' > Sys.time(); x=get.distances.all(testpoints(11e6), testpoints(10), return.crosstab=TRUE); Sys.time()
+#' [1] "2015-04-18 12:02:31 EDT"
+#' [1] "2015-04-18 12:02:58 EDT"
+#' and doesnt matter much if fewer blocks and more sites, vs more blocks and fewer sites, at a time.
+#' > Sys.time(); x=get.distances.all(testpoints((1.1e6)), testpoints(100), return.crosstab=TRUE); Sys.time()
+#' [1] "2015-04-18 12:06:51 EDT"
+#' [1] "2015-04-18 12:07:18 EDT"
+#' and 131 seconds for 50 sites to all blocks: so 5x27sec=135 expected, close to actual 131.
+#' Sys.time(); x=get.distances.all(testpoints(11e6), testpoints(50), return.crosstab=TRUE); Sys.time()
+#' [1] "2015-04-18 12:10:10 EDT"
+#' [1] "2015-04-18 12:12:21 EDT"
+#' **** So a typical request of 100 to 1000 to 10k sites could take
+#'   262 to 2620 to 26200 seconds, or 3 minutes to 45 minutes to 7.3 hours!! That is too slow for common use/webapp.
+#' ******
 #' > Sys.time(); x=get.distances.all(testpoints(1e5), testpoints(1000), units='miles',return.rownums=TRUE); Sys.time() \cr
 #' [1] "2015-03-09 21:23:04 EDT" \cr
 #' [1] "2015-03-09 21:23:40 EDT"  36 SECONDS IF DATA.FRAME ETC. DONE TO FORMAT RESULTS AND GET ROWNUMS \cr
@@ -177,17 +194,17 @@ get.distances <- function(frompoints, topoints, radius=5, units='miles', ignore0
   if (units=='miles' ) { radius <- radius * km.per.mile }
   if (radius > 5000) {stop('radius must be less than 5,000 kilometers')}
   
-  maxlat <- 72
-  # For most northern point of USA http://en.wikipedia.org/wiki/Extreme_points_of_the_United_States, where 
-  # max degrees per mile, latitude is under 72
-  
-  deltalat <- 1.01 * radius * 1 / (meters.per.degree.lat(maxlat) / 1000 )
-  # added in 1.01 * to search over 2% wider and taller box just to avoid problems from rounding or 72 degree max assumed lat.
-  # old approximation wasn't quite good enough: deltalat <- radius * ( max.lat.per.mile <- 1/68 )   # 0.07352941 degrees for 5 miles
-
-  if (!tailored.deltalon) {
-    deltalon <- 1.01 * radius * 1 / ( meters.per.degree.lon(maxlat) / 1000 )
-  }
+#   maxlat <- 72
+#   # For most northern point of USA http://en.wikipedia.org/wiki/Extreme_points_of_the_United_States, where 
+#   # max degrees per mile, latitude is under 72
+#   
+#   deltalat <- 1.01 * radius * 1 / (meters.per.degree.lat(maxlat) / 1000 )
+#   # added in 1.01 * to search over 2% wider and taller box just to avoid problems from rounding or 72 degree max assumed lat.
+#   # old approximation wasn't quite good enough: deltalat <- radius * ( max.lat.per.mile <- 1/68 )   # 0.07352941 degrees for 5 miles
+# 
+#   if (!tailored.deltalon) {
+#     deltalon <- 1.01 * radius * 1 / ( meters.per.degree.lon(maxlat) / 1000 )
+#   }
   # This should calc deltalon as function of lat, for each frompoint, using lat of northern edge of box as input to meters.per.degree.lon(lat)
   # making it up to ~2-3x as wide, so maybe 2x-3x as fast if search smaller box for more southern (20-30 degrees) vs northmost points (72 degrees)
   # But checking that using # maybe would just slow it down on net? Seems worth trying.
@@ -226,127 +243,151 @@ get.distances <- function(frompoints, topoints, radius=5, units='miles', ignore0
   
   if (!return.rownums & !return.latlons & !return.crosstab) {wantvector <- TRUE} else {wantvector <- FALSE}
   
-  results.empty=get.distances.all(data.frame(lat=0,lon=0), data.frame(lat=0,lon=0), return.rownums=return.rownums, return.latlons=return.latlons, return.crosstab=return.crosstab)
-  colcount=dim(results.empty)[2]
-  if (is.null(colcount)) {colcount <- 1}
-  results.full <- matrix(ncol=colcount) # can't preallocate since don't know size yet due to not getting dist for any except within box defined by radius, and then removing others based on radius
+  
+  results <- get.distances.all(frompoints, topoints, units=units, return.rownums=return.rownums, return.latlons=return.latlons, return.crosstab=return.crosstab)
 
-  ########################################################################
-  # For each row in frompoints, 
-  ########################################################################
-  
-  firstvalidresults <- TRUE
-  
-  for (rownum.frompoints in 1:fromcount) {
-    
-    # for performance, may want to use data.table package here?
-    
-    # Filter topoints using a box that is based on radius, to limit to tobox, then use get.distances.all() for just that subset
-    # cat('\n\n')    
-    # if (exists('deltalon')) {cat('deltalon and lat', deltalon, deltalat, '\n')}
-    # cat('rownum ',rownum.frompoints,' out of', fromcount,'\n')
-    #     
-    fromlat <- frompoints[rownum.frompoints, 'lat']
-    fromlon <- frompoints[rownum.frompoints, 'lon']
-    
-    # ****  check speed impact of using this:
-    if (tailored.deltalon) {
-      deltalon <- 1.01 * radius * 1 / ( meters.per.degree.lon( fromlat + deltalat ) / 1000 )
-    }
-    # This should calc deltalon as function of lat, for each frompoint, using lat of northern edge of box as input to meters.per.degree.lon(lat)
-    # making it up to ~2-3x as wide, so maybe 2x-3x as fast if search smaller box for more southern (20-30 degrees) vs northmost points (72 degrees)
-    # But checking that using # maybe would just slow it down on net? Seems worth trying.
-    # not sure if faster to say tolat<-topoints[ , 'lat'] and same for tolon, or just look up each vector twice below
-    rownum.topoints <- (topoints[ , 'lat'] > fromlat - deltalat) &
-      (topoints[ , 'lat'] < fromlat + deltalat) & 
-      (topoints[ , 'lon'] > fromlon - deltalon) & 
-      (topoints[ , 'lon'] < fromlon + deltalon) 
-    # 
-    # cat('topoints total:',length(topoints[,'lat']), '  topoints in box: ', sum(rownum.topoints),'\n')
-    tobox <- topoints[rownum.topoints, ]
-    rownum.topoints <- (1:tocount)[rownum.topoints]
-    # cat('rownum.topoints',rownum.topoints,'\n')
-    # cat('rownum.frompoints',rownum.frompoints,'\n')
-    
-    if (sum(as.numeric(rownum.topoints)) > 0) {
-      # print(frompoints[rownum.frompoints,])
-      # print(tobox)
-      
-      results <- get.distances.all(frompoints[rownum.frompoints, ], tobox, units='km', return.rownums=return.rownums, return.latlons=return.latlons, return.crosstab=FALSE)
-      
-      if (length(rownum.topoints)==1) {just1topoint <- TRUE} else {just1topoint <- FALSE}
-      
-      # # testing:
-      # cat('results: \n'); print(results)
-      # cat('wantvector:', wantvector, '\njust1topoint:', just1topoint, '\n')
-      # cat('is.matrix(results):', is.matrix(results),  '\nis.vector(results): ', is.vector(results), '\nis.data.frame(results):', is.data.frame(results), '\nclass(results):', class(results), '\n')
-      # cat('str(results): \n');   print(str(results)); cat('\n')
-      # cat('dim(results): \n'); print(dim(results));cat('\n')
-      # cat('dimnames(results):\n'); print( dimnames(results) ); cat('\n')
-      # 
-      
-      # remove those outside search radius, and note right now results and radius are in km
-      if (!wantvector) {
-        if (return.rownums) {
-          # fix the torow numbers to be just those requested, and fromrow should be the one being used right now in this loop
-          if (!just1topoint) {
-            results[ , 'fromrow'] <- rownum.frompoints
-            results[ , 'torow']   <- rownum.topoints
-          } else {
-            # test this:
-            results['fromrow'] <- rownum.frompoints
-            results['torow']   <- rownum.topoints
-          }
-        }
-        results <- results[ results[ , 'd'] <= radius, ]
-        # append results to results.full
-        
-        if (ignore0) { results <- results[ results[,'d'] != 0,  ] }
-        
-        #*** need to handle case here where ignore0 caused there to be zero valid nonzero results:
-        #*****
-        # if (length(results[,'d']) != 0) { }
-        
-        
-        
-        if (rownum.frompoints==1 | firstvalidresults ) {results.full <- results} else { results.full <- rbind(results.full, results) } 
-        firstvalidresults <- FALSE
-        
-      } else {
-        # JUST A VECTOR OF DISTANCES
-        results <- results[ results <= radius]
-        if (ignore0) { results <- results[ results != 0 ] }
-        # test that this works if 0,1,>1 topoints
-        # print('rownum.frompoints');print(rownum.frompoints); cat('\n')
-        # append results to results.full
-        
-        #*** need to handle case here where ignore0 caused there to be zero valid nonzero results:
-        #*****
-        # if (length(results) == 0) { }
-        
-        
-        
-        
-        if (rownum.frompoints==1 | firstvalidresults ) {results.full <- results} else { results.full <- c(results.full, results) }
-        firstvalidresults <- FALSE
-        
-      }
-      
-      # print('results.full now: '); print(results.full); cat('\n')
-      # print('results now: '); print(results); cat('\n')
-      
-      # Note that if wantvector, results are hard to interpret since length returned is not same as length of input and can't tell which was <= radius
-    }
-  }
-
-  #  if (is.data.frame(results) && min(dim(results))>1) { results.full <- results.full[-1,] } else { results.full <- results.full[-1] }
-  
   # CONVERT TO CORRECT UNITS NOW ****
   if (!wantvector) {
-    if (units=='miles') { results.full[,'d'] <- results.full[,'d'] / km.per.mile }
+    if (units=='miles') { results[,'d'] <- results[,'d'] / km.per.mile }
   } else {
-    if (units=='miles') { results.full <- results.full / km.per.mile }
+    if (units=='miles') { results <- results / km.per.mile }
   }
-  if (as.df) {results.full <- as.data.frame(results.full)}
-  return(results.full)  
+
+  if (as.df) {results <- as.data.frame(results)}
+  
+  if (return.crosstab) {return(results)}
+  
+  if (!wantvector) {
+    results <- results[ results[ , 'd'] <= radius, ]
+    if (ignore0) { results <- results[ results[,'d'] != 0,  ] }
+  } else {
+    results <- results[ results <= radius]
+    if (ignore0) { results <- results[ results != 0 ] }
+  }
+  
+  return(results)
+  
+#   results.empty=get.distances.all(data.frame(lat=0,lon=0), data.frame(lat=0,lon=0), return.rownums=return.rownums, return.latlons=return.latlons, return.crosstab=return.crosstab)
+#   colcount=dim(results.empty)[2]
+#   if (is.null(colcount)) {colcount <- 1}
+#   results.full <- matrix(ncol=colcount) # can't preallocate since don't know size yet due to not getting dist for any except within box defined by radius, and then removing others based on radius
+# 
+#   #######################################################################
+#   For each row in frompoints, 
+#   #######################################################################
+#   
+#   firstvalidresults <- TRUE
+#   
+#   for (rownum.frompoints in 1:fromcount) {
+#     
+#     # for performance, may want to use data.table package here?
+#     
+#     # Filter topoints using a box that is based on radius, to limit to tobox, then use get.distances.all() for just that subset
+#     # cat('\n\n')    
+#     # if (exists('deltalon')) {cat('deltalon and lat', deltalon, deltalat, '\n')}
+#     # cat('rownum ',rownum.frompoints,' out of', fromcount,'\n')
+#     #     
+#     fromlat <- frompoints[rownum.frompoints, 'lat']
+#     fromlon <- frompoints[rownum.frompoints, 'lon']
+#     
+#     # ****  check speed impact of using this:
+#     if (tailored.deltalon) {
+#       deltalon <- 1.01 * radius * 1 / ( meters.per.degree.lon( fromlat + deltalat ) / 1000 )
+#     }
+#     # This should calc deltalon as function of lat, for each frompoint, using lat of northern edge of box as input to meters.per.degree.lon(lat)
+#     # making it up to ~2-3x as wide, so maybe 2x-3x as fast if search smaller box for more southern (20-30 degrees) vs northmost points (72 degrees)
+#     # But checking that using # maybe would just slow it down on net? Seems worth trying.
+#     # not sure if faster to say tolat<-topoints[ , 'lat'] and same for tolon, or just look up each vector twice below
+#     rownum.topoints <- (topoints[ , 'lat'] > fromlat - deltalat) &
+#       (topoints[ , 'lat'] < fromlat + deltalat) & 
+#       (topoints[ , 'lon'] > fromlon - deltalon) & 
+#       (topoints[ , 'lon'] < fromlon + deltalon) 
+#     # 
+#     # cat('topoints total:',length(topoints[,'lat']), '  topoints in box: ', sum(rownum.topoints),'\n')
+#     tobox <- topoints[rownum.topoints, ]
+#     rownum.topoints <- (1:tocount)[rownum.topoints]
+#     # cat('rownum.topoints',rownum.topoints,'\n')
+#     # cat('rownum.frompoints',rownum.frompoints,'\n')
+#     
+#     if (sum(as.numeric(rownum.topoints)) > 0) {
+#       # print(frompoints[rownum.frompoints,])
+#       # print(tobox)
+#       
+#       results <- get.distances.all(frompoints[rownum.frompoints, ], tobox, units='km', return.rownums=return.rownums, return.latlons=return.latlons, return.crosstab=FALSE)
+#       
+#       if (length(rownum.topoints)==1) {just1topoint <- TRUE} else {just1topoint <- FALSE}
+#       
+#       # # testing:
+#       # cat('results: \n'); print(results)
+#       # cat('wantvector:', wantvector, '\njust1topoint:', just1topoint, '\n')
+#       # cat('is.matrix(results):', is.matrix(results),  '\nis.vector(results): ', is.vector(results), '\nis.data.frame(results):', is.data.frame(results), '\nclass(results):', class(results), '\n')
+#       # cat('str(results): \n');   print(str(results)); cat('\n')
+#       # cat('dim(results): \n'); print(dim(results));cat('\n')
+#       # cat('dimnames(results):\n'); print( dimnames(results) ); cat('\n')
+#       # 
+#       
+#       # remove those outside search radius, and note right now results and radius are in km
+#       if (!wantvector) {
+#         if (return.rownums) {
+#           # fix the torow numbers to be just those requested, and fromrow should be the one being used right now in this loop
+#           if (!just1topoint) {
+#             results[ , 'fromrow'] <- rownum.frompoints
+#             results[ , 'torow']   <- rownum.topoints
+#           } else {
+#             # test this:
+#             results['fromrow'] <- rownum.frompoints
+#             results['torow']   <- rownum.topoints
+#           }
+#         }
+#         results <- results[ results[ , 'd'] <= radius, ]
+#         # append results to results.full
+#         
+#         if (ignore0) { results <- results[ results[,'d'] != 0,  ] }
+#         
+#         #*** need to handle case here where ignore0 caused there to be zero valid nonzero results:
+#         #*****
+#         # if (length(results[,'d']) != 0) { }
+#         
+#         
+#         
+#         if (rownum.frompoints==1 | firstvalidresults ) {results.full <- results} else { results.full <- rbind(results.full, results) } 
+#         firstvalidresults <- FALSE
+#         
+#       } else {
+#         # JUST A VECTOR OF DISTANCES
+#         results <- results[ results <= radius]
+#         if (ignore0) { results <- results[ results != 0 ] }
+#         # test that this works if 0,1,>1 topoints
+#         # print('rownum.frompoints');print(rownum.frompoints); cat('\n')
+#         # append results to results.full
+#         
+#         #*** need to handle case here where ignore0 caused there to be zero valid nonzero results:
+#         #*****
+#         # if (length(results) == 0) { }
+#         
+#         
+#         
+#         
+#         if (rownum.frompoints==1 | firstvalidresults ) {results.full <- results} else { results.full <- c(results.full, results) }
+#         firstvalidresults <- FALSE
+#         
+#       }
+#       
+#       # print('results.full now: '); print(results.full); cat('\n')
+#       # print('results now: '); print(results); cat('\n')
+#       
+#       # Note that if wantvector, results are hard to interpret since length returned is not same as length of input and can't tell which was <= radius
+#     }
+#   }
+# 
+#   #  if (is.data.frame(results) && min(dim(results))>1) { results.full <- results.full[-1,] } else { results.full <- results.full[-1] }
+#   
+#   # CONVERT TO CORRECT UNITS NOW ****
+#   if (!wantvector) {
+#     if (units=='miles') { results.full[,'d'] <- results.full[,'d'] / km.per.mile }
+#   } else {
+#     if (units=='miles') { results.full <- results.full / km.per.mile }
+#   }
+#   if (as.df) {results.full <- as.data.frame(results.full)}
+#   return(results.full)  
 }

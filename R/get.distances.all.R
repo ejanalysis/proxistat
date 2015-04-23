@@ -7,6 +7,28 @@
 #' @details
 #' *** Probably slower than it needs to be partly by using data.frame instead of matrix class? Roughly 10-20% faster if as.df=FALSE than if TRUE.
 #' \cr\cr
+#' Just using get.distances.all is reasonably fast? (30-40 seconds for 100 million distances, but slow working with results so large), 
+#' Sys.time(); x=get.distances.all(testpoints(1e5), testpoints(1000), return.crosstab=TRUE); Sys.time() \cr
+#' [1] "2015-03-10 18:59:08 EDT" \cr
+#' [1] "2015-03-10 18:59:31 EDT"  23 SECONDS  for 100 million distances IF NO PROCESSING OTHER THAN CROSSTAB \cr
+#' Sys.time(); x=get.distances.all(testpoints(1e6), testpoints(100), return.crosstab=TRUE); Sys.time() \cr
+#' [1] "2015-03-10 21:54:11 EDT" \cr
+#' [1] "2015-03-10 21:54:34 EDT"  23 SECONDS for 100 million distances (1m x 100, or 100k x 1000) \cr
+#' Sys.time(); x=get.distances.all(testpoints(1e6), testpoints(300), return.crosstab=TRUE); Sys.time() \cr
+#' [1] "2015-03-10 21:56:11 EDT" \cr
+#' [1] "2015-03-10 21:57:18 EDT"  67 seconds for 300 million pairs.  \cr
+#'  plus 20 seconds or so for x[x>100] <- Inf  \cr
+#'            #' so 11m blocks to 1k points could take >40 minutes!  \cr
+#'            >3 minutes per 100 sites? \cr
+#'            About 2.6 seconds per site for 11m blocks?  \cr
+#'             \cr
+#' > Sys.time(); x=get.distances.all(testpoints(1e5), testpoints(1000), units='miles',return.rownums=TRUE); Sys.time() \cr
+#' [1] "2015-03-09 21:23:04 EDT" \cr
+#' [1] "2015-03-09 21:23:40 EDT"  36 SECONDS IF DATA.FRAME ETC. DONE TO FORMAT RESULTS AND GET ROWNUMS \cr
+#' > Sys.time(); x=get.distances.all(testpoints(1e5), testpoints(1000), units='miles',return.rownums=TRUE)$d; Sys.time() \cr
+#' [1] "2015-03-09 21:18:47 EDT" \cr
+#' [1] "2015-03-09 21:19:26 EDT" 49 SECONDS IF DATA.FRAME ETC. DONE TO FORMAT RESULTS AND GET ROWNUMS IN get.distances.all \cr
+#'  \cr
 #' 
 #' @param frompoints A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed.
 #' @param topoints A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed.
@@ -36,6 +58,27 @@
 #'   based on distances to nearby points.
 #' @concept proximity
 #' @examples
+#' set.seed(999)
+#' t1=testpoints(1)
+#' t10=testpoints(10)
+#' t100=testpoints(100, minlat=25,maxlat=48)
+#' t1k=testpoints(1e3)
+#' t10k=testpoints(1e4)
+#' t100k=testpoints(1e5)
+#' t1m=testpoints(1e6)
+#' #t10m=testpoints(1e7)
+#' 
+#' get.distances.all(t1, t1)
+#' get.distances.all(t1, t10[2, ,drop=FALSE])
+#' x=get.distances.all(t10, t100[1:20 , ], units='km')
+#'  plot(x$tolon, x$tolat,pch='.')
+#'  points(x$fromlon, x$fromlat)
+#'  with(x, linesegments(fromlon, fromlat, tolon, tolat ))
+#'  with(x[x$d<500, ], linesegments(fromlon, fromlat, tolon, tolat ,col='red'))
+#' x=get.distances.all(t10, t1k); head(x);summary(x$d)
+#' x=get.distances.all(t10, t1k, units='km'); head(x);summary(x$d)
+#' x=get.distances.all(t10, t1k, units='km'); head(x);summary(x$d)
+#' 
 #'    test.from <- structure(list(fromlat = c(38.9567309094, 45), 
 #'      fromlon = c(-77.0896572305, -100)), .Names = c("lat", "lon"), 
 #'      row.names = c("1", "2"), class = "data.frame")

@@ -28,6 +28,7 @@ showing fromlat, fromlon, tolat, tolon.}
 \value{
 By default, returns a vector of distances, but can return a matrix of numbers, with columns that can include fromrow and torow indexing
   which is nearest (first if >1 match) of topoints, fromlat, fromlon, tolat, tolon, and d (distance).
+  ** Returns Inf when no topoints are found within the radius, and also when a distance to nearest is zero but ignore0=TRUE.
   Distance returned is in miles by default, but with option to set units='km' to get kilometers.
   See parameters for details on other formats that may be returned if specified.
 }
@@ -50,6 +51,22 @@ But R hung/crashed on 11mill frompoints -- Probably out of memory. *** Need to b
 There are 11,078,297 blocks according to \url{http://www.census.gov/geo/maps-data/data/tallies/national_geo_tallies.html}
 }
 \examples{
+set.seed(999)
+t1=testpoints(1)
+t10=testpoints(10)
+t100=testpoints(100)
+t1k=testpoints(1e3)
+t10k=testpoints(1e4)
+t100k=testpoints(1e5)
+t1m=testpoints(1e6)
+#t10m=testpoints(1e7)
+
+get.nearest2(t1, t1)
+get.nearest2(t1, t10[2, ,drop=FALSE])
+get.nearest2(t10, t1k)
+get.nearest2(t10, t1k, radius=500, units='km')
+get.nearest2(t10, t1k, radius=10, units='km')
+
 test.from <- structure(list(fromlat = c(38.9567309094, 38.9507043428),
  fromlon = c(-77.0896572305, -77.0896199948)), .Names = c("lat", "lon"),
  row.names = c("6054762", "6054764"), class = "data.frame")
