@@ -131,19 +131,18 @@ get.distances.all <- function(frompoints, topoints, units='miles', return.crosst
   if (!(units %in% c('km', 'miles'))) {stop('units must be "miles" or "km" ')}
   km.per.mile <- convert(1, 'miles', 'km') # about 1.60934
   
+  #   if (paste(colnames(frompoints),collapse='')!='latlon')  {
+  #     warning('frompoints colnames being changed to lat and lon, in that order')
+  #     colnames(frompoints) <- c('lat', 'lon')
+  #   }
+  
+  # handle cases where an input is only one row (one point)
   if (is.vector(frompoints)) {mycols <- names(frompoints); frompoints <- matrix(frompoints, nrow=1); dimnames(frompoints)[[2]] = mycols }
-  if (is.vector(topoints))   {mycols <- names(topoints);   topoints   <- matrix(  topoints, nrow=1); dimnames(  topoints)[[2]] = mycols }
-
-  if (paste(colnames(frompoints),collapse='')!='latlon')  {
-    warning('frompoints colnames being changed to lat and lon, in that order')
-    colnames(frompoints) <- c('lat', 'lon')
-  }
-
-  if (paste(colnames(topoints),collapse='')!='latlon' ) {
-    warning('topoints colnames being changed to lat and lon, in that order')
-    colnames(topoints) <- c('lat', 'lon')
-  }
-
+  if (is.vector(topoints)) {mycols <- names(topoints); topoints <- matrix(topoints, nrow=1); dimnames(topoints)[[2]] = mycols }
+  
+  colnames(frompoints) <- latlon.colnames.check(frompoints)
+  colnames(topoints)   <- latlon.colnames.check(topoints)
+  
   frompoints.sp <- sp::SpatialPoints(coords = data.frame(x = frompoints[,'lon'], y = frompoints[,'lat']), proj4string=sp::CRS("+proj=longlat +datum=WGS84"))
   topoints.sp   <- sp::SpatialPoints(coords = data.frame(x = topoints[,'lon'], y = topoints[,'lat']), proj4string=sp::CRS("+proj=longlat +datum=WGS84"))
   results.matrix <- sp::spDists(frompoints.sp, topoints.sp, longlat=TRUE) # result is in kilometers so far

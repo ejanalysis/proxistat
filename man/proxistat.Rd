@@ -5,7 +5,7 @@
 \title{Proximity Statistic for Each Location and Nearby Points}
 \usage{
 proxistat(frompoints, topoints, area = 0, radius = 5, units = "miles",
-  decay = "1/d", FIPS, pop, testing = FALSE)
+  decay = "1/d", FIPS, pop, testing = FALSE, dfunc = "hf")
 }
 \arguments{
 \item{frompoints}{Locations of internal points of Census subunits. A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed. Decimal degrees. Required.}
@@ -27,6 +27,9 @@ Decay weighting also can be '1/d^2' or '1/1' to represent decay by inverse of sq
 \item{pop}{NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE. A number or vector of numbers giving population count of each spatial unit. Default is 1, which would give the unweighted average.}
 
 \item{testing}{Logical during work in progress}
+
+\item{dfunc}{Optional character element "hf"(default) or "slc" to specify distance function Haversine or spherical law of cosines.
+If "sp", it uses the \pkg{sp} package to find distances more accurately but more slowly.}
 }
 \value{
 By default, returns a vector of numbers, the proximity scores, one for each of the frompoints. Based on miles by default, or km depending on units. Returns +Inf for a unit if that area's area and distance are both zero.

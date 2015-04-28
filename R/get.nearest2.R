@@ -68,6 +68,13 @@
 get.nearest2 <- function(frompoints, topoints, units='miles', ignore0=FALSE, 
                          return.rownums=FALSE, return.latlons=FALSE, radius=Inf) {
   
+  # handle cases where an input is only one row (one point)
+  if (is.vector(frompoints)) {mycols <- names(frompoints); frompoints <- matrix(frompoints, nrow=1); dimnames(frompoints)[[2]] = mycols }
+  if (is.vector(topoints)) {mycols <- names(topoints); topoints <- matrix(topoints, nrow=1); dimnames(topoints)[[2]] = mycols }
+  
+  colnames(frompoints) <- latlon.colnames.check(frompoints)
+  colnames(topoints)   <- latlon.colnames.check(topoints)
+  
   n.from <- length(frompoints[,1])
   n.to <- length(topoints[,1])
   #frompoints and topoints each must be a matrix with 'lat' and 'lon' colnames (or only 2 cols that are lat and lon in that order)

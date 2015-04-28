@@ -199,23 +199,11 @@ get.distances <- function(frompoints, topoints, radius=5, units='miles', ignore0
   if (is.vector(frompoints)) {mycols <- names(frompoints); frompoints <- matrix(frompoints, nrow=1); dimnames(frompoints)[[2]] = mycols }
   if (is.vector(topoints)) {mycols <- names(topoints); topoints <- matrix(topoints, nrow=1); dimnames(topoints)[[2]] = mycols }
 
-  latlon.colnames.check <- function(mypoints) {
-    if (!( ('lat' %in% colnames(mypoints)) & ('lon' %in% colnames(mypoints)) )) {
-      if (length(colnames(mypoints))==2) {
-        warning('assuming the first column is latitude and second is longitude')
-        return(c('lat', 'lon'))
-      } else {
-        stop('frompoints must have columns named lat and lon, or at least have only 2 columns so they can be interpreted as lat and lon')
-      }
-    } else {
-      return(colnames(mypoints))
-    }
-  }
   colnames(frompoints) <- latlon.colnames.check(frompoints)
   colnames(topoints)   <- latlon.colnames.check(topoints)
   
   fromcount <- length(frompoints[,1])
-  tocount <- length(topoints[,1])
+  tocount   <- length(  topoints[,1])
 
   if (return.crosstab) {
     # don't use loop below if need full crosstab. Loop speeds it up if willing to limit to a search radius, but not clear if it might speed it up if using Inf search radius ...

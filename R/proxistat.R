@@ -52,6 +52,8 @@
 #' @param decay A string specifying type of function to use when weighting by distance. Default is '1/d'
 #'   For '1/d' decay weighting (default), score is count of points within radius, divided by harmonic mean of distances (when count>0).
 #'   Decay weighting also can be '1/d^2' or '1/1' to represent decay by inverse of squared distance, or no decay (equal weighting for all points).
+#' @param dfunc Optional character element "hf"(default) or "slc" to specify distance function Haversine or spherical law of cosines.
+#'   If "sp", it uses the \pkg{sp} package to find distances more accurately but more slowly. 
 #' @return By default, returns a vector of numbers, the proximity scores, one for each of the frompoints. Based on miles by default, or km depending on units. Returns +Inf for a unit if that area's area and distance are both zero.
 #' @seealso \code{\link{get.distances}} and \code{\link{get.distances.all}} for distances between points, and
 #'   \code{\link{get.nearest}} which finds the distance to the single nearest point
@@ -89,9 +91,9 @@
 #' print(unitscores)
 #'
 #' @export
-proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', decay='1/d', FIPS, pop, testing=FALSE) {
+proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', decay='1/d', FIPS, pop, testing=FALSE, dfunc='hf') {
 
-  warning('THIS IS A WORK IN PROGRESS')
+  # warning('THIS IS A WORK IN PROGRESS - e.g. seems slow to use get.distances and then get.nearest both for 11m blocks')
 
 	# Value returned also could include count of points nearby (within radius)?
   # One way to get that is specify decay='1/1'
@@ -108,6 +110,13 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
 	}
   if (!(decay %in% c('1/d', '1/d^2', '1'))) {stop('invalid decay parameter')}
 
+  # handle cases where an input is only one row (one point)
+  if (is.vector(frompoints)) {mycols <- names(frompoints); frompoints <- matrix(frompoints, nrow=1); dimnames(frompoints)[[2]] = mycols }
+  if (is.vector(topoints)) {mycols <- names(topoints); topoints <- matrix(topoints, nrow=1); dimnames(topoints)[[2]] = mycols }
+  
+  colnames(frompoints) <- latlon.colnames.check(frompoints)
+  colnames(topoints)   <- latlon.colnames.check(topoints)
+  
   decayfunction <- switch(decay,
     '1/d'   = function(d) sum(1/d, na.rm=TRUE),
     '1/d^2' = function(d) sum(1/(d^2), na.rm=TRUE),
@@ -130,9 +139,23 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
   #########################################
   # 1) get distances <= radius
   #########################################
-
-  ddf <- get.distances(frompoints, topoints, radius=radius, units=units, )
-
+  
+  # maybe just do this...
+  ddf <- get.distances3(frompoints, topoints, units=units, radius=radius, dfunc=dfunc, return.rownums=TRUE)
+  
+  #   if (dfunc=='hf') {
+  #     ddf <- get.distances3(frompoints, topoints, units=units, radius=radius, dfunc='hf', return.rownums=TRUE)
+  #     # need to cbind the return.rownums cols here
+  #   }  
+  #   
+  #   if (dfunc=='slc') {
+  #     ddf <- get.distances3(frompoints, topoints, units=units, radius=radius, dfunc='slc', return.rownums=TRUE)
+  #   }
+  # 
+  #   if (dfunc=='sp') {
+  #     ddf <- get.distances3(frompoints, topoints, radius=radius, units=units, dfunc='sp', return.rownums=TRUE)  # need as.df=TRUE? Not if coded to refer to it as a matrix
+  #   }
+  
   if (testing) {cat('\n\n ddf before fix min dist: \n\n');print(ddf);cat('\n\n')}
 
   #########################################
@@ -141,8 +164,8 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
 
   if (length(area)==1) {area <- rep(area, n) }
   min.dist <- 0.9 * sqrt( area / pi )  # one per frompoints, not one per ddf row
-  ddf.min.dist <- min.dist[ddf$fromrow] # min.dist[match(ddf$fromrow , 1:length(area))]
-  ddf$d <- pmax(ddf$d, ddf.min.dist) # use d or min.dist, whichever is greater
+  ddf.min.dist <- min.dist[ddf[ , 'fromrow']] # min.dist[match(ddf$fromrow , 1:length(area))]
+  ddf[ , 'd'] <- pmax(ddf[ , 'd'], ddf.min.dist) # use d or min.dist, whichever is greater
 
   # *** May want to retain info on which distances were adjusted upwards based on min.dist?
 
@@ -156,10 +179,13 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
   # ddf$d[ddf$d==0 & area==0] <- 0
 
   #########################################
-  # 3) keep only if new adjusted d <=radius
+  # 3) keep only if new adjusted d <=radius  BUT RETAIN SINGLE NEAREST JUST IN CASE NEED THAT!!
   #########################################
-
-  ddf <- ddf[ddf$d <= radius, ]
+  
+#  nearestone <-  
+  # this needs to be nearest per fromrow
+  
+  ddf <- ddf[ddf[ , 'd'] <= radius, ]
 
   if (testing) {cat('ddf with final d adjusted up where was <min.dist, but dropped if adjusted to > radius: \n\n');print(ddf);cat('\n\n')}
 
@@ -169,7 +195,7 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
   # use distance to nearest single topoint
   #########################################
 
-  fromrow.0near <- which(!(1:n %in% ddf$fromrow))
+  fromrow.0near <- which(!(1:n %in% ddf[ , 'fromrow']))
 
   if (testing) {cat('fromrow.0near = '); print(fromrow.0near)}
   if (testing) {cat('\nlength of fromrow.0near = ');print(length(fromrow.0near));cat('\n\n')}
@@ -178,32 +204,33 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
 
     if (testing) {cat(' some fromrows were not in results of get.distances in ddf \n')}
 
-    d.nearest1 <- get.nearest(frompoints = frompoints[fromrow.0near, ], topoints, units = units, return.rownums = FALSE, return.latlons = FALSE)
+#***    d.nearest1 <- ddf[fromrow.0near, ]  # NOT DONE YET... NEEDS TO BE RIGHT LENGTH and format 
+d.nearest1 <- get.nearest(frompoints = frompoints[fromrow.0near, ], topoints, units = units, return.rownums = TRUE, return.latlons = FALSE)
+# *** BUT NOTE THAT THESE rownums are NOT the same frompoints as in ddf -- the universe here is only fromrow.0near!!!
+# CAN / SHOULD THOSE BE FIXED HERE??
 
     # Now have to check again to fix d < min.dist but radius is now irrelevant and even if adjusted d is no longer the nearest, it is the smallest d allowed.
 
-    d.nearest1$d[d.nearest1$d < min.dist[fromrow.0near] ] <- min.dist[fromrow.0near]
+    d.nearest1[ d.nearest1[ , 'd'] < min.dist[fromrow.0near], 'd' ] <- min.dist[fromrow.0near]
   }
 
+  ##################################################
   # now merge ddf with d.nearest1
-
+  ## BUT NOTE THE fromrow VALUES ARE WRONG!!??
+  # NEED TO HANDLE CASES WHERE ddf and/or d.nearest1 HAVE ZERO ROWS HERE, OR JUST USE c() to combine vectors instead of using rbind to combine all the vectors at once in a data.frame
   ##################################################
-  # *** NEED TO HANDLE CASES WHERE ddf and/or d.nearest1 HAVE ZERO ROWS HERE, OR JUST USE c() to combine vectors instead of using rbind to combine all the vectors at once in a data.frame
-  ##################################################
 
-  if (length(ddf$d)==0 & exists('d.nearest1')) {
-    ddf <- d.nearest1
+  if (length(ddf[ , 'd'])==0 & exists('d.nearest1')) {
+    ddf <- d.nearest1  
   } else {
     if (exists('d.nearest1')) {
-      colnames(d.nearest) <- colnames(ddf)
-      if (testing) {cat('d.nearest1 = ', d.nearest1,'\n')}
-      ddf <- rbind(ddf, d.nearest1)   # STILL CRASHES HERE IN CERTAIN CASES? ******
+      colnames(d.nearest1) <- colnames(ddf)
+      if (testing) {cat('d.nearest1 = '); print(d.nearest1) }
+      ddf <- rbind(ddf, d.nearest1)   # STILL CRASHES HERE IN CERTAIN CASES? ****** ALSO THIS STEP IS LIKELY SLOW
     }
   }
 
-
-
-
+  
   ######################################
 
   # **** CASES WITH CRASHES THAT NEED TO BE FIXED:
@@ -228,8 +255,9 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
 #   Error in ddf$fromrow : $ operator is invalid for atomic vectors
 #
 
+  # ****  THIS COULD PROBABLY BE MADE MUCH MUCH FASTER USING data.table package or some other approach:
 
-  scores <- aggregate(ddf$d, by=list(ddf$fromrow), FUN=decayfunction )
+  scores <- aggregate(ddf[ , 'd'], by=list(ddf[, 'fromrow']), FUN=decayfunction )
 
   return(scores)
 }
@@ -244,6 +272,8 @@ if (1==0) {
   #########################################
   # Get blocks as "blocks" with FIPS.BLOCK, FIPS.BG, lat, lon, pop, area
   #########################################
+  #require("UScensus2010blocks")
+  blocks <- UScensus2010blocks::get.blocks()
   blocks$FIPS.BG <- substr(blocks$FIPS.BLOCK, 1, 12)
 
   # etc.
@@ -281,98 +311,98 @@ if (1==0) {
 
 
 if (1==0)  {
-
-#######################################################################################
-# NOTES ON R CODE TO CALCULATE
-#   PROXIMITY SCORES,
-#    DISTANCE TO NEAREST SITE, AND
-#   COUNT OF SITES NEARBY (WITHIN X MILES)
-# FOR EVERY BLOCK OR BLOCK GROUP IN THE US,
-# FOR A USER-DEFINED SET OF SITES (E.G. REGULATED FACILITIES IN ONE SECTOR)
-# AND SUMMARY STATISTICS ON DISTRIBUTIONS OF THESE BY DEMOGRAPHIC GROUP.
-#
-# Started work on this around 9/24/2013
-
-
-
-
-# #######################################################################################
-#
-#	TOOL TO CALCULATE PROXIMITY SCORE FOR EVERY BLOCK GROUP IN THE US
-#	FOR PROXIMITY AND COUNT OF USER-SPECIFIED SET OF FACILITIES OR POINTS
-#	AND
-#	THEN CALCULATE US SUMMARY STATS ON
-#
-#	DISTRIBUTION OF PROXIMITY SCORES WITHIN EACH DEMOGRAPHIC GROUP INCLUDING US POP OVERALL, SUCH AS:
-#
-# DISTANCE TO NEAREST SITE:
-#
-#	1A- DIST. FOR EACH %ILE OF POP.: DISTANCE TO CLOSEST SITE FOR EACH DEMOG GROUP (AVG/MEDIAN/DISTRIBUTION OVER PEOPLE)
-#	1B- %ILE OF POP., FOR EACH DISTANCE: WHAT % OF EACH DEMOG GROUP IS WITHIN X MILES OF ANY ONE SITE? (%ILES OF # OF MILES)
-#	1C- RR AS RATIO OF AVG PERSON'S DISTANCE TO NEAREST SITE, FOR DEMOG GROUP VS REST OF THE US POPULATION
-#
-# COUNT OF SITES NEARBY:
-#
-#	2A- # OF SITES NEARBY, FOR EACH %ILE OF POP.: # OF SITES WITHIN X MILES, FOR EACH DEMOG GROUP (AVG/MEDIAN/DISTRIB OVER PEOPLE)
-#		- POSSIBLY FOR EACH OF SEVERAL DISTANCES X
-#	2B- %ILE OF POP., FOR EACH # OF SITES NEARBY: WHAT % FOR EACH DEMOG GROUP HAS Y SITES NEARBY (WITHIN X MILES)?
-#		- POSSIBLY FOR EACH OF SEVERAL DISTANCES X
-#	2C- RR AS RATIO OF AVG PERSON'S COUNT OF SITES NEARBY, FOR DEMOG GROUP VS REST OF THE US POPULATION
-#
-# PROXIMITY SCORE (DISTANCE AND COUNT):
-#
-#	3A- PROXIMITY SCORE FOR A GIVEN %ILE OF POP.: AVG/MEDIAN/DISTRIBUTION OF PROXIMITY SCORES IN US, FOR JUST LOW-INCOME, ETC.
-#	3B- %ILE OF POP., FOR EACH PROXIMITY SCORE: WHAT % OF EACH DEMOG GROUP HAS PROXIMITY SCORE OF Z?
-#	3C- RR AS RATIO OF AVG PERSON'S PROXIMITY SCORE, FOR DEMOG GROUP VS REST OF THE US POPULATION
-#
-#
-#
-#######################################################################################
-
-
-#######################################################################################
-# notes on how to calc distances
-#######################################################################################
-
-# Formula for distance between two lat/lon points
-# see http://stackoverflow.com/questions/27928/how-do-i-calculate-distance-between-two-latitude-longitude-points
-# or many formulas at http://www.movable-type.co.uk/scripts/latlong.html
-#
-# or maybe just
-#=ACOS(COS(RADIANS(90-Lat1)) *COS(RADIANS(90-Lat2)) +SIN(RADIANS(90-Lat1)) *SIN(RADIANS(90-Lat2)) *COS(RADIANS(Long1-Long2))) *6371
-#and my final version that uses Excel cell references is:
-#
-#=ACOS(COS(RADIANS(90-A2)) *COS(RADIANS(90-A3)) +SIN(RADIANS(90-A2)) *SIN(RADIANS(90-A3)) *COS(RADIANS(B2-B3))) *6371
-#PS. To calculate distances in miles, substitute R (6371) with 3958.756 (and for nautical miles, use 3440.065).
-# http://bluemm.blogspot.com/2007/01/excel-formula-to-calculate-distance.html
-
-# For the US 48 states plus DC not PR/VI/etc.,
-# furthest east is roughly -66.949778
-# furthest south is roughly 24.554
-#
-# furthest north is roughly 48.99 (1 mile buffer is a bit into Canada), OR 49
-# furthest west is roughly  -124.771694
-#   but AK/HI are further.
-
-#######################################################################################
-# old examples of distance functions - but see get.distance() etc. now
-#######################################################################################
-#
-# get.distance <- function(lat1, lon1, lat2, lon2) {
-#   sqrt( (lat2-lat1)^2 + (lon2-lon1)^2)
-#   # this could return a single number or vectorized should return a vector, but
-#   # all 4 inputs have to be same length
-#   # or if one is a single point it will be recycled.
-#   # *** Replace this with the more accurate formula for spheroid
-# }
-#
-# get.distance.matrix <- function(frompoints, topoints) {
-#   apply(frompoints, 1, FUN=function(x) get.distance(x$lat, x$lon, topoints$lat, topoints$lon) )
-#   # This can return a matrix of all pairs, where it returns one row for each combo of frompoints & topoints.
-#   # It loops over the rows in frompoints[,c('lat', 'lon')] and for each finds the distances to all the points in topoints[,c('lat','lon')]
-#   # frompoints$lat1 & frompoints$lon1 can be different length than topoints$lat2, topoints$lon2
-# }
-
-
-################# ################# ################# ################# ################# ################# #################
+  
+  #######################################################################################
+  # NOTES ON R CODE TO CALCULATE
+  #   PROXIMITY SCORES,
+  #    DISTANCE TO NEAREST SITE, AND
+  #   COUNT OF SITES NEARBY (WITHIN X MILES)
+  # FOR EVERY BLOCK OR BLOCK GROUP IN THE US,
+  # FOR A USER-DEFINED SET OF SITES (E.G. REGULATED FACILITIES IN ONE SECTOR)
+  # AND SUMMARY STATISTICS ON DISTRIBUTIONS OF THESE BY DEMOGRAPHIC GROUP.
+  #
+  # Started work on this around 9/24/2013
+  
+  
+  
+  
+  # #######################################################################################
+  #
+  #	TOOL TO CALCULATE PROXIMITY SCORE FOR EVERY BLOCK GROUP IN THE US
+  #	FOR PROXIMITY AND COUNT OF USER-SPECIFIED SET OF FACILITIES OR POINTS
+  #	AND
+  #	THEN CALCULATE US SUMMARY STATS ON
+  #
+  #	DISTRIBUTION OF PROXIMITY SCORES WITHIN EACH DEMOGRAPHIC GROUP INCLUDING US POP OVERALL, SUCH AS:
+  #
+  # DISTANCE TO NEAREST SITE:
+  #
+  #	1A- DIST. FOR EACH %ILE OF POP.: DISTANCE TO CLOSEST SITE FOR EACH DEMOG GROUP (AVG/MEDIAN/DISTRIBUTION OVER PEOPLE)
+  #	1B- %ILE OF POP., FOR EACH DISTANCE: WHAT % OF EACH DEMOG GROUP IS WITHIN X MILES OF ANY ONE SITE? (%ILES OF # OF MILES)
+  #	1C- RR AS RATIO OF AVG PERSON'S DISTANCE TO NEAREST SITE, FOR DEMOG GROUP VS REST OF THE US POPULATION
+  #
+  # COUNT OF SITES NEARBY:
+  #
+  #	2A- # OF SITES NEARBY, FOR EACH %ILE OF POP.: # OF SITES WITHIN X MILES, FOR EACH DEMOG GROUP (AVG/MEDIAN/DISTRIB OVER PEOPLE)
+  #		- POSSIBLY FOR EACH OF SEVERAL DISTANCES X
+  #	2B- %ILE OF POP., FOR EACH # OF SITES NEARBY: WHAT % FOR EACH DEMOG GROUP HAS Y SITES NEARBY (WITHIN X MILES)?
+  #		- POSSIBLY FOR EACH OF SEVERAL DISTANCES X
+  #	2C- RR AS RATIO OF AVG PERSON'S COUNT OF SITES NEARBY, FOR DEMOG GROUP VS REST OF THE US POPULATION
+  #
+  # PROXIMITY SCORE (DISTANCE AND COUNT):
+  #
+  #	3A- PROXIMITY SCORE FOR A GIVEN %ILE OF POP.: AVG/MEDIAN/DISTRIBUTION OF PROXIMITY SCORES IN US, FOR JUST LOW-INCOME, ETC.
+  #	3B- %ILE OF POP., FOR EACH PROXIMITY SCORE: WHAT % OF EACH DEMOG GROUP HAS PROXIMITY SCORE OF Z?
+  #	3C- RR AS RATIO OF AVG PERSON'S PROXIMITY SCORE, FOR DEMOG GROUP VS REST OF THE US POPULATION
+  #
+  #
+  #
+  #######################################################################################
+  
+  
+  #######################################################################################
+  # notes on how to calc distances
+  #######################################################################################
+  
+  # Formula for distance between two lat/lon points
+  # see http://stackoverflow.com/questions/27928/how-do-i-calculate-distance-between-two-latitude-longitude-points
+  # or many formulas at http://www.movable-type.co.uk/scripts/latlong.html
+  #
+  # or maybe just
+  #=ACOS(COS(RADIANS(90-Lat1)) *COS(RADIANS(90-Lat2)) +SIN(RADIANS(90-Lat1)) *SIN(RADIANS(90-Lat2)) *COS(RADIANS(Long1-Long2))) *6371
+  #and my final version that uses Excel cell references is:
+  #
+  #=ACOS(COS(RADIANS(90-A2)) *COS(RADIANS(90-A3)) +SIN(RADIANS(90-A2)) *SIN(RADIANS(90-A3)) *COS(RADIANS(B2-B3))) *6371
+  #PS. To calculate distances in miles, substitute R (6371) with 3958.756 (and for nautical miles, use 3440.065).
+  # http://bluemm.blogspot.com/2007/01/excel-formula-to-calculate-distance.html
+  
+  # For the US 48 states plus DC not PR/VI/etc.,
+  # furthest east is roughly -66.949778
+  # furthest south is roughly 24.554
+  #
+  # furthest north is roughly 48.99 (1 mile buffer is a bit into Canada), OR 49
+  # furthest west is roughly  -124.771694
+  #   but AK/HI are further.
+  
+  #######################################################################################
+  # old examples of distance functions - but see get.distance() etc. now
+  #######################################################################################
+  #
+  # get.distance <- function(lat1, lon1, lat2, lon2) {
+  #   sqrt( (lat2-lat1)^2 + (lon2-lon1)^2)
+  #   # this could return a single number or vectorized should return a vector, but
+  #   # all 4 inputs have to be same length
+  #   # or if one is a single point it will be recycled.
+  #   # *** Replace this with the more accurate formula for spheroid
+  # }
+  #
+  # get.distance.matrix <- function(frompoints, topoints) {
+  #   apply(frompoints, 1, FUN=function(x) get.distance(x$lat, x$lon, topoints$lat, topoints$lon) )
+  #   # This can return a matrix of all pairs, where it returns one row for each combo of frompoints & topoints.
+  #   # It loops over the rows in frompoints[,c('lat', 'lon')] and for each finds the distances to all the points in topoints[,c('lat','lon')]
+  #   # frompoints$lat1 & frompoints$lon1 can be different length than topoints$lat2, topoints$lon2
+  # }
+  
+  
+  ################# ################# ################# ################# ################# ################# #################
 }

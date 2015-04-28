@@ -85,22 +85,9 @@ get.nearest <- function(frompoints, topoints, units='miles', ignore0=FALSE,
   
   # Here, May need to fix cases where only a single row is in frompoints or topoints ( get.distances() handles that well.)
     
-  # This check of colnames is copied from get.distances()
-  latlon.colnames.check <- function(mypoints) {
-    if (!( ('lat' %in% colnames(mypoints)) & ('lon' %in% colnames(mypoints)) )) {
-      if (length(colnames(mypoints))==2) {
-        warning('assuming the first column is latitude and second is longitude')
-        return(c('lat', 'lon'))
-      } else {
-        stop('frompoints must have columns named lat and lon, or at least have only 2 columns so they can be interpreted as lat and lon')
-      }
-    } else {
-      return(colnames(mypoints))
-    }
-  }
-  
-  if(is.vector(frompoints) & length(frompoints)==2) {frompoints <- matrix(frompoints, ncol=2) }
-  if(is.vector(topoints)   & length(topoints)==2)   {topoints   <- matrix(topoints,   ncol=2) }
+  # handle cases where an input is only one row (one point)
+  if (is.vector(frompoints)) {mycols <- names(frompoints); frompoints <- matrix(frompoints, nrow=1); dimnames(frompoints)[[2]] = mycols }
+  if (is.vector(topoints)) {mycols <- names(topoints); topoints <- matrix(topoints, nrow=1); dimnames(topoints)[[2]] = mycols }
   
   colnames(frompoints) <- latlon.colnames.check(frompoints)
   colnames(topoints)   <- latlon.colnames.check(topoints)

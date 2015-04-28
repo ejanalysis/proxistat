@@ -4,22 +4,21 @@
 \alias{gcd}
 \title{Distance between two points by Haversine, Spherical Law of Cosines, or Vincenty inverse formula}
 \usage{
-gcd(long1, lat1, long2, lat2, algorithm = "hf")
+gcd(frompoints, topoints, dfunc = "hf", units = "km")
 }
 \arguments{
-\item{long1}{longitude(s) in radians, vector of one or more numbers}
+\item{frompoints}{Required matrix or data.frame of 2 columns, named lat and lon, with latitude and longitude(s) in degrees, one row per point.}
 
-\item{lat1}{latitude(s) in radians, vector of one or more numbers}
+\item{topoints}{Required matrix or data.frame of 2 columns, named lat and lon, with latitude and longitude(s) in degrees, one row per point.}
 
-\item{long2}{longitude(s) in radians, vector of one or more numbers}
+\item{dfunc}{Character string "hf" for Haversine by default, or "slc" for Spherical Law of Cosines
+(and may add "vif" for Vincenty inverse formula but that is not implemented here).
+For "sp" algorithm (\pkg{sp}), see \code{\link{get.distances3}}}
 
-\item{lat2}{latitude(s) in radians, vector of one or more numbers}
-
-\item{algorithm}{Character string "hf" for Haversine by default, or "slc" for Spherical Law of Cosines
-(and may add "vif" for Vincenty inverse formula but that is not implemented here)}
+\item{units}{Optional character variable specifying 'km' or 'miles', 'km' by default.}
 }
 \value{
-Distance in kilometers
+Distance in kilometers by default, or in miles if units='miles'
 }
 \description{
 Calculates the geodesic distance between two points (or multiple pairs of points) specified by degrees (DD) latitude/longitude using
@@ -28,11 +27,11 @@ Taken from \url{http://www.r-bloggers.com/great-circle-distance-calculations-in-
 Note these are not the most accurate method for long distances (e.g., >1000 km) nor the fastest.
 }
 \details{
-long1 and lat1 must be same length. long2 and lat1 must be same length.
-  All four must be the same length, defining pairs of points.
-  Alternatively long1 and lat1 can define a single point while long2 and lat2 define a series of points, or vice versa.
+*** frompoints and topoints must have same number of rows, defining all pairs of points.
+  Alternatively can define a single point while topoints defines a series of points, or vice versa.
   Taken from \url{http://www.r-bloggers.com/great-circle-distance-calculations-in-r/}
-  but use \code{\link{pmin}} instead of \code{\link{min}} to vectorize it to handle at least pairs.
+  but use \code{\link{pmin}} instead of \code{\link{min}} to vectorize it to handle at least pairs,
+  and parameters changed to keep lat/lon as a matrix or data.frame rather than 2 separate vectors.
 }
 \seealso{
 \code{\link{convert}}, \code{\link{gcd}}, \code{\link{get.distances}}, \code{\link{get.distances.all}}

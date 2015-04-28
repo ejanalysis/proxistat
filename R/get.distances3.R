@@ -1,4 +1,4 @@
-#' @title Alt method faster/no loop - to Find distances between nearby points, just within specified radius. **work in progress
+#' @title Alt method MUCH faster/no loop & simpler distance formula approx - to Find distances between nearby points, just within specified radius. **work in progress
 #'
 #' @description Returns the distances from one set of points to nearby members of another set of points.
 #'   ** Documentation copied from get.distances, not edited to be relevant to this alt version.
@@ -31,6 +31,8 @@
 #' @param units A string that is 'miles' by default, or 'km' for kilometers, specifying units for radius and distances returned.
 #' @param ignore0 A logical, default is FALSE, specifying whether to ignore distances that are zero and report only nonzero distances.
 #'   Useful if want distance to points other than self, where frompoints=topoints, for example. Ignored if return.crosstab = TRUE.
+#' @param dfunc Optional character element "hf"(default) or "slc" to specify distance function Haversine or spherical law of cosines.
+#'   If "sp", it uses the \pkg{sp} package to find distances more accurately but more slowly. 
 #' @param return.crosstab Logical value, FALSE by default. If TRUE, value returned is a matrix of the distances, 
 #'   with a row per frompoint and col per topoint. (Distances larger than max search radius are not provided, even in this format).
 #' @param return.rownums Logical value, TRUE by default. If TRUE, value returned also includes two extra columns:
@@ -109,8 +111,8 @@
 #'     
 #'    #*** Can fail if radius=50 miles? ... Error in rbind() numbers of
 #'    #  columns of arguments do not match !
-#'    #big = get.distances2(t100, t1k, radius=100, units='miles', return.latlons=TRUE); head(big); summary(big$d)
-#'    big = get.distances2(t100, t1k, radius=100, units='miles', return.latlons=TRUE); head(big); summary(big$d)
+#'    #big = get.distances3(t100, t1k, radius=100, units='miles', return.latlons=TRUE); head(big); summary(big$d)
+#'    big = get.distances3(t100, t1k, radius=100, units='miles', return.latlons=TRUE); head(big); summary(big$d)
 #'    
 #'    # see as map of many points
 #'     plot(big$fromlon, big$fromlat,main='from black circles... 
@@ -123,41 +125,41 @@
 #'    with(junk,linesegments(fromlon, fromlat, tolon, tolat) )
 #'    
 #'     # more test cases
-#'  length(get.distances2(t10,t10,radius=4999,ignore0 = TRUE, units='km')$d)
-#'  get.distances2(t10,t10,radius=4999,ignore0 = TRUE, units='km')
-#' get.distances2(test.from[1,],test.to[1,],radius=3000,return.rownums=F,return.latlons=F)
-#' get.distances2(test.from[1,],test.to[1,],radius=3000,return.rownums=FALSE,return.latlons=TRUE)
-#' get.distances2(test.from[1,],test.to[1,],radius=3000,return.rownums=TRUE,return.latlons=FALSE)
-#' get.distances2(test.from[1,],test.to[1,],radius=3000,return.rownums=TRUE,return.latlons=TRUE)
+#'  length(get.distances3(t10,t10,radius=4999,ignore0 = TRUE, units='km')$d)
+#'  get.distances3(t10,t10,radius=4999,ignore0 = TRUE, units='km')
+#' get.distances3(test.from[1,],test.to[1,],radius=3000,return.rownums=F,return.latlons=F)
+#' get.distances3(test.from[1,],test.to[1,],radius=3000,return.rownums=FALSE,return.latlons=TRUE)
+#' get.distances3(test.from[1,],test.to[1,],radius=3000,return.rownums=TRUE,return.latlons=FALSE)
+#' get.distances3(test.from[1,],test.to[1,],radius=3000,return.rownums=TRUE,return.latlons=TRUE)
 #'  
-#' get.distances2(test.from[1,],test.to[1:3,],radius=3000,return.rownums=F,return.latlons=F)
-#' get.distances2(test.from[1,],test.to[1:3,],radius=3000,return.rownums=FALSE,return.latlons=TRUE)
-#' get.distances2(test.from[1,],test.to[1:3,],radius=3000,return.rownums=TRUE,return.latlons=FALSE)
-#' get.distances2(test.from[1,],test.to[1:3,],radius=3000,return.rownums=TRUE,return.latlons=TRUE)
+#' get.distances3(test.from[1,],test.to[1:3,],radius=3000,return.rownums=F,return.latlons=F)
+#' get.distances3(test.from[1,],test.to[1:3,],radius=3000,return.rownums=FALSE,return.latlons=TRUE)
+#' get.distances3(test.from[1,],test.to[1:3,],radius=3000,return.rownums=TRUE,return.latlons=FALSE)
+#' get.distances3(test.from[1,],test.to[1:3,],radius=3000,return.rownums=TRUE,return.latlons=TRUE)
 #'  
-#' get.distances2(test.from[1:2,],test.to[1,],radius=3000,return.rownums=F,return.latlons=F)
-#' get.distances2(test.from[1:2,],test.to[1,],radius=3000,return.rownums=FALSE,return.latlons=TRUE)
-#' get.distances2(test.from[1:2,],test.to[1,],radius=3000,return.rownums=TRUE,return.latlons=FALSE)
-#' get.distances2(test.from[1:2,],test.to[1,],radius=3000,return.rownums=TRUE,return.latlons=TRUE)
+#' get.distances3(test.from[1:2,],test.to[1,],radius=3000,return.rownums=F,return.latlons=F)
+#' get.distances3(test.from[1:2,],test.to[1,],radius=3000,return.rownums=FALSE,return.latlons=TRUE)
+#' get.distances3(test.from[1:2,],test.to[1,],radius=3000,return.rownums=TRUE,return.latlons=FALSE)
+#' get.distances3(test.from[1:2,],test.to[1,],radius=3000,return.rownums=TRUE,return.latlons=TRUE)
 #'  
-#' get.distances2(test.from[1:2,],test.to[1:3,],radius=3000,return.rownums=F,return.latlons=F)
-#' get.distances2(test.from[1:2,],test.to[1:3,],radius=3000,return.rownums=FALSE,return.latlons=T)
-#' get.distances2(test.from[1:2,],test.to[1:3,],radius=3000,return.rownums=TRUE,return.latlons=F)
-#' get.distances2(test.from[1:2,],test.to[1:3,],radius=3000,return.rownums=TRUE,return.latlons=TRUE)
-#' get.distances2(test.from[1:2,],test.to[1:3,], radius=0.7,return.rownums=TRUE,
+#' get.distances3(test.from[1:2,],test.to[1:3,],radius=3000,return.rownums=F,return.latlons=F)
+#' get.distances3(test.from[1:2,],test.to[1:3,],radius=3000,return.rownums=FALSE,return.latlons=T)
+#' get.distances3(test.from[1:2,],test.to[1:3,],radius=3000,return.rownums=TRUE,return.latlons=F)
+#' get.distances3(test.from[1:2,],test.to[1:3,],radius=3000,return.rownums=TRUE,return.latlons=TRUE)
+#' get.distances3(test.from[1:2,],test.to[1:3,], radius=0.7,return.rownums=TRUE,
 #'   return.latlons=TRUE, units='km')
-#' get.distances2(test.from[1:2,],test.to[1:3,], radius=0.7,return.rownums=TRUE,
+#' get.distances3(test.from[1:2,],test.to[1:3,], radius=0.7,return.rownums=TRUE,
 #'   return.latlons=TRUE, units='miles')
 #' 
 #'   # Warning messages:
 #'   # Ignoring return.crosstab because radius was specified
-#' get.distances2(test.from[1,],test.to[1:3, ], return.crosstab=TRUE)
-#' get.distances2(test.from[1:2,],test.to[1, ], return.crosstab=TRUE)
-#' get.distances2(test.from[1:2,],test.to[1:3, ], return.crosstab=TRUE)
-#' get.distances2(test.from[1:2,],test.to[1:3, ], radius=0.7, return.crosstab=TRUE)
+#' get.distances3(test.from[1,],test.to[1:3, ], return.crosstab=TRUE)
+#' get.distances3(test.from[1:2,],test.to[1, ], return.crosstab=TRUE)
+#' get.distances3(test.from[1:2,],test.to[1:3, ], return.crosstab=TRUE)
+#' get.distances3(test.from[1:2,],test.to[1:3, ], radius=0.7, return.crosstab=TRUE)
 #' @export
-get.distances2 <- function(frompoints, topoints, radius=5, units='miles', ignore0=FALSE, 
-                          return.rownums=TRUE, return.latlons=FALSE, return.crosstab=FALSE, tailored.deltalon=FALSE, as.df=FALSE) {
+get.distances3 <- function(frompoints, topoints, radius=5, units='miles', ignore0=FALSE, dfunc='hf',
+                    return.rownums=TRUE, return.latlons=FALSE, return.crosstab=FALSE, tailored.deltalon=FALSE, as.df=FALSE) {
   # notes:
   #  Make FIPS columns factors for speed when rollup to block groups? 
   #  Index blocks on longitude and latitude. Use data.table for speed?
@@ -175,51 +177,60 @@ get.distances2 <- function(frompoints, topoints, radius=5, units='miles', ignore
   if (units=='miles' ) { radius.km <- radius * km.per.mile } else {radius.km <- radius}
   if (radius.km > 5000) {stop('radius must be less than 5,000 kilometers')}
   
-  # obsolete code from original get.distances function
-  #   maxlat <- 72
-  #   # For most northern point of USA http://en.wikipedia.org/wiki/Extreme_points_of_the_United_States, where 
-  #   # max degrees per mile, latitude is under 72
-  #   
-  #   deltalat <- 1.01 * radius * 1 / (meters.per.degree.lat(maxlat) / 1000 )
-  #   # added in 1.01 * to search over 2% wider and taller box just to avoid problems from rounding or 72 degree max assumed lat.
-  #   # old approximation wasn't quite good enough: deltalat <- radius * ( max.lat.per.mile <- 1/68 )   # 0.07352941 degrees for 5 miles
-  # 
-  #   if (!tailored.deltalon) {
-  #     deltalon <- 1.01 * radius * 1 / ( meters.per.degree.lon(maxlat) / 1000 )
-  #   }
-  # This should calc deltalon as function of lat, for each frompoint, using lat of northern edge of box as input to meters.per.degree.lon(lat)
-  # making it up to ~2-3x as wide, so maybe 2x-3x as fast if search smaller box for more southern (20-30 degrees) vs northmost points (72 degrees)
-  # But checking that using # maybe would just slow it down on net? Seems worth trying.
-  # Each degree at the equator represents 111,319.9 metres or approximately 111.32 km.
-  
   if (return.crosstab) { if ( !missingradius ) {warning('Ignoring return.crosstab because radius was specified'); return.crosstab <- FALSE} }
   
   # handle cases where an input is only one row (one point)
   if (is.vector(frompoints)) {mycols <- names(frompoints); frompoints <- matrix(frompoints, nrow=1); dimnames(frompoints)[[2]] = mycols }
-  if (is.vector(topoints)) {mycols <- names(topoints); topoints <- matrix(topoints, nrow=1); dimnames(topoints)[[2]] = mycols }
-  
+  if (is.vector(  topoints)) {mycols <- names(  topoints);   topoints <- matrix(  topoints, nrow=1); dimnames(  topoints)[[2]] = mycols }
+
   colnames(frompoints) <- latlon.colnames.check(frompoints)
-  colnames(topoints)   <- latlon.colnames.check(topoints)
+  colnames(  topoints) <- latlon.colnames.check(  topoints)
   
   fromcount <- length(frompoints[ , 1])
   tocount   <- length(  topoints[ , 1])
   
   if (!return.rownums & !return.latlons & !return.crosstab) {wantvector <- TRUE} else {wantvector <- FALSE}
   
-  # KEY FUNCTION -- gets distance for every pair of from-to:
+  # reformat frompoints and topoints to have 1 row per combo (per from-to pair, i.e., per distance)
+  latlonpairs = cbind(expand.gridMatrix(frompoints$lat, topoints$lat), expand.gridMatrix(frompoints$lon, topoints$lon))
+  colnames(latlonpairs) <- c('fromlat', 'tolat', 'fromlon', 'tolon')
+
+  ############# KEY FUNCTION -- gets distance for every pair of from-to: ################
+  
+  # *** ideally to avoid warning HAVE TO NAME THE COLS lat lon lat lon here:
+  
+  results <- gcd(
+    frompoints= latlonpairs[ , c('fromlat', 'fromlon')],
+    topoints= latlonpairs[ , c(  'tolat',   'tolon')],
+    units=units,
+    dfunc=dfunc
+  )
+  results <- cbind(d=results)
   
   if (return.crosstab) {
-    results <- get.distances.all(frompoints, topoints, return.crosstab=TRUE, as.df=as.df, units=units)
+    # reformat to be 1 row per frompoints and 1 col per topoints
+    results <- matrix(results, nrow=length(frompoints[,1]), ncol=length(topoints[,1]), byrow=FALSE)
+    if (as.df) {results=as.data.frame(results)}
     return(results)
   }
   
-  results <- get.distances.all(frompoints, topoints, units=units, return.rownums=return.rownums, return.latlons=return.latlons, return.crosstab=return.crosstab)
+  if (return.rownums) {
+    # Create rownums in correct format... cycle through frompoints first, then topoints 
+    rownumpairs <- cbind(expand.gridMatrix(1:length(frompoints[,1]), 1:length(topoints[,1])))
+    results <- cbind(rownumpairs, results)
+    colnames(results) <- c('fromrow','torow', colnames(results))
+  }
 
-  # Convert to desired format
-  
+  if (return.latlons) {
+    results <- cbind(results, latlonpairs[ , c('fromlat' ,'fromlon', 'tolat', 'tolon')])
+  }
+
+  # units should already be same for results and radius, as defined by units param
+  #if (units=='miles') { results <- convert(results, from='km', towhat = 'mi')}
+
   if (as.df) {results <- as.data.frame(results)}
   
-  # Remove those outside radius, and remove zero distances if ignore0=TRUE
+  # Remove those outside radius, and remove zero distances if ignore0=TRUE (now radius and results are both in same units)
   
   if (!wantvector) {
     results <- results[ results[ , 'd'] <= radius, ]
@@ -230,128 +241,4 @@ get.distances2 <- function(frompoints, topoints, radius=5, units='miles', ignore
   }
   
   return(results)
-  
-#   results.empty=get.distances.all(data.frame(lat=0,lon=0), data.frame(lat=0,lon=0), return.rownums=return.rownums, return.latlons=return.latlons, return.crosstab=return.crosstab)
-#   colcount=dim(results.empty)[2]
-#   if (is.null(colcount)) {colcount <- 1}
-#   results.full <- matrix(ncol=colcount) # can't preallocate since don't know size yet due to not getting dist for any except within box defined by radius, and then removing others based on radius
-# 
-#   #######################################################################
-#   For each row in frompoints, 
-#   #######################################################################
-#   
-#   firstvalidresults <- TRUE
-#   
-#   for (rownum.frompoints in 1:fromcount) {
-#     
-#     # for performance, may want to use data.table package here?
-#     
-#     # Filter topoints using a box that is based on radius, to limit to tobox, then use get.distances.all() for just that subset
-#     # cat('\n\n')    
-#     # if (exists('deltalon')) {cat('deltalon and lat', deltalon, deltalat, '\n')}
-#     # cat('rownum ',rownum.frompoints,' out of', fromcount,'\n')
-#     #     
-#     fromlat <- frompoints[rownum.frompoints, 'lat']
-#     fromlon <- frompoints[rownum.frompoints, 'lon']
-#     
-#     # ****  check speed impact of using this:
-#     if (tailored.deltalon) {
-#       deltalon <- 1.01 * radius * 1 / ( meters.per.degree.lon( fromlat + deltalat ) / 1000 )
-#     }
-#     # This should calc deltalon as function of lat, for each frompoint, using lat of northern edge of box as input to meters.per.degree.lon(lat)
-#     # making it up to ~2-3x as wide, so maybe 2x-3x as fast if search smaller box for more southern (20-30 degrees) vs northmost points (72 degrees)
-#     # But checking that using # maybe would just slow it down on net? Seems worth trying.
-#     # not sure if faster to say tolat<-topoints[ , 'lat'] and same for tolon, or just look up each vector twice below
-#     rownum.topoints <- (topoints[ , 'lat'] > fromlat - deltalat) &
-#       (topoints[ , 'lat'] < fromlat + deltalat) & 
-#       (topoints[ , 'lon'] > fromlon - deltalon) & 
-#       (topoints[ , 'lon'] < fromlon + deltalon) 
-#     # 
-#     # cat('topoints total:',length(topoints[,'lat']), '  topoints in box: ', sum(rownum.topoints),'\n')
-#     tobox <- topoints[rownum.topoints, ]
-#     rownum.topoints <- (1:tocount)[rownum.topoints]
-#     # cat('rownum.topoints',rownum.topoints,'\n')
-#     # cat('rownum.frompoints',rownum.frompoints,'\n')
-#     
-#     if (sum(as.numeric(rownum.topoints)) > 0) {
-#       # print(frompoints[rownum.frompoints,])
-#       # print(tobox)
-#       
-#       results <- get.distances.all(frompoints[rownum.frompoints, ], tobox, units='km', return.rownums=return.rownums, return.latlons=return.latlons, return.crosstab=FALSE)
-#       
-#       if (length(rownum.topoints)==1) {just1topoint <- TRUE} else {just1topoint <- FALSE}
-#       
-#       # # testing:
-#       # cat('results: \n'); print(results)
-#       # cat('wantvector:', wantvector, '\njust1topoint:', just1topoint, '\n')
-#       # cat('is.matrix(results):', is.matrix(results),  '\nis.vector(results): ', is.vector(results), '\nis.data.frame(results):', is.data.frame(results), '\nclass(results):', class(results), '\n')
-#       # cat('str(results): \n');   print(str(results)); cat('\n')
-#       # cat('dim(results): \n'); print(dim(results));cat('\n')
-#       # cat('dimnames(results):\n'); print( dimnames(results) ); cat('\n')
-#       # 
-#       
-#       # remove those outside search radius, and note right now results and radius are in km
-#       if (!wantvector) {
-#         if (return.rownums) {
-#           # fix the torow numbers to be just those requested, and fromrow should be the one being used right now in this loop
-#           if (!just1topoint) {
-#             results[ , 'fromrow'] <- rownum.frompoints
-#             results[ , 'torow']   <- rownum.topoints
-#           } else {
-#             # test this:
-#             results['fromrow'] <- rownum.frompoints
-#             results['torow']   <- rownum.topoints
-#           }
-#         }
-#         results <- results[ results[ , 'd'] <= radius, ]
-#         # append results to results.full
-#         
-#         if (ignore0) { results <- results[ results[,'d'] != 0,  ] }
-#         
-#         #*** need to handle case here where ignore0 caused there to be zero valid nonzero results:
-#         #*****
-#         # if (length(results[,'d']) != 0) { }
-#         
-#         
-#         
-#         if (rownum.frompoints==1 | firstvalidresults ) {results.full <- results} else { results.full <- rbind(results.full, results) } 
-#         firstvalidresults <- FALSE
-#         
-#       } else {
-#         # JUST A VECTOR OF DISTANCES
-#         results <- results[ results <= radius]
-#         if (ignore0) { results <- results[ results != 0 ] }
-#         # test that this works if 0,1,>1 topoints
-#         # print('rownum.frompoints');print(rownum.frompoints); cat('\n')
-#         # append results to results.full
-#         
-#         #*** need to handle case here where ignore0 caused there to be zero valid nonzero results:
-#         #*****
-#         # if (length(results) == 0) { }
-#         
-#         
-#         
-#         
-#         if (rownum.frompoints==1 | firstvalidresults ) {results.full <- results} else { results.full <- c(results.full, results) }
-#         firstvalidresults <- FALSE
-#         
-#       }
-#       
-#       # print('results.full now: '); print(results.full); cat('\n')
-#       # print('results now: '); print(results); cat('\n')
-#       
-#       # Note that if wantvector, results are hard to interpret since length returned is not same as length of input and can't tell which was <= radius
-#     }
-#   }
-# 
-#   #  if (is.data.frame(results) && min(dim(results))>1) { results.full <- results.full[-1,] } else { results.full <- results.full[-1] }
-#   
-#   # CONVERT TO CORRECT UNITS NOW ****
-#   if (!wantvector) {
-#     if (units=='miles') { results.full[,'d'] <- results.full[,'d'] / km.per.mile }
-#   } else {
-#     if (units=='miles') { results.full <- results.full / km.per.mile }
-#   }
-#   if (as.df) {results.full <- as.data.frame(results.full)}
-#   return(results.full)  
 }
