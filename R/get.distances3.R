@@ -192,21 +192,30 @@ get.distances3 <- function(frompoints, topoints, radius=5, units='miles', ignore
   if (!return.rownums & !return.latlons & !return.crosstab) {wantvector <- TRUE} else {wantvector <- FALSE}
   
   # reformat frompoints and topoints to have 1 row per combo (per from-to pair, i.e., per distance)
-  latlonpairs = cbind(expand.gridMatrix(frompoints$lat, topoints$lat), expand.gridMatrix(frompoints$lon, topoints$lon))
+  latlonpairs = cbind(
+    expand.gridMatrix(frompoints$lat, topoints$lat), 
+    expand.gridMatrix(frompoints$lon, topoints$lon)
+  )
   colnames(latlonpairs) <- c('fromlat', 'tolat', 'fromlon', 'tolon')
-
+  
   ############# KEY FUNCTION -- gets distance for every pair of from-to: ################
   
   # *** ideally to avoid warning HAVE TO NAME THE COLS lat lon lat lon here:
-  
-  results <- gcd(
-    frompoints= latlonpairs[ , c('fromlat', 'fromlon')],
-    topoints= latlonpairs[ , c(  'tolat',   'tolon')],
-    units=units,
-    dfunc=dfunc
-  )
-  results <- cbind(d=results)
-  
+  if (dfunc=='sp') {
+    results <- get.distances.all(
+      frompoints= latlonpairs[ , c('fromlat', 'fromlon')],
+      topoints=   latlonpairs[ , c(  'tolat',   'tolon')],
+      units=units
+    )
+  } else {
+    results <- gcd(
+      frompoints= latlonpairs[ , c('fromlat', 'fromlon')],
+      topoints=   latlonpairs[ , c(  'tolat',   'tolon')],
+      units=units,
+      dfunc=dfunc
+    )
+    results <- cbind(d=results)
+
   if (return.crosstab) {
     # reformat to be 1 row per frompoints and 1 col per topoints
     results <- matrix(results, nrow=length(frompoints[,1]), ncol=length(topoints[,1]), byrow=FALSE)
@@ -218,18 +227,20 @@ get.distances3 <- function(frompoints, topoints, radius=5, units='miles', ignore
     # Create rownums in correct format... cycle through frompoints first, then topoints 
     rownumpairs <- cbind(expand.gridMatrix(1:length(frompoints[,1]), 1:length(topoints[,1])))
     results <- cbind(rownumpairs, results)
-    colnames(results) <- c('fromrow','torow', colnames(results))
+    colnames(results) <- c('fromrow','torow', 'd')
   }
-
+  
   if (return.latlons) {
     results <- cbind(results, latlonpairs[ , c('fromlat' ,'fromlon', 'tolat', 'tolon')])
   }
-
+  
   # units should already be same for results and radius, as defined by units param
   #if (units=='miles') { results <- convert(results, from='km', towhat = 'mi')}
-
+  
   if (as.df) {results <- as.data.frame(results)}
   
+  }
+
   # Remove those outside radius, and remove zero distances if ignore0=TRUE (now radius and results are both in same units)
   
   if (!wantvector) {

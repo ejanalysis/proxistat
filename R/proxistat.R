@@ -93,7 +93,7 @@
 #' @export
 proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', decay='1/d', FIPS, pop, testing=FALSE, dfunc='hf') {
 
-  # warning('THIS IS A WORK IN PROGRESS - e.g. seems slow to use get.distances and then get.nearest both for 11m blocks')
+   warning('THIS IS A WORK IN PROGRESS - e.g. seems slow to use get.distances and then get.nearest both for 11m blocks')
 
 	# Value returned also could include count of points nearby (within radius)?
   # One way to get that is specify decay='1/1'
@@ -194,26 +194,31 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
   # For any frompoint that had no topoint within radius,
   # use distance to nearest single topoint
   #########################################
-
+  
   fromrow.0near <- which(!(1:n %in% ddf[ , 'fromrow']))
-
+  
   if (testing) {cat('fromrow.0near = '); print(fromrow.0near)}
   if (testing) {cat('\nlength of fromrow.0near = ');print(length(fromrow.0near));cat('\n\n')}
-
+  
   if (length(fromrow.0near) > 0) {
-
+    
     if (testing) {cat(' some fromrows were not in results of get.distances in ddf \n')}
-
-#***    d.nearest1 <- ddf[fromrow.0near, ]  # NOT DONE YET... NEEDS TO BE RIGHT LENGTH and format 
-d.nearest1 <- get.nearest(frompoints = frompoints[fromrow.0near, ], topoints, units = units, return.rownums = TRUE, return.latlons = FALSE)
-# *** BUT NOTE THAT THESE rownums are NOT the same frompoints as in ddf -- the universe here is only fromrow.0near!!!
-# CAN / SHOULD THOSE BE FIXED HERE??
-
+    
+    
+    ##********************** **************
+    
+    #***    d.nearest1 <- ddf[fromrow.0near, ]  # NOT DONE YET... NEEDS TO BE RIGHT LENGTH and format 
+    d.nearest1 <- get.nearest(frompoints = frompoints[fromrow.0near, ], topoints, units = units, return.rownums = TRUE, return.latlons = FALSE)
+    # *** BUT NOTE THAT THESE rownums are NOT the same frompoints as in ddf -- the universe here is only fromrow.0near!!!
+    # CAN / SHOULD THOSE BE FIXED HERE??
+    
     # Now have to check again to fix d < min.dist but radius is now irrelevant and even if adjusted d is no longer the nearest, it is the smallest d allowed.
-
+    
     d.nearest1[ d.nearest1[ , 'd'] < min.dist[fromrow.0near], 'd' ] <- min.dist[fromrow.0near]
+    
+    
   }
-
+  
   ##################################################
   # now merge ddf with d.nearest1
   ## BUT NOTE THE fromrow VALUES ARE WRONG!!??
