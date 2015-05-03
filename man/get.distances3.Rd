@@ -4,25 +4,28 @@
 \alias{get.distances3}
 \title{Alt method MUCH faster/no loop & simpler distance formula approx - to Find distances between nearby points, just within specified radius. **work in progress}
 \usage{
-get.distances3(frompoints, topoints, radius = 5, units = "miles",
-  ignore0 = FALSE, dfunc = "hf", return.rownums = TRUE,
+get.distances3(frompoints, topoints, radius = 5200, units = "miles",
+  ignore0 = FALSE, dfunc = "sp", as.df = FALSE, return.rownums = TRUE,
   return.latlons = FALSE, return.crosstab = FALSE,
-  tailored.deltalon = FALSE, as.df = FALSE)
+  tailored.deltalon = FALSE)
 }
 \arguments{
 \item{frompoints}{A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed.}
 
 \item{topoints}{A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed.}
 
-\item{radius}{A single number defining nearby, the maximum distance searched for or recorded. Default is 5 miles, which is 8.0467 km, unless units or radius is specified. Must be <5,000 km (about 3106 miles)}
+\item{radius}{A single number defining nearby, the maximum distance searched for or recorded.
+Default is max allowed... radius must be less than about 8,368 kilometers (5,200 miles, or the distance from Hawaii to Maine)}
 
 \item{units}{A string that is 'miles' by default, or 'km' for kilometers, specifying units for radius and distances returned.}
 
 \item{ignore0}{A logical, default is FALSE, specifying whether to ignore distances that are zero and report only nonzero distances.
 Useful if want distance to points other than self, where frompoints=topoints, for example. Ignored if return.crosstab = TRUE.}
 
-\item{dfunc}{Optional character element "hf"(default) or "slc" to specify distance function Haversine or spherical law of cosines.
-If "sp", it uses the \pkg{sp} package to find distances more accurately but more slowly.}
+\item{dfunc}{Optional character element "hf" or "slc" to specify distance function Haversine or spherical law of cosines.
+If "sp" (default), it uses the \pkg{sp} package to find distances more accurately and more quickly.}
+
+\item{as.df}{Optional logical, default is TRUE}
 
 \item{return.rownums}{Logical value, TRUE by default. If TRUE, value returned also includes two extra columns:
 a col of index numbers starting at 1 specifying the frompoint and a similar col specifying the topoint.}
@@ -34,51 +37,11 @@ showing fromlat, fromlon, tolat, tolon.}
 with a row per frompoint and col per topoint. (Distances larger than max search radius are not provided, even in this format).}
 
 \item{tailored.deltalon}{Logical value, FALSE by default, but ignored. Leftover from older get.distances function. Defined size of initially searched area as function of lat, for each frompoint,
-rather than initially searching a conservatively large box.
-  Just using get.distances.all is reasonably fast? (30-40 seconds for 100 million distances, but slow working with results so large),
-  and could remove those outside the radius after that, skipping the searchbox approach: \cr
- (or just use spDists) \cr
-Sys.time(); x=get.distances.all(testpoints(1e5), testpoints(1000), return.crosstab=TRUE); Sys.time() \cr
-[1] "2015-03-10 18:59:08 EDT" \cr
-[1] "2015-03-10 18:59:31 EDT"  23 SECONDS  for 100 million distances IF NO PROCESSING OTHER THAN CROSSTAB \cr
-Sys.time(); x=get.distances.all(testpoints(1e6), testpoints(100), return.crosstab=TRUE); Sys.time() \cr
-[1] "2015-03-10 21:54:11 EDT" \cr
-[1] "2015-03-10 21:54:34 EDT"  23 SECONDS for 100 million distances (1m x 100, or 100k x 1000) \cr
-Sys.time(); x=get.distances.all(testpoints(1e6), testpoints(300), return.crosstab=TRUE); Sys.time() \cr
-[1] "2015-03-10 21:56:11 EDT" \cr
-[1] "2015-03-10 21:57:18 EDT"  67-74 seconds for 300 million pairs.  \cr
- plus 20 seconds or so for x[x>100] <- Inf  \cr
-           #' so 11m blocks to 1k points could take >40 minutes!  \cr
-           >3 minutes per 100 sites? \cr
-           About 2.6 seconds per site for 11m blocks?  \cr
-            \cr
-**** get.distances.all scales linearly, more or less: *****
-IT TAKES ALMOST 30 (27) SECONDS FOR 10 POINTS and every Census Block in the US (11m).
-> Sys.time(); x=get.distances.all(testpoints(11e6), testpoints(10), return.crosstab=TRUE); Sys.time()
-[1] "2015-04-18 12:02:31 EDT"
-[1] "2015-04-18 12:02:58 EDT"
-and doesnt matter much if fewer blocks and more sites, vs more blocks and fewer sites, at a time.
-> Sys.time(); x=get.distances.all(testpoints((1.1e6)), testpoints(100), return.crosstab=TRUE); Sys.time()
-[1] "2015-04-18 12:06:51 EDT"
-[1] "2015-04-18 12:07:18 EDT"
-and 131 seconds for 50 sites to all blocks: so 5x27sec=135 expected, close to actual 131.
-Sys.time(); x=get.distances.all(testpoints(11e6), testpoints(50), return.crosstab=TRUE); Sys.time()
-[1] "2015-04-18 12:10:10 EDT"
-[1] "2015-04-18 12:12:21 EDT"
-**** So a typical request of 100 to 1000 to 10k sites could take
-  262 to 2620 to 26200 seconds, or 3 minutes to 45 minutes to 7.3 hours!! That is too slow for common use/webapp.
-******
-> Sys.time(); x=get.distances.all(testpoints(1e5), testpoints(1000), units='miles',return.rownums=TRUE); Sys.time() \cr
-[1] "2015-03-09 21:23:04 EDT" \cr
-[1] "2015-03-09 21:23:40 EDT"  36 SECONDS IF DATA.FRAME ETC. DONE TO FORMAT RESULTS AND GET ROWNUMS \cr
-> Sys.time(); x=get.distances.all(testpoints(1e5), testpoints(1000), units='miles',return.rownums=TRUE)$d; Sys.time() \cr
-[1] "2015-03-09 21:18:47 EDT" \cr
-[1] "2015-03-09 21:19:26 EDT" 49 SECONDS IF DATA.FRAME ETC. DONE TO FORMAT RESULTS AND GET ROWNUMS IN get.distances.all \cr}
-
-\item{as.df}{Optional logical, default is TRUE}
+rather than initially searching a conservatively large box.}
 }
 \value{
-By default, returns a dataframe that has 3 columns: fromrow, torow, distance (where fromrow or torow is the row number of the corresponding input, starting at 1).
+By default, returns a dataframe that has 3 columns: fromrow, torow, distance
+  (where fromrow or torow is the row number of the corresponding input, starting at 1).
   Distance returned is in miles by default, but with option to set units='km' to get kilometers.
   See parameters for details on other formats that may be returned if specified.
 }
@@ -96,18 +59,13 @@ Returns the distances from one set of points to nearby members of another set of
  \cr\cr
  Uses \code{\link{get.distances.all}}. Relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
  \cr\cr
- ** Note this is work in progress - see notes on parameter \code{tailored.deltalon}.
- For performance it only uses it for distance pairs (pairs of points) that have been initially
- quickly filtered using lat/lon to be not much more than radius, in an attempt to go
- much faster than finding every distance pair and then dropping all outside the search radius.
- But it might be faster just to get all distances even outside box and then return only those within radius.
- \cr\cr
  Regarding distance calculation, also see \url{http://en.wikipedia.org/wiki/Vincenty\%27s_formulae},
  \url{http://williams.best.vwh.net/avform.htm#Dist}, \url{http://sourceforge.net/projects/geographiclib/},
  and \url{http://www.r-bloggers.com/great-circle-distance-calculations-in-r/}.
  \cr\cr
- Finding distance to all of the 11 million census blocks in usa within 5 km, for 100 points, can take a while... maybe >1 minute?
- May need to switch to just use a js library like turf, or investigate using data.table to index and more quickly subset the (potentially 11 million Census blocks of) topoints
+ Finding distance to all of the 11 million census blocks in usa within 5 km, for 100 points, can take a while.
+ May need to switch to just use a js library like turf,
+ or investigate using data.table to index and more quickly subset the (potentially 11 million Census blocks of) topoints
  (or pre-index that block point dataset and allow this function to accept a data.table as input).
 }
 \examples{

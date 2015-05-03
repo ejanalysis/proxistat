@@ -1,9 +1,8 @@
 #' @title Proximity Statistic for Each Location and Nearby Points
 #'
 #' @description Calculate proximity statistic for each location,
-#' quantifying number of and proximities of nearby points.
-#' \code{proxistat} returns a proximity statistic (score) for each location (e.g., Census block).
-#'
+#'   quantifying number of and proximities of nearby points.
+#'   \code{proxistat} returns a proximity statistic (score) for each location (e.g., Census block).
 #' @details
 #' This function returns a vector of proximity scores, one for each location such as a Census block.
 #' For example, the proximity score may be used to represent how many hazardous waste sites are near any given neighborhood and how close they are.
@@ -23,38 +22,72 @@
 #' "Nearby" is defined as a user-specified parameter, so only points within the specified distance are counted, except if none are nearby,
 #' the single nearest point (at any distance) is used.
 #' \cr\cr
+#' Default relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
+#' Other values of dfunc parameter are slower.
+#' \cr\cr
+#' IMPORTANT:
+#' \cr\cr
+#' To create a proximity score for a block group, one can find the score for each block in the block group
+#' and then find the population-weighted average of those block scores, for a single block group.
+#' \cr
+#' FIPS for blocks can be used to find FIPS for block groups. FIPS for block groups can be used to find FIPS for tracts.
+#' \cr\cr
+#' ADJUSTMENT FOR SMALL DISTANCES: 
+#' \cr\cr
 #' The adjustment for small distances ensure that each distance represents roughly the distance to the average resident within a spatial unit like a block,
-#' rather than just the distance to the center or internal point. The adjustment uses the area of the spatial unit and assumes residents are evenly spread across the unit.
+#' rather than just the distance to the center or internal point. 
+#' The adjustment uses the area of the spatial unit and assumes residents are evenly spread across the unit.
 #' Distance is adjusted in each place if area of each spatial unit is specified, to ensure it represents roughly distance to average resident in the unit:
 #' The distance is capped to be no less than 0.9 * radius of a circle of area equal to census unit's area.
 #' This approximation treats unit as if it were a circle and assumes pop is evenly distributed within that circle's area, since
 #' \cr
 #'   0.9r = 0.9 * sqrt(area/pi) = approx solution to dist from avg point (resident) in circle
 #' to a random point in the circle (facility or point of interest).
-#' \cr\cr
-#' Relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
-#' \cr\cr
-#' IMPORTANT:
-#' \cr
-#' To create a proximity score for a block group, one can find the score for each block in the block group
-#' and then find the population-weighted average of those block scores, for a single block group.
-#' \cr
-#' FIPS for blocks can be used to find FIPS for block groups. FIPS for block groups can be used to find FIPS for tracts.
-#'
+#' 
+#' The use of a minimum distance per areal unit is intended to help approximate the distance from the average resident 
+#' rather than from the internal point or center of the areal unit. The approximation assumes distance to the average resident can be estimated 
+#' as if homes and facilities were on average uniformly distributed within blocks (or whatever units are used) that were roughly circular on average.
+#' It relies on the fact that the average distance between two random points in a circle of radius R is 90% of R 
+#' (Weisstein, Eric W. "Disk Line Picking." From MathWorld--A Wolfram Web Resource. \url{http://mathworld.wolfram.com/DiskLinePicking.html} ). 
+#' This means that if a population is randomly spread over a roughly circular block, a facility inside the block (i.e., very close to the internal point)
+#' typically would be 0.9R from the average person. The same math shows that the average point in the circle is 0.67R from the center, 
+#' and 1.13R from the edge of the circle. We can describe this relationship using an equation that is a portion of the formula for the 
+#' distance between two random points in a circle of radius=1. The formula uses b= the facility’s distance from the center as a fraction of the radius, 
+#' and the integral over a represents distances of residences from the center. 
+#' We can solve the equation using \url{http://WolframAlpha.com}, for b=0, 0.5, or 1, representing points at the center, halfway to the edge, 
+#' and at the edge of the circle. For example, we can use this equation for b=0.5 to find that the average person, if randomly located in a circle of radius R, 
+#' is a distance of about 0.8 R from a facility that is halfway between the center and edge of the circle. 
+#' Note this is not the same as the expected location of a randomly placed facility, which would use b=sqrt(0.5) instead and gives a distance of about 0.9R. 
+#' The following would be used as the input to WolframAlpha to derive the 0.9 approximation: 
+#' Integrate[(1/Pi) Sqrt[a + (Sqrt(0.5))^2 - 2 * (Sqrt(0.5)) * Sqrt[a] cos(t)], {a,  0,  1},  {t, 0, pi}]  
+#'  \url{http://bit.ly/1GJ9UID}
 #' @param testing Logical during work in progress
-#' @param frompoints Locations of internal points of Census subunits. A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed. Decimal degrees. Required.
-#' @param topoints Locations of nearby points of interest, proximity to which is the basis of each Census unit's score. A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed. Decimal degrees. Required.
-#' @param area A number or vector of numbers giving size of each spatial unit with FIPS.pop, in square miles by default (or square kilometers if units is 'km'). Optional. Default is 0, in which case no adjustment is made for small or even zero distance, which can cause unrealistically large or even infinite/undefined scores. For zero distance if area=0, Inf will be returned for the score.
-#' @param radius A number giving distance defining nearby, i.e. the search radius, in miles by default (or kilometers if units is 'km'). Default is 5.
+#' @param frompoints Locations of internal points of Census subunits. 
+#'   A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed. Decimal degrees. Required.
+#' @param topoints Locations of nearby points of interest, proximity to which is the basis of each Census unit's score. 
+#'   A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed. Decimal degrees. Required.
+#' @param area A number or vector of numbers giving size of each spatial unit with FIPS.pop, 
+#'   in square miles by default (or square kilometers if units is 'km'). Optional. 
+#'     Default is 0, in which case no adjustment is made for small or even zero distance, 
+#'     which can cause unrealistically large or even infinite/undefined scores. For zero distance if area=0, Inf will be returned for the score.
+#' @param radius *NOTE: This default is not the same as the default in get.distances3! 
+#'   Optional, a number giving distance defining nearby, i.e. the search radius, 
+#'   in miles by default (or kilometers if units is 'km'). Default is 5 miles. Max is 5200 miles (roughly the distance from Hawaii to Maine).
 #' @param units A string that is 'miles' by default, or 'km' for kilometers, specifying units for distances returned and for radius input.
-#' @param FIPS NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE. A vector of strings designating places that will be assigned scores where each is the Census FIPS code or other ID. Optional.
-#' @param pop NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE. A number or vector of numbers giving population count of each spatial unit. Default is 1, which would give the unweighted average.
+#' @param FIPS NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE. 
+#'   A vector of strings designating places that will be assigned scores where each is the Census FIPS code or other ID. Optional.
+#'   Might want to have this be a factor not string to be faster, or ensure it is indexed on fips, or have separate FIPS.BG passed to this function.
+#' @param pop NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE. 
+#'   A number or vector of numbers giving population count of each spatial unit. 
+#'   Default is 1, which would give the unweighted average.
 #' @param decay A string specifying type of function to use when weighting by distance. Default is '1/d'
 #'   For '1/d' decay weighting (default), score is count of points within radius, divided by harmonic mean of distances (when count>0).
 #'   Decay weighting also can be '1/d^2' or '1/1' to represent decay by inverse of squared distance, or no decay (equal weighting for all points).
-#' @param dfunc Optional character element "hf"(default) or "slc" to specify distance function Haversine or spherical law of cosines.
-#'   If "sp", it uses the \pkg{sp} package to find distances more accurately but more slowly. 
-#' @return By default, returns a vector of numbers, the proximity scores, one for each of the frompoints. Based on miles by default, or km depending on units. Returns +Inf for a unit if that area's area and distance are both zero.
+#' @param dfunc Optional character element "hf" or "slc" to specify distance function Haversine or spherical law of cosines.
+#'   If "sp" (default, fastest), it uses the \pkg{sp} package to find distances more accurately and more quickly.
+#' @return By default, returns a vector of numbers, the proximity scores, one for each of the frompoints (or if testing, a matrix with 2 columns: fromrow and d for distance).
+#'   Based on miles by default, or km depending on units. 
+#'   Returns +Inf for a unit if that area's area and distance are both zero.
 #' @seealso \code{\link{get.distances}} and \code{\link{get.distances.all}} for distances between points, and
 #'   \code{\link{get.nearest}} which finds the distance to the single nearest point
 #'   within a specified search radius instead of all topoints.
@@ -91,17 +124,32 @@
 #' print(unitscores)
 #'
 #' @export
-proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', decay='1/d', FIPS, pop, testing=FALSE, dfunc='hf') {
+proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', decay='1/d', FIPS, pop, testing=FALSE, dfunc='sp') {
+  
+  maxradius.miles <- 5200
 
-   warning('THIS IS A WORK IN PROGRESS - e.g. seems slow to use get.distances and then get.nearest both for 11m blocks')
+  # notes :   Make FIPS columns factors for speed when rollup to block groups? 
+  
+   warning('THIS IS A WORK IN PROGRESS - e.g. just to get distances for 16.7K topoints, could take about 20 hours')
 
 	# Value returned also could include count of points nearby (within radius)?
   # One way to get that is specify decay='1/1'
 
   # Error checking -- also uses the error checking that get.distances() does
+  
   if (missing(frompoints) | missing(topoints)) {stop('frompoints and topoints must be specified')}
-  if (is.na(radius) || !is.numeric(radius) || radius<0 || is.infinite(radius) || radius> 40000 ) {stop('invalid radius')}
   if (!(units %in% c('km', 'miles'))) {stop('units must be "km" or "miles" ')  }
+  radius.miles <- convert(radius, units, 'mi')
+  if (radius.miles > maxradius.miles) {
+    stop(paste(
+      'radius must be less than about', 
+      round(convert(maxradius.miles, 'mi', 'km'), 1),
+      'kilometers (actually ',
+      maxradius.miles,
+      ' miles, or the distance from Hawaii to Maine)'
+    )) 
+  }
+  if (is.na(radius) || !is.numeric(radius) || radius < 0 || is.infinite(radius)  ) {stop('invalid radius')}
 	if (!missing(area)) {
     if (!is.vector(area) || !is.numeric(area) || any(is.na(area)) || any(is.infinite(area)) || length(area)!=length(frompoints[,1])) {
       stop('area will not be recycled - if supplied, it must be a numeric vector of same length as number of points with no NA or Inf values')
@@ -112,13 +160,13 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
 
   # handle cases where an input is only one row (one point)
   if (is.vector(frompoints)) {mycols <- names(frompoints); frompoints <- matrix(frompoints, nrow=1); dimnames(frompoints)[[2]] = mycols }
-  if (is.vector(topoints)) {mycols <- names(topoints); topoints <- matrix(topoints, nrow=1); dimnames(topoints)[[2]] = mycols }
+  if (is.vector(  topoints)) {mycols <- names(  topoints);   topoints <- matrix(  topoints, nrow=1); dimnames(  topoints)[[2]] = mycols }
   
   colnames(frompoints) <- latlon.colnames.check(frompoints)
-  colnames(topoints)   <- latlon.colnames.check(topoints)
+  colnames(topoints)   <- latlon.colnames.check(  topoints)
   
   decayfunction <- switch(decay,
-    '1/d'   = function(d) sum(1/d, na.rm=TRUE),
+    '1/d'   = function(d) sum(1/d,     na.rm=TRUE),
     '1/d^2' = function(d) sum(1/(d^2), na.rm=TRUE),
     '1/1'   = function(d) length(d)
   )
@@ -140,21 +188,12 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
   # 1) get distances <= radius
   #########################################
   
-  # maybe just do this...
-  ddf <- get.distances3(frompoints, topoints, units=units, radius=radius, dfunc=dfunc, return.rownums=TRUE)
+  ddf <- get.distances3(frompoints, topoints, units=units, dfunc=dfunc, return.rownums=TRUE)
+  # NOTE: DO NOT SPECIFY radius IN get.distances3 here, so it will use default radius of 5200 miles, so that
+  # this function can use distances greater than radius that was passed to proxistat, 
+  # in case there are none within radius and it needs nearest single one outside radius.
   
-  #   if (dfunc=='hf') {
-  #     ddf <- get.distances3(frompoints, topoints, units=units, radius=radius, dfunc='hf', return.rownums=TRUE)
-  #     # need to cbind the return.rownums cols here
-  #   }  
-  #   
-  #   if (dfunc=='slc') {
-  #     ddf <- get.distances3(frompoints, topoints, units=units, radius=radius, dfunc='slc', return.rownums=TRUE)
-  #   }
-  # 
-  #   if (dfunc=='sp') {
-  #     ddf <- get.distances3(frompoints, topoints, radius=radius, units=units, dfunc='sp', return.rownums=TRUE)  # need as.df=TRUE? Not if coded to refer to it as a matrix
-  #   }
+  #ddf.dt <- data.table(ddf, key=c('fromrow', 'torow', 'd'))
   
   if (testing) {cat('\n\n ddf before fix min dist: \n\n');print(ddf);cat('\n\n')}
 
@@ -165,12 +204,15 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
   if (length(area)==1) {area <- rep(area, n) }
   min.dist <- 0.9 * sqrt( area / pi )  # one per frompoints, not one per ddf row
   ddf.min.dist <- min.dist[ddf[ , 'fromrow']] # min.dist[match(ddf$fromrow , 1:length(area))]
-  ddf[ , 'd'] <- pmax(ddf[ , 'd'], ddf.min.dist) # use d or min.dist, whichever is greater
-
-  # *** May want to retain info on which distances were adjusted upwards based on min.dist?
+  #
+  # use d or min.dist, whichever is greater
+  #### *** May want to retain info on which distances were adjusted upwards based on min.dist? ****
+  # min.dist.adjustment.used <- which(ddf[ , 'd'] < ddf.min.dist)
+  # ddf[ min.dist.adjustment.used, 'd'] <- ddf.min.dist[min.dist.adjustment.used]
+  ddf[ , 'd'] <- pmax(ddf[ , 'd'], ddf.min.dist) 
 
   if (testing) {cat('ddf with d adjusted up if d<min.dist: \n\n');print(ddf);cat('\n\n')}
-
+  
   # WHERE area = 0 FOR ONE OR ALL UNITS, AND DISTANCE=0 from that unit to 1+ topoints,
   # THIS RETURNS +Inf FOR THE SCORE FOR THAT frompoint
   #   (regardless of distances to any other topoints), unless no decay.
@@ -179,11 +221,14 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
   # ddf$d[ddf$d==0 & area==0] <- 0
 
   #########################################
-  # 3) keep only if new adjusted d <=radius  BUT RETAIN SINGLE NEAREST JUST IN CASE NEED THAT!!
+  # 3) keep only if new adjusted d <=radius  (or if it is the minimum of all for the given fromrow)
   #########################################
   
-#  nearestone <-  
-  # this needs to be nearest per fromrow
+  # ***** BUT RETAIN SINGLE NEAREST JUST IN CASE NEED THAT!! **** 
+  #  nearestone <-  
+  # this needs to be nearest per fromrow *******
+  
+  
   
   ddf <- ddf[ddf[ , 'd'] <= radius, ]
 
@@ -208,7 +253,7 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
     ##********************** **************
     
     #***    d.nearest1 <- ddf[fromrow.0near, ]  # NOT DONE YET... NEEDS TO BE RIGHT LENGTH and format 
-    d.nearest1 <- get.nearest(frompoints = frompoints[fromrow.0near, ], topoints, units = units, return.rownums = TRUE, return.latlons = FALSE)
+    #d.nearest1 <- get.nearest(frompoints = frompoints[fromrow.0near, ], topoints, units = units, return.rownums = TRUE, return.latlons = FALSE)
     # *** BUT NOTE THAT THESE rownums are NOT the same frompoints as in ddf -- the universe here is only fromrow.0near!!!
     # CAN / SHOULD THOSE BE FIXED HERE??
     
@@ -222,7 +267,8 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
   ##################################################
   # now merge ddf with d.nearest1
   ## BUT NOTE THE fromrow VALUES ARE WRONG!!??
-  # NEED TO HANDLE CASES WHERE ddf and/or d.nearest1 HAVE ZERO ROWS HERE, OR JUST USE c() to combine vectors instead of using rbind to combine all the vectors at once in a data.frame
+  # NEED TO HANDLE CASES WHERE ddf and/or d.nearest1 HAVE ZERO ROWS HERE, 
+  #  OR JUST USE c() to combine vectors instead of using rbind to combine all the vectors at once in a data.frame
   ##################################################
 
   if (length(ddf[ , 'd'])==0 & exists('d.nearest1')) {
@@ -237,34 +283,55 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
 
   
   ######################################
-
+  
   # **** CASES WITH CRASHES THAT NEED TO BE FIXED:
-
-#   > proxistat(test.from, test.to,radius=0.002)
-#   fromrow torow d
-#   1       2     2 0
-#   fromrow torow d min.dist
-#   1       2     2 0        0
-#   [1] 1
-#   [1] 1
-#   Error in rbind(deparse.level, ...) :
-#     numbers of columns of arguments do not match
-#   4 stop("numbers of columns of arguments do not match")
-#   3 rbind(deparse.level, ...)
-#   2 rbind(ddf, d.nearest1) at proxistat.R#148
-#   1 proxistat(test.from, test.to, radius = 0.002)
+  
+  #   > proxistat(test.from, test.to,radius=0.002)
+  #   fromrow torow d
+  #   1       2     2 0
+  #   fromrow torow d min.dist
+  #   1       2     2 0        0
+  #   [1] 1
+  #   [1] 1
+  #   Error in rbind(deparse.level, ...) :
+  #     numbers of columns of arguments do not match
+  #   4 stop("numbers of columns of arguments do not match")
+  #   3 rbind(deparse.level, ...)
+  #   2 rbind(ddf, d.nearest1) at proxistat.R#148
+  #   1 proxistat(test.from, test.to, radius = 0.002)
   #
-#     > proxistat(test.from, test.to,radius=0.00)
-#   [,1] [,2] [,3]
-#   [1,]   NA   NA   NA
-#   Error in ddf$fromrow : $ operator is invalid for atomic vectors
-#
-
+  #     > proxistat(test.from, test.to,radius=0.00)
+  #   [,1] [,2] [,3]
+  #   [1,]   NA   NA   NA
+  #   Error in ddf$fromrow : $ operator is invalid for atomic vectors
+  #
+  ######################################
+  
+  
+  ######################################
+  # AGGREGATE SCORES ACROSS ALL TOPOINTS NEAR A GIVEN FROMPOINT
+  ######################################
+  #
   # ****  THIS COULD PROBABLY BE MADE MUCH MUCH FASTER USING data.table package or some other approach:
+  # except there would be overhead time in turning ddf into a data.table
+  # Using aggregate for 11m blocks aggregated into 220k block groups might take something like 2 minutes! 
+  # #rollup to blockgroups is slow using aggregate:
+  # system.time({x = aggregate(pop ~ fips.bg, data=blocks, FUN=sum)})   TAKES ABOUT 40 SECONDS
+  # 
+  scores <- aggregate( d ~ fromrow , data=ddf, FUN=decayfunction )
+  
+  #scores <- ddf.dt[ , decayfunction(d), by='fromrow' ]
 
-  scores <- aggregate(ddf[ , 'd'], by=list(ddf[, 'fromrow']), FUN=decayfunction )
-
-  return(scores)
+  
+  # or could implement this idea, for getting multiple metrics per block group:
+  #   count.near      <- aggregate(distances.to.blocks$FACILITYID, by=list(distances.to.blocks$FIPS.BG), function(x) length(unique(x)))
+  #   nearest.pts     <- aggregate(distances.to.blocks$d, by=list(distances.to.blocks$FIPS.BG), min)
+  #   proximity.score <- aggregate(cbind(d=distances.to.blocks$d, pop=distances.to.blocks$pop), by=list(distances$FIPS.BG), function(x) Hmisc::wtd.mean(1/x[,'d'], x[,'pop']))
+  if (testing) {
+    return(scores)
+  } else {
+    return(scores[,'d'])
+  }
 }
 
 
@@ -272,7 +339,8 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
 if (1==0) {
   ###########################################################################################################################
   # ANOTHER APPROACH I TRIED :
-  # might be more efficient to LOOP OVER SITES, NOT BLOCKS, TO CALC DISTANCES, running get.distances() on just all sites as frompoints, and then get.nearest as needed.
+  # might be more efficient to LOOP OVER SITES, NOT BLOCKS, TO CALC DISTANCES, 
+  #  running get.distances() on just all sites as frompoints, and then get.nearest as needed.
 
   #########################################
   # Get blocks as "blocks" with FIPS.BLOCK, FIPS.BG, lat, lon, pop, area
@@ -281,7 +349,7 @@ if (1==0) {
   blocks <- UScensus2010blocks::get.blocks()
   blocks$FIPS.BG <- substr(blocks$FIPS.BLOCK, 1, 12)
 
-  # etc.
+    # etc.
 
   #########################################
   # each site is treated as a frompoint, so create one row per facility/site:

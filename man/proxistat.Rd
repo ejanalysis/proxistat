@@ -5,16 +5,23 @@
 \title{Proximity Statistic for Each Location and Nearby Points}
 \usage{
 proxistat(frompoints, topoints, area = 0, radius = 5, units = "miles",
-  decay = "1/d", FIPS, pop, testing = FALSE, dfunc = "hf")
+  decay = "1/d", FIPS, pop, testing = FALSE, dfunc = "sp")
 }
 \arguments{
-\item{frompoints}{Locations of internal points of Census subunits. A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed. Decimal degrees. Required.}
+\item{frompoints}{Locations of internal points of Census subunits.
+A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed. Decimal degrees. Required.}
 
-\item{topoints}{Locations of nearby points of interest, proximity to which is the basis of each Census unit's score. A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed. Decimal degrees. Required.}
+\item{topoints}{Locations of nearby points of interest, proximity to which is the basis of each Census unit's score.
+A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed. Decimal degrees. Required.}
 
-\item{area}{A number or vector of numbers giving size of each spatial unit with FIPS.pop, in square miles by default (or square kilometers if units is 'km'). Optional. Default is 0, in which case no adjustment is made for small or even zero distance, which can cause unrealistically large or even infinite/undefined scores. For zero distance if area=0, Inf will be returned for the score.}
+\item{area}{A number or vector of numbers giving size of each spatial unit with FIPS.pop,
+in square miles by default (or square kilometers if units is 'km'). Optional.
+  Default is 0, in which case no adjustment is made for small or even zero distance,
+  which can cause unrealistically large or even infinite/undefined scores. For zero distance if area=0, Inf will be returned for the score.}
 
-\item{radius}{A number giving distance defining nearby, i.e. the search radius, in miles by default (or kilometers if units is 'km'). Default is 5.}
+\item{radius}{*NOTE: This default is not the same as the default in get.distances3!
+Optional, a number giving distance defining nearby, i.e. the search radius,
+in miles by default (or kilometers if units is 'km'). Default is 5 miles. Max is 5200 miles (roughly the distance from Hawaii to Maine).}
 
 \item{units}{A string that is 'miles' by default, or 'km' for kilometers, specifying units for distances returned and for radius input.}
 
@@ -22,22 +29,28 @@ proxistat(frompoints, topoints, area = 0, radius = 5, units = "miles",
 For '1/d' decay weighting (default), score is count of points within radius, divided by harmonic mean of distances (when count>0).
 Decay weighting also can be '1/d^2' or '1/1' to represent decay by inverse of squared distance, or no decay (equal weighting for all points).}
 
-\item{FIPS}{NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE. A vector of strings designating places that will be assigned scores where each is the Census FIPS code or other ID. Optional.}
+\item{FIPS}{NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE.
+A vector of strings designating places that will be assigned scores where each is the Census FIPS code or other ID. Optional.
+Might want to have this be a factor not string to be faster, or ensure it is indexed on fips, or have separate FIPS.BG passed to this function.}
 
-\item{pop}{NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE. A number or vector of numbers giving population count of each spatial unit. Default is 1, which would give the unweighted average.}
+\item{pop}{NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE.
+A number or vector of numbers giving population count of each spatial unit.
+Default is 1, which would give the unweighted average.}
 
 \item{testing}{Logical during work in progress}
 
-\item{dfunc}{Optional character element "hf"(default) or "slc" to specify distance function Haversine or spherical law of cosines.
-If "sp", it uses the \pkg{sp} package to find distances more accurately but more slowly.}
+\item{dfunc}{Optional character element "hf" or "slc" to specify distance function Haversine or spherical law of cosines.
+If "sp" (default, fastest), it uses the \pkg{sp} package to find distances more accurately and more quickly.}
 }
 \value{
-By default, returns a vector of numbers, the proximity scores, one for each of the frompoints. Based on miles by default, or km depending on units. Returns +Inf for a unit if that area's area and distance are both zero.
+By default, returns a vector of numbers, the proximity scores, one for each of the frompoints (or if testing, a matrix with 2 columns: fromrow and d for distance).
+  Based on miles by default, or km depending on units.
+  Returns +Inf for a unit if that area's area and distance are both zero.
 }
 \description{
 Calculate proximity statistic for each location,
-quantifying number of and proximities of nearby points.
-\code{proxistat} returns a proximity statistic (score) for each location (e.g., Census block).
+  quantifying number of and proximities of nearby points.
+  \code{proxistat} returns a proximity statistic (score) for each location (e.g., Census block).
 }
 \details{
 This function returns a vector of proximity scores, one for each location such as a Census block.
@@ -58,23 +71,45 @@ The harmonic mean distance (see \code{\link[proxistat]{harmean}}) is the inverse
 "Nearby" is defined as a user-specified parameter, so only points within the specified distance are counted, except if none are nearby,
 the single nearest point (at any distance) is used.
 \cr\cr
+Default relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
+Other values of dfunc parameter are slower.
+\cr\cr
+IMPORTANT:
+\cr\cr
+To create a proximity score for a block group, one can find the score for each block in the block group
+and then find the population-weighted average of those block scores, for a single block group.
+\cr
+FIPS for blocks can be used to find FIPS for block groups. FIPS for block groups can be used to find FIPS for tracts.
+\cr\cr
+ADJUSTMENT FOR SMALL DISTANCES:
+\cr\cr
 The adjustment for small distances ensure that each distance represents roughly the distance to the average resident within a spatial unit like a block,
-rather than just the distance to the center or internal point. The adjustment uses the area of the spatial unit and assumes residents are evenly spread across the unit.
+rather than just the distance to the center or internal point.
+The adjustment uses the area of the spatial unit and assumes residents are evenly spread across the unit.
 Distance is adjusted in each place if area of each spatial unit is specified, to ensure it represents roughly distance to average resident in the unit:
 The distance is capped to be no less than 0.9 * radius of a circle of area equal to census unit's area.
 This approximation treats unit as if it were a circle and assumes pop is evenly distributed within that circle's area, since
 \cr
   0.9r = 0.9 * sqrt(area/pi) = approx solution to dist from avg point (resident) in circle
 to a random point in the circle (facility or point of interest).
-\cr\cr
-Relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
-\cr\cr
-IMPORTANT:
-\cr
-To create a proximity score for a block group, one can find the score for each block in the block group
-and then find the population-weighted average of those block scores, for a single block group.
-\cr
-FIPS for blocks can be used to find FIPS for block groups. FIPS for block groups can be used to find FIPS for tracts.
+
+The use of a minimum distance per areal unit is intended to help approximate the distance from the average resident
+rather than from the internal point or center of the areal unit. The approximation assumes distance to the average resident can be estimated
+as if homes and facilities were on average uniformly distributed within blocks (or whatever units are used) that were roughly circular on average.
+It relies on the fact that the average distance between two random points in a circle of radius R is 90% of R
+(Weisstein, Eric W. "Disk Line Picking." From MathWorld--A Wolfram Web Resource. \url{http://mathworld.wolfram.com/DiskLinePicking.html} ).
+This means that if a population is randomly spread over a roughly circular block, a facility inside the block (i.e., very close to the internal point)
+typically would be 0.9R from the average person. The same math shows that the average point in the circle is 0.67R from the center,
+and 1.13R from the edge of the circle. We can describe this relationship using an equation that is a portion of the formula for the
+distance between two random points in a circle of radius=1. The formula uses b= the facility’s distance from the center as a fraction of the radius,
+and the integral over a represents distances of residences from the center.
+We can solve the equation using \url{http://WolframAlpha.com}, for b=0, 0.5, or 1, representing points at the center, halfway to the edge,
+and at the edge of the circle. For example, we can use this equation for b=0.5 to find that the average person, if randomly located in a circle of radius R,
+is a distance of about 0.8 R from a facility that is halfway between the center and edge of the circle.
+Note this is not the same as the expected location of a randomly placed facility, which would use b=sqrt(0.5) instead and gives a distance of about 0.9R.
+The following would be used as the input to WolframAlpha to derive the 0.9 approximation:
+Integrate[(1/Pi) Sqrt[a + (Sqrt(0.5))^2 - 2 * (Sqrt(0.5)) * Sqrt[a] cos(t)], {a,  0,  1},  {t, 0, pi}]
+ \url{http://bit.ly/1GJ9UID}
 }
 \examples{
 test.from <- structure(list(fromlat = c(38.9567309094, 38.9507043428),
