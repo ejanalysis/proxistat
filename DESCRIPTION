@@ -26,9 +26,8 @@ License: Artistic-2.0
 Depends:
   R (>= 3.1.2)
 Imports:
-  sp
+  sp, data.table
 Suggests:
-  data.table,
   matrixStats
 URL: https://github.com/ejanalysis/ejanalysis/
         http://www.ejanalysis.com/

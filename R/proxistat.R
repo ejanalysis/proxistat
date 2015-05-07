@@ -130,7 +130,7 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
 
   # notes :   Make FIPS columns factors for speed when rollup to block groups? 
   
-   warning('THIS IS A WORK IN PROGRESS - e.g. just to get distances for 16.7K topoints, could take about 20 hours')
+   warning('NOT WORKING YET- THIS IS A WORK IN PROGRESS - e.g. just to get distances for 16.7K topoints, could take about 20 hours')
 
 	# Value returned also could include count of points nearby (within radius)?
   # One way to get that is specify decay='1/1'
@@ -171,9 +171,9 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
     '1/1'   = function(d) length(d)
   )
   # For 1/d,  sum(1/d) is the same as n/harmean(d)
-
+  
   n <- length(frompoints[,1])
-
+  
   #########################################
   # Sequence of steps in finding d value(s):
   #########################################
@@ -188,14 +188,14 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
   # 1) get distances <= radius
   #########################################
   
-  ddf <- get.distances3(frompoints, topoints, units=units, dfunc=dfunc, return.rownums=TRUE)
+  ddf.dt <- get.distances3(frompoints, topoints, units=units, dfunc=dfunc, return.rownums=TRUE)
   # NOTE: DO NOT SPECIFY radius IN get.distances3 here, so it will use default radius of 5200 miles, so that
   # this function can use distances greater than radius that was passed to proxistat, 
   # in case there are none within radius and it needs nearest single one outside radius.
   
-  #ddf.dt <- data.table(ddf, key=c('fromrow', 'torow', 'd'))
+  ddf.dt <- data.table(ddf.dt, key=c('fromrow', 'torow', 'd'))
   
-  if (testing) {cat('\n\n ddf before fix min dist: \n\n');print(ddf);cat('\n\n')}
+  if (testing) {cat('\n\n ddf before fix min dist: \n\n');print(ddf.dt);cat('\n\n')}
 
   #########################################
   # 2) Set distance to minimum allowed distance or true distance, whichever is greater.
@@ -203,15 +203,15 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
 
   if (length(area)==1) {area <- rep(area, n) }
   min.dist <- 0.9 * sqrt( area / pi )  # one per frompoints, not one per ddf row
-  ddf.min.dist <- min.dist[ddf[ , 'fromrow']] # min.dist[match(ddf$fromrow , 1:length(area))]
+  ddf.min.dist <- min.dist[ddf.dt[ , 'fromrow']] # min.dist[match(ddf$fromrow , 1:length(area))]
   #
   # use d or min.dist, whichever is greater
   #### *** May want to retain info on which distances were adjusted upwards based on min.dist? ****
   # min.dist.adjustment.used <- which(ddf[ , 'd'] < ddf.min.dist)
   # ddf[ min.dist.adjustment.used, 'd'] <- ddf.min.dist[min.dist.adjustment.used]
-  ddf[ , 'd'] <- pmax(ddf[ , 'd'], ddf.min.dist) 
+  ddf.dt[ , 'd'] <- pmax(ddf.dt[ , 'd'], ddf.min.dist) 
 
-  if (testing) {cat('ddf with d adjusted up if d<min.dist: \n\n');print(ddf);cat('\n\n')}
+  if (testing) {cat('ddf.dt with d adjusted up if d<min.dist: \n\n');print(ddf.dt);cat('\n\n')}
   
   # WHERE area = 0 FOR ONE OR ALL UNITS, AND DISTANCE=0 from that unit to 1+ topoints,
   # THIS RETURNS +Inf FOR THE SCORE FOR THAT frompoint
@@ -228,6 +228,7 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
   #  nearestone <-  
   # this needs to be nearest per fromrow *******
   
+  #<- ddf.dt[ , decayfunction(d), by='fromrow' ]
   
   
   ddf <- ddf[ddf[ , 'd'] <= radius, ]
@@ -318,9 +319,9 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='miles', dec
   # #rollup to blockgroups is slow using aggregate:
   # system.time({x = aggregate(pop ~ fips.bg, data=blocks, FUN=sum)})   TAKES ABOUT 40 SECONDS
   # 
-  scores <- aggregate( d ~ fromrow , data=ddf, FUN=decayfunction )
+  #scores <- aggregate( d ~ fromrow , data=ddf, FUN=decayfunction )
   
-  #scores <- ddf.dt[ , decayfunction(d), by='fromrow' ]
+  scores <- ddf.dt[ , decayfunction(d), by='fromrow' ]
 
   
   # or could implement this idea, for getting multiple metrics per block group:
