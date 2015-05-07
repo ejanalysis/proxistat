@@ -28,10 +28,12 @@ gcd <- function(frompoints, topoints, dfunc='hf', units='km') {
   
   # Work with 4 vectors of equal length, 
   # and Convert degrees to radians
-  long1 <- deg2rad(frompoints[ , 'lon'])
-  long2 <- deg2rad(  topoints[ , 'lon'])
-  lat1  <- deg2rad(frompoints[ , 'lat'])
-  lat2  <- deg2rad(  topoints[ , 'lat'])
+  frompoints <- deg2rad(frompoints)
+  topoints   <- deg2rad(  topoints)
+  long1 <- frompoints[ , 'lon']
+  long2 <-   topoints[ , 'lon']
+  lat1  <- frompoints[ , 'lat']
+  lat2  <-   topoints[ , 'lat']
 
   if (!(units %in% c('km', 'miles'))) {stop('units must be "miles" or "km" ')}
   

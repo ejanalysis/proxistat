@@ -171,7 +171,8 @@ get.distances3 <- function(frompoints, topoints, radius=5200, units='miles', ign
       frompoints, topoints,
       units=units,
       return.latlons=return.latlons, 
-      return.rownums=return.rownums,
+      return.rownums=return.rownums, 
+      return.crosstab=return.crosstab,
       as.df=as.df
     )
   } else {
@@ -219,8 +220,12 @@ get.distances3 <- function(frompoints, topoints, radius=5200, units='miles', ign
   # Remove those outside radius, and remove zero distances if ignore0=TRUE (now radius and results are both in same units)
   
   if (!wantvector) {
+    
+    # what if return.crosstab?
+    
     results <- results[ results[ , 'd'] <= radius, ]
     if (ignore0) { results <- results[ results[,'d'] != 0,  ] }
+    
   } else {
     results <- results[ results <= radius]
     if (ignore0) { results <- results[ results != 0 ] }
