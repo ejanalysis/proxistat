@@ -189,6 +189,7 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   #########################################
   
   ddf.dt <- get.distances3(frompoints, topoints, units=units, dfunc=dfunc, return.rownums=TRUE)
+
   # NOTE: DO NOT SPECIFY radius IN get.distances3 here, so it will use default radius of 5200 miles, so that
   # this function can use distances greater than radius that was passed to proxistat, 
   # in case there are none within radius and it needs nearest single one outside radius.
