@@ -4,6 +4,7 @@
 #'   quantifying number of and proximities of nearby points.
 #'   \code{proxistat} returns a proximity statistic (score) for each location (e.g., Census block).
 #' @details
+#' This version uses get.distances3 with return.crosstab=TRUE.
 #' This function returns a vector of proximity scores, one for each location such as a Census block.
 #' For example, the proximity score may be used to represent how many hazardous waste sites are near any given neighborhood and how close they are.
 #' A proximity score quantifies the proximity and count of nearby points using a specified formula.
@@ -72,7 +73,7 @@
 #'     which can cause unrealistically large or even infinite/undefined scores. For zero distance if area=0, Inf will be returned for the score.
 #' @param radius *NOTE: This default is not the same as the default in get.distances3! 
 #'   Optional, a number giving distance defining nearby, i.e. the search radius, 
-#'   in kilometers by default (or miles if units is 'miles'). Default is 5 km. Max is 5200 miles (roughly the distance from Hawaii to Maine).
+#'   in km by default (or miles if units is 'miles'). Default is 5 kilometers. Max is 5200 miles (roughly the distance from Hawaii to Maine).
 #' @param units A string that is 'miles' by default, or 'km' for kilometers, specifying units for distances returned and for radius input.
 #' @param FIPS NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE. 
 #'   A vector of strings designating places that will be assigned scores where each is the Census FIPS code or other ID. Optional.
@@ -80,6 +81,8 @@
 #' @param pop NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE. 
 #'   A number or vector of numbers giving population count of each spatial unit. 
 #'   Default is 1, which would give the unweighted average.
+#' @param return.count Optional, logical, defaults to FALSE, specifies if results returned should include a column with the count of topoints that were within radius, for each of the frompoints
+#' @param return.nearest Optional, logical, defaults to FALSE, specifies if results returned should include a column with the distance to the nearest single of the topoints, for each of the frompoints
 #' @param decay A string specifying type of function to use when weighting by distance. Default is '1/d'
 #'   For '1/d' decay weighting (default), score is count of points within radius, divided by harmonic mean of distances (when count>0).
 #'   Decay weighting also can be '1/d^2' or '1/1' to represent decay by inverse of squared distance, or no decay (equal weighting for all points).
@@ -109,11 +112,11 @@
 #' t100k=testpoints(1e5)
 #' t1m=testpoints(1e6)
 #'
-#' proxistat(t1, t10k, radius=1, units='km')
+#' proxistat3(t1, t10k, radius=1, units='km')
 #'
-#' proxistat(t10, t10k)
+#' proxistat3(t10, t10k)
 #'
-#' subunitscores = proxistat(frompoints=test.from, topoints=test.to,
+#' subunitscores = proxistat3(frompoints=test.from, topoints=test.to,
 #'   area=rep(0.2, length(test.from[,1])), radius=1, units='km')
 #' print(subunitscores)
 #' subunitpop = rep(1000, length(test.from$lat))
@@ -124,18 +127,15 @@
 #' print(unitscores)
 #'
 #' @export
-proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay='1/d', FIPS, pop, testing=FALSE, dfunc='sp') {
+proxistat3 <- function(frompoints, topoints, area=0, radius=5, units='km', decay='1/d', return.count=FALSE, return.nearest=FALSE, FIPS, pop, testing=FALSE, dfunc='sp') {
   
   maxradius.miles <- 5200
 
   # notes :   Make FIPS columns factors for speed when rollup to block groups? 
   
-   warning('NOT WORKING YET- THIS IS A WORK IN PROGRESS - e.g. just to get distances for 16.7K topoints, could take about 20 hours')
+   warning('NOT NECESSARILY WORKING YET- THIS IS A WORK IN PROGRESS')
 
-	# Value returned also could include count of points nearby (within radius)?
-  # One way to get that is specify decay='1/1'
-
-  # Error checking -- also uses the error checking that get.distances() does
+  # Error checking -- also uses the error checking that get.distances3() does
   
   if (missing(frompoints) | missing(topoints)) {stop('frompoints and topoints must be specified')}
   if (!(units %in% c('km', 'miles'))) {stop('units must be "km" or "miles" ')  }
@@ -166,9 +166,9 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   colnames(topoints)   <- latlon.colnames.check(  topoints)
   
   decayfunction <- switch(decay,
-    '1/d'   = function(d) sum(1/d,     na.rm=TRUE),
-    '1/d^2' = function(d) sum(1/(d^2), na.rm=TRUE),
-    '1/1'   = function(d) length(d)
+    '1/d'   = function(d) rowSums(1/d,     na.rm=TRUE),
+    '1/d^2' = function(d) rowSums(1/(d^2), na.rm=TRUE),
+    '1/1'   = function(d) rowSums(d > 0, na.rm=TRUE)
   )
   # For 1/d,  sum(1/d) is the same as n/harmean(d)
   
@@ -188,31 +188,26 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   # 1) get distances <= radius
   #########################################
   
-  ddf.dt <- get.distances3(frompoints, topoints, units=units, dfunc=dfunc, return.rownums=TRUE)
+  ddf <- get.distances3(frompoints, topoints, units=units, dfunc=dfunc, return.crosstab = TRUE)
   # NOTE: DO NOT SPECIFY radius IN get.distances3 here, so it will use default radius of 5200 miles, so that
   # this function can use distances greater than radius that was passed to proxistat, 
   # in case there are none within radius and it needs nearest single one outside radius.
   
-  ddf.dt <- data.table(ddf.dt, key=c('fromrow', 'torow', 'd'))
-  
-  if (testing) {cat('\n\n ddf before fix min dist: \n\n');print(ddf.dt);cat('\n\n')}
+  #if (testing) {cat('\n\n ddf before fix min dist: \n\n');print(ddf);cat('\n\n')}
 
   #########################################
   # 2) Set distance to minimum allowed distance or true distance, whichever is greater.
   #########################################
 
-  if (length(area)==1) {area <- rep(area, n) }
-  min.dist <- 0.9 * sqrt( area / pi )  # one per frompoints, not one per ddf row
-  ddf.min.dist <- min.dist[ddf.dt[ , 'fromrow']] # min.dist[match(ddf$fromrow , 1:length(area))]
-  #
   # use d or min.dist, whichever is greater
-  #### *** May want to retain info on which distances were adjusted upwards based on min.dist? ****
-  # min.dist.adjustment.used <- which(ddf[ , 'd'] < ddf.min.dist)
-  # ddf[ min.dist.adjustment.used, 'd'] <- ddf.min.dist[min.dist.adjustment.used]
-  ddf.dt[ , 'd'] <- pmax(ddf.dt[ , 'd'], ddf.min.dist) 
-
-  if (testing) {cat('ddf.dt with d adjusted up if d<min.dist: \n\n');print(ddf.dt);cat('\n\n')}
+  if (length(area)==1) {area <- rep(area, n) }
+  min.dist <- 0.9 * sqrt( area / pi )  # one per frompoints, which now that crosstab used is one per ddf row
+  # takes about 6 seconds for 10k x 10k matrix, for example
+  ddf <- apply(ddf, 2, FUN=function(x) pmax(x, min.dist))
   
+  if (testing) {cat('ddf with d adjusted up if d<min.dist: \n\n'); print(ddf); cat('\n\n')}
+  
+  # not done:?
   # WHERE area = 0 FOR ONE OR ALL UNITS, AND DISTANCE=0 from that unit to 1+ topoints,
   # THIS RETURNS +Inf FOR THE SCORE FOR THAT frompoint
   #   (regardless of distances to any other topoints), unless no decay.
@@ -221,124 +216,78 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   # ddf$d[ddf$d==0 & area==0] <- 0
 
   #########################################
+  # ***** RETAIN SINGLE NEAREST IN CASE NEED THAT!! **** 
+  #########################################
+  
+  # which topoint was the nearest?
+  nearestone.colnum <- apply(ddf, 1, which.min)  # about 4 seconds for 10k x 10k matrix, for example
+  # how far away was that one nearest to each frompoint?
+  #nearestone.d <-  rowMins(ddf)
+  nearestone.d <- ddf[ cbind(1:NROW(ddf), nearestone.colnum) ]
+  
+  #########################################
   # 3) keep only if new adjusted d <=radius  (or if it is the minimum of all for the given fromrow)
   #########################################
   
-  # ***** BUT RETAIN SINGLE NEAREST JUST IN CASE NEED THAT!! **** 
-  #  nearestone <-  
-  # this needs to be nearest per fromrow *******
+  # set to NA any cell of matrix where distance is > search radius
+  ddf[ddf > radius] <- NA
   
-  #<- ddf.dt[ , decayfunction(d), by='fromrow' ]
-  
-  
-  ddf <- ddf[ddf[ , 'd'] <= radius, ]
+  if (return.count) {
+    # record how many are within the radius
+    count.near <- rowSums(!is.na(ddf))
+  }
 
   if (testing) {cat('ddf with final d adjusted up where was <min.dist, but dropped if adjusted to > radius: \n\n');print(ddf);cat('\n\n')}
 
+  #### *** May want to retain info on which fromrows had a score that was based on any distances that were adjusted upwards based on min.dist? ****
+  # min.dist.adjustment.used <- which()
+  
   #########################################
-  # 4) None within radius....
+  # 4) where None within radius.... 
   # For any frompoint that had no topoint within radius,
   # use distance to nearest single topoint
   #########################################
   
-  fromrow.0near <- which(!(1:n %in% ddf[ , 'fromrow']))
+  # note which frompoints had zero within the radius
+  fromrow.0near <- which(rowSums(ddf, na.rm=TRUE)==0)
+  
+  # put back in the distance that was the nearest one, but only for rows where none were within radius
+  ddf[ cbind(1:NROW(ddf), nearestone.colnum) ][fromrow.0near ] <- nearestone.d[fromrow.0near]
   
   if (testing) {cat('fromrow.0near = '); print(fromrow.0near)}
   if (testing) {cat('\nlength of fromrow.0near = ');print(length(fromrow.0near));cat('\n\n')}
-  
   if (length(fromrow.0near) > 0) {
-    
     if (testing) {cat(' some fromrows were not in results of get.distances in ddf \n')}
-    
-    
-    ##********************** **************
-    
-    #***    d.nearest1 <- ddf[fromrow.0near, ]  # NOT DONE YET... NEEDS TO BE RIGHT LENGTH and format 
-    #d.nearest1 <- get.nearest(frompoints = frompoints[fromrow.0near, ], topoints, units = units, return.rownums = TRUE, return.latlons = FALSE)
-    # *** BUT NOTE THAT THESE rownums are NOT the same frompoints as in ddf -- the universe here is only fromrow.0near!!!
-    # CAN / SHOULD THOSE BE FIXED HERE??
-    
-    # Now have to check again to fix d < min.dist but radius is now irrelevant and even if adjusted d is no longer the nearest, it is the smallest d allowed.
-    
-    d.nearest1[ d.nearest1[ , 'd'] < min.dist[fromrow.0near], 'd' ] <- min.dist[fromrow.0near]
-    
-    
   }
-  
-  ##################################################
-  # now merge ddf with d.nearest1
-  ## BUT NOTE THE fromrow VALUES ARE WRONG!!??
-  # NEED TO HANDLE CASES WHERE ddf and/or d.nearest1 HAVE ZERO ROWS HERE, 
-  #  OR JUST USE c() to combine vectors instead of using rbind to combine all the vectors at once in a data.frame
-  ##################################################
-
-  if (length(ddf[ , 'd'])==0 & exists('d.nearest1')) {
-    ddf <- d.nearest1  
-  } else {
-    if (exists('d.nearest1')) {
-      colnames(d.nearest1) <- colnames(ddf)
-      if (testing) {cat('d.nearest1 = '); print(d.nearest1) }
-      ddf <- rbind(ddf, d.nearest1)   # STILL CRASHES HERE IN CERTAIN CASES? ****** ALSO THIS STEP IS LIKELY SLOW
-    }
-  }
-
-  
-  ######################################
-  
-  # **** CASES WITH CRASHES THAT NEED TO BE FIXED:
-  
-  #   > proxistat(test.from, test.to,radius=0.002)
-  #   fromrow torow d
-  #   1       2     2 0
-  #   fromrow torow d min.dist
-  #   1       2     2 0        0
-  #   [1] 1
-  #   [1] 1
-  #   Error in rbind(deparse.level, ...) :
-  #     numbers of columns of arguments do not match
-  #   4 stop("numbers of columns of arguments do not match")
-  #   3 rbind(deparse.level, ...)
-  #   2 rbind(ddf, d.nearest1) at proxistat.R#148
-  #   1 proxistat(test.from, test.to, radius = 0.002)
-  #
-  #     > proxistat(test.from, test.to,radius=0.00)
-  #   [,1] [,2] [,3]
-  #   [1,]   NA   NA   NA
-  #   Error in ddf$fromrow : $ operator is invalid for atomic vectors
-  #
-  ######################################
-  
   
   ######################################
   # AGGREGATE SCORES ACROSS ALL TOPOINTS NEAR A GIVEN FROMPOINT
   ######################################
-  #
-  # ****  THIS COULD PROBABLY BE MADE MUCH MUCH FASTER USING data.table package or some other approach:
-  # except there would be overhead time in turning ddf into a data.table
-  # Using aggregate for 11m blocks aggregated into 220k block groups might take something like 2 minutes! 
-  # #rollup to blockgroups is slow using aggregate:
-  # system.time({x = aggregate(pop ~ fips.bg, data=blocks, FUN=sum)})   TAKES ABOUT 40 SECONDS
-  # 
-  #scores <- aggregate( d ~ fromrow , data=ddf, FUN=decayfunction )
   
-  scores <- ddf.dt[ , decayfunction(d), by='fromrow' ]
-
+  results <- cbind(scores=decayfunction(ddf))
   
-  # or could implement this idea, for getting multiple metrics per block group:
-  #   count.near      <- aggregate(distances.to.blocks$FACILITYID, by=list(distances.to.blocks$FIPS.BG), function(x) length(unique(x)))
-  #   nearest.pts     <- aggregate(distances.to.blocks$d, by=list(distances.to.blocks$FIPS.BG), min)
-  #   proximity.score <- aggregate(cbind(d=distances.to.blocks$d, pop=distances.to.blocks$pop), by=list(distances$FIPS.BG), function(x) Hmisc::wtd.mean(1/x[,'d'], x[,'pop']))
-  if (testing) {
-    return(scores)
-  } else {
-    return(scores[,'d'])
+  #      or get multiple metrics per block group:
+  if (return.count) {
+    results <- cbind( scores=results, count.near=count.near)
   }
-}
+  
+  if (return.nearest) {
+    results <- cbind(results, nearestone.d=nearestone.d)
+  }
 
+  return(results)
+
+}
 
 
 if (1==0) {
   ###########################################################################################################################
+  
+  # Using aggregate for 11m blocks aggregated into 220k block groups might take something like 2 minutes! 
+  # #rollup to blockgroups is slow using aggregate:
+  # system.time({x = aggregate(pop ~ fips.bg, data=blocks, FUN=sum)})   TAKES ABOUT 40 SECONDS
+  
+  
   # ANOTHER APPROACH I TRIED :
   # might be more efficient to LOOP OVER SITES, NOT BLOCKS, TO CALC DISTANCES, 
   #  running get.distances() on just all sites as frompoints, and then get.nearest as needed.
