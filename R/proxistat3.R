@@ -154,7 +154,7 @@ proxistat3 <- function(frompoints, topoints, area=0, radius=5, units='km', decay
     if (!is.vector(area) || !is.numeric(area) || any(is.na(area)) || any(is.infinite(area)) || length(area)!=length(frompoints[,1])) {
       stop('area will not be recycled - if supplied, it must be a numeric vector of same length as number of points with no NA or Inf values')
     }
-	  if (any(area < 0) | any(area > 1e6) ) {stop('area must be between 0 and 1 million')}
+	  if (any(area < 0)  ) {stop('area must be > 0 ')}
 	}
   if (!(decay %in% c('1/d', '1/d^2', '1'))) {stop('invalid decay parameter')}
 

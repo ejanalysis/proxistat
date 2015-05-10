@@ -1,5 +1,5 @@
-#' @title Call a function once per chunk & save output as file (breaks large input data into chunks)
-#' @description Call get.distances3 function in chunks, when list of frompoints is so long it taxes RAM (e.g. 11m blocks),
+#' @title Call proxistat3 once per chunk & save output as file (breaks large input data into chunks)
+#' @description Call proxistat3 function in chunks, when list of frompoints is so long it taxes RAM (e.g. 11m blocks),
 #'   saving each chunk as a separate .RData file in current working directory
 #' @details   filesizes if crosstab format (FASTEST & avoid needing rownums which take >twice as long & 1.25x sized file):
 #'   80MB file/chunk if   1k blocks x 11k topoints/chunk:  y=get.distances.chunked(testpoints(11e6), testpoints(11000), 1e3, units='km',return.crosstab=TRUE)
@@ -10,10 +10,11 @@
 #' @param tochunksize (not currently required - current default is to use all topoints at once) number specifying how many points to analyze at a time (per chunk).
 #' @param ... Other parameters to pass to \code{\link{get.distances3}}, such as units
 #' @param folder Optional path specifying where to save .RData files, default is getwd()
-#' @param FUN Optional function, \code{\link{get.distances3}} by default, but can be \code{\link{proxistat3}}, for example. Must take frompoints and topoints as parameters.
+#' @param FUN Optional function, \code{\link{proxistat3}} by default, and other values not implemented yet.
 #' @return Returns vector of character elements that are filenames for saved .RData output files in current working directory
+#'   Each saved output is a vector of proximity scores if FUN=get.proxistat3, or matrix with extra columns depending on return. parameters above.
 #' @export
-get.distances.chunked <- function(frompoints, topoints, fromchunksize, tochunksize, FUN=get.distances3, folder=getwd(), ...) {
+proxistat.chunked <- function(frompoints, topoints, fromchunksize, tochunksize, FUN=proxistat3, area, folder=getwd(), ...) {
   
   nfrom = length(frompoints[ , 1])
   nto   = length(  topoints[ , 1])
@@ -29,7 +30,7 @@ get.distances.chunked <- function(frompoints, topoints, fromchunksize, tochunksi
   if (tochunksize > nto ) {
     warning('tochunksize was more than topoints size so doing all at once')
     tochunksize <- nto
-    }
+  }
   
   fromchunks = ceiling(nfrom / fromchunksize) 
   tochunks =   ceiling(nto     / tochunksize) 
@@ -72,12 +73,8 @@ get.distances.chunked <- function(frompoints, topoints, fromchunksize, tochunksi
     # later might also try to chunk the topoints:
     #output <- get.distances3(frompoints=frompoints[fromrow.start:fromrow.end, ], topoints=topoints[torow.start:torow.end, ], ...) 
     
-    # Quick workaround to handle the fact that area needs to be chunked just like frompoints or topoints, when proxistat is called:
-    if (exists('area')) {
-      output <- FUN(frompoints=frompoints[fromrow.start:fromrow.end, ], topoints=topoints, area=area[fromrow.start:fromrow.end], ...)
-    } else {
-      output <- FUN(frompoints=frompoints[fromrow.start:fromrow.end, ], topoints=topoints, ...)
-    }
+    # ***  area needs to be chunked just like frompoints or topoints, when proxistat is called:
+    output <- proxistat3(frompoints=frompoints[fromrow.start:fromrow.end, ], topoints=topoints, area=area[fromrow.start:fromrow.end], ...)
 
     save(output, file=file.path(folder, filenames[fchunk]))
     
