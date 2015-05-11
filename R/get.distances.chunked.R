@@ -10,8 +10,8 @@
 #' @param tochunksize (not currently required - current default is to use all topoints at once) number specifying how many points to analyze at a time (per chunk).
 #' @param ... Other parameters to pass to \code{\link{get.distances3}}, such as units
 #' @param folder Optional path specifying where to save .RData files, default is getwd()
-#' @param FUN Optional function, \code{\link{get.distances3}} by default, but can be \code{\link{proxistat3}}, for example. Must take frompoints and topoints as parameters.
-#' @return Returns vector of character elements that are filenames for saved .RData output files in current working directory
+#' @param FUN Optional function, \code{\link{get.distances3}} by default, no other value allowed currently. 
+#' @return Returns vector of character elements that are filenames for saved .RData output files in current working directory or specified folder.
 #' @export
 get.distances.chunked <- function(frompoints, topoints, fromchunksize, tochunksize, FUN=get.distances3, folder=getwd(), ...) {
   
@@ -72,12 +72,7 @@ get.distances.chunked <- function(frompoints, topoints, fromchunksize, tochunksi
     # later might also try to chunk the topoints:
     #output <- get.distances3(frompoints=frompoints[fromrow.start:fromrow.end, ], topoints=topoints[torow.start:torow.end, ], ...) 
     
-    # Quick workaround to handle the fact that area needs to be chunked just like frompoints or topoints, when proxistat is called:
-    if (exists('area')) {
-      output <- FUN(frompoints=frompoints[fromrow.start:fromrow.end, ], topoints=topoints, area=area[fromrow.start:fromrow.end], ...)
-    } else {
       output <- FUN(frompoints=frompoints[fromrow.start:fromrow.end, ], topoints=topoints, ...)
-    }
 
     save(output, file=file.path(folder, filenames[fchunk]))
     

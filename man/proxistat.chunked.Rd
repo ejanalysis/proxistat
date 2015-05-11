@@ -5,7 +5,8 @@
 \title{Call proxistat3 once per chunk & save output as file (breaks large input data into chunks)}
 \usage{
 proxistat.chunked(frompoints, topoints, fromchunksize, tochunksize,
-  FUN = proxistat3, area, folder = getwd(), ...)
+  FUN = proxistat3, area, folder = getwd(), savechunks = TRUE,
+  assemble = TRUE, ...)
 }
 \arguments{
 \item{frompoints}{Require matrix or data.frame of lat/lon vauels that can be passed to get.distances3 function (colnames 'lat' and 'lon')}
@@ -23,7 +24,7 @@ proxistat.chunked(frompoints, topoints, fromchunksize, tochunksize,
 \item{...}{Other parameters to pass to \code{\link{get.distances3}}, such as units}
 }
 \value{
-Returns vector of character elements that are filenames for saved .RData output files in current working directory
+Returns vector of character elements that are filenames for saved .RData output files in current working directory or specified folder.
   Each saved output is a vector of proximity scores if FUN=get.proxistat3, or matrix with extra columns depending on return. parameters above.
 }
 \description{

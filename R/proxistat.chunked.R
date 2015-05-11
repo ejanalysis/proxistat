@@ -8,13 +8,17 @@
 #' @param topoints Require matrix or data.frame of lat/lon vauels that can be passed to get.distances3 function (colnames 'lat' and 'lon')
 #' @param fromchunksize Required, number specifying how many points to analyze at a time (per chunk).
 #' @param tochunksize (not currently required - current default is to use all topoints at once) number specifying how many points to analyze at a time (per chunk).
+#' @param savechunks Optional logical defaults to TRUE. Specifies whether to save .RData file of each chunk
+#' @param assemble Optional logical defaults to TRUE. Specifies whether to assemble all chunks into one variable called outputs, 
+#'     which is saved as outputs.RData and returned by this function.
 #' @param ... Other parameters to pass to \code{\link{get.distances3}}, such as units
 #' @param folder Optional path specifying where to save .RData files, default is getwd()
 #' @param FUN Optional function, \code{\link{proxistat3}} by default, and other values not implemented yet.
-#' @return Returns vector of character elements that are filenames for saved .RData output files in current working directory
+#' @return If assemble=TRUE, returns assembled set of all chunks as vector or matrix. 
+#'   If assemble=FALSE, returns vector of character elements that are filenames for saved .RData output files in current working directory or specified folder.
 #'   Each saved output is a vector of proximity scores if FUN=get.proxistat3, or matrix with extra columns depending on return. parameters above.
 #' @export
-proxistat.chunked <- function(frompoints, topoints, fromchunksize, tochunksize, FUN=proxistat3, area, folder=getwd(), ...) {
+proxistat.chunked <- function(frompoints, topoints, fromchunksize, tochunksize, FUN=proxistat3, area, folder=getwd(), savechunks=TRUE, assemble=TRUE, ...) {
   
   nfrom = length(frompoints[ , 1])
   nto   = length(  topoints[ , 1])
@@ -74,11 +78,29 @@ proxistat.chunked <- function(frompoints, topoints, fromchunksize, tochunksize, 
     #output <- get.distances3(frompoints=frompoints[fromrow.start:fromrow.end, ], topoints=topoints[torow.start:torow.end, ], ...) 
     
     # ***  area needs to be chunked just like frompoints or topoints, when proxistat is called:
-    output <- proxistat3(frompoints=frompoints[fromrow.start:fromrow.end, ], topoints=topoints, area=area[fromrow.start:fromrow.end], ...)
+    output <- proxistat3(frompoints=frompoints[fromrow.start:fromrow.end, ], topoints=topoints, 
+     area=area[fromrow.start:fromrow.end], ...)
 
-    save(output, file=file.path(folder, filenames[fchunk]))
+    if (savechunks) {
+      save(output, file=file.path(folder, filenames[fchunk]))
+    }
     
+    if (assemble) {
+      if (fchunk)==1 {
+        outputs <- output
+      } else {
+        outputs <- rbind( outputs, output )  
+      }
+    }
+    rm(output)
   }
+    
   print(round( difftime(Sys.time(), started), 1))
-  return(filenames)
+  
+  if (assemble) {
+    save(outputs, file=file.path(folder, 'outputs.RData'))
+    return(outputs)
+  } else {
+    return(filenames)
+  }
 }

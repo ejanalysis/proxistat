@@ -16,14 +16,14 @@ get.distances.chunked(frompoints, topoints, fromchunksize, tochunksize,
 
 \item{tochunksize}{(not currently required - current default is to use all topoints at once) number specifying how many points to analyze at a time (per chunk).}
 
-\item{FUN}{Optional function, \code{\link{get.distances3}} by default, but can be \code{\link{proxistat3}}, for example. Must take frompoints and topoints as parameters.}
+\item{FUN}{Optional function, \code{\link{get.distances3}} by default, no other value allowed currently.}
 
 \item{folder}{Optional path specifying where to save .RData files, default is getwd()}
 
 \item{...}{Other parameters to pass to \code{\link{get.distances3}}, such as units}
 }
 \value{
-Returns vector of character elements that are filenames for saved .RData output files in current working directory
+Returns vector of character elements that are filenames for saved .RData output files in current working directory or specified folder.
 }
 \description{
 Call get.distances3 function in chunks, when list of frompoints is so long it taxes RAM (e.g. 11m blocks),
