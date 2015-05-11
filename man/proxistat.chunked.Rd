@@ -21,10 +21,16 @@ proxistat.chunked(frompoints, topoints, fromchunksize, tochunksize,
 
 \item{folder}{Optional path specifying where to save .RData files, default is getwd()}
 
+\item{savechunks}{Optional logical defaults to TRUE. Specifies whether to save .RData file of each chunk}
+
+\item{assemble}{Optional logical defaults to TRUE. Specifies whether to assemble all chunks into one variable called outputs,
+which is saved as outputs.RData and returned by this function.}
+
 \item{...}{Other parameters to pass to \code{\link{get.distances3}}, such as units}
 }
 \value{
-Returns vector of character elements that are filenames for saved .RData output files in current working directory or specified folder.
+If assemble=TRUE, returns assembled set of all chunks as vector or matrix.
+  If assemble=FALSE, returns vector of character elements that are filenames for saved .RData output files in current working directory or specified folder.
   Each saved output is a vector of proximity scores if FUN=get.proxistat3, or matrix with extra columns depending on return. parameters above.
 }
 \description{

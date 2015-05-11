@@ -86,7 +86,7 @@ proxistat.chunked <- function(frompoints, topoints, fromchunksize, tochunksize, 
     }
     
     if (assemble) {
-      if (fchunk)==1 {
+      if (fchunk==1) {
         outputs <- output
       } else {
         outputs <- rbind( outputs, output )  
