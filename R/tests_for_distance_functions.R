@@ -30,7 +30,11 @@ if (1==0) {
   tt=testpoints(1000,25,47)
   tf=data.frame(tf)
   tt=data.frame(tt)
-  x=get.nearest2(tf,tt,return.latlons = TRUE)
+  
+  
+  
+  x=get.nearest(tf,tt,return.latlons = TRUE)
+  
   x=as.data.frame(x)
   plot(tt$lon, tt$lat, pch='.', main='Line drawn to the point nearest a given red circle')
   points(tf$lon, tf$lat,col='red')

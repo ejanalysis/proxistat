@@ -171,6 +171,7 @@ get.distances.all <- function(frompoints, topoints, units='miles', return.crosst
   
   if (return.rownums & !return.latlons) { 
     # return tall matrix with fromrow, torow, d
+    # **** BUT THIS IS TOO SLOW OR FAILS FOR LARGE NUMBERS LIKE 100k frompoints x 10K topoints
 
     results=cbind( expand.gridMatrix(1:length(topoints[,'lat']), 1:length(frompoints[,'lat'])), as.vector( t(results.matrix) )  )
     colnames(results) <- c('torow', 'fromrow', 'd')

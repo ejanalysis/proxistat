@@ -9,11 +9,15 @@
 #' Points are specified using latitude and longitude in decimal degrees.
 #' Relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
 #' \cr\cr
-#' NOTE: *** This is OK for <100k frompoints and 100 topoints, but starts to get slow. 
-#' This method is MUCH slower than just using other version of get.nearest that gets full distance matrix via spDists() and then gets minima.
 #' A future version may use get.distances.all() but for performance only use it for distance pairs (pairs of points) that have been initially 
 #' quickly filtered using lat/lon to be not too far, in an attempt to go much faster in an initial pass.
-#'
+#' *** old get.nearest with loops takes 42 seconds vs 3 seconds for this version, for 100k frompoints and 100 topoints:  Sys.time(); x=get.nearest(t100k, t100); Sys.time()
+#' > Sys.time(); x=get.nearest(testpoints(1e6), testpoints(100)); Sys.time()
+#' [1] 14:33:05 EDT
+#' [1] 14:33:33 EDT  <30 seconds from 1 mill to 100 points, as in finding nearest of 100 sites for 9% of the US Census blocks.
+#' But R hung/crashed on 11mill frompoints -- Probably out of memory. *** Need to break it up into batches of maybe 1 to 100 million distances at a time? 
+#' There are 11,078,297 blocks according to \url{http://www.census.gov/geo/maps-data/data/tallies/national_geo_tallies.html}
+#' 
 #' @param frompoints A matrix or data.frame with two cols, 'lat' and 'lon' (or only 2 cols that are lat and lon in that order) with datum=WGS84 assumed.
 #' @param topoints A matrix or data.frame with two cols, 'lat' and 'lon' (or only 2 cols that are lat and lon in that order) with datum=WGS84 assumed.
 #' @param radius Optional number, default is Inf. Distance within which search should be limited, or max distance that will be returned.
@@ -24,9 +28,9 @@
 #' @param return.latlons Logical value, FALSE by default. If TRUE, value returned also includes four extra columns,
 #'   showing fromlat, fromlon, tolat, tolon.
 #' @param units A string that is 'miles' by default, or 'km' for kilometers, specifying units for distances returned.
-#' @return By default, returns a matrix of numbers, with columns fromrow, torow indexing which is nearest of topoints, and d (distance).
+#' @return By default, returns a vector of distances, but can return a matrix of numbers, with columns that can include fromrow and torow indexing 
+#'   which is nearest (first if >1 match) of topoints, fromlat, fromlon, tolat, tolon, and d (distance).
 #'   ** Returns Inf when no topoints are found within the radius, and also when a distance to nearest is zero but ignore0=TRUE. 
-#'   Future edit might want to return smallest nonzero distance.**
 #'   Distance returned is in miles by default, but with option to set units='km' to get kilometers.
 #'   See parameters for details on other formats that may be returned if specified.
 #' @seealso \code{\link{get.distances}} which gets distances between all points (within an optional search radius),
@@ -59,32 +63,11 @@
 #'  tolon = c(-77.0892818598, -77.0896199948, -77.0972395245)), .Names = c("lat", "lon"),
 #'  class = "data.frame", row.names = c("6054762", "6054763", "6054764"))
 #' get.nearest(test.from, test.to)
-#' 
+#' get.nearest(testpoints(10), testpoints(30))
 #' @export
 get.nearest <- function(frompoints, topoints, units='miles', ignore0=FALSE, 
-                        return.rownums=TRUE, return.latlons=FALSE, radius=Inf) {
-
-  # ***** Notes on performance/ speed: ******
-  # It should be easy to speed this up (for very large numbers of topoints) by using a box to search within (as get.distances does) and only enlarge the search box if no topoints are found in it.
-  # One could assume topoints are uniformly distributed in extent defined by range(topoints$lat) and range(topoints$lat)
-  # Then do initial search for nearest by using get.distances(frompoints, topoints, max.miles=x) 
-  # where max.miles is chosen so there is a 95% chance that at least one topoint will be within max.miles ***
-  # So full extent of A sqkm for N topoints means avg of N/A topoints per sqkm, or A/N sqkms have 1 topoint on avg, and 
-  # Each of N topoints has box/A chance of being in box, and 
-  # chance of at least one being in box is 1-(1-box/A)^N = 0.95, so box/A= 1 - (1-0.95)^(1/N)
-  # e.g., 
-  # search box area should be roughly ... 
-
-  #frompoints and topoints each must be a matrix with 'lat' and 'lon' colnames (or only 2 cols that are lat and lon in that order)
+                         return.rownums=FALSE, return.latlons=FALSE, radius=Inf) {
   
-  # This formula (using SpatialPoints() & spDists() ) is the best method I've tried so far.
-  # [DIRECTLY USING MY OWN DISTANCE FORMULA WITH sin cos etc. was even faster, but results appeared to be wrong - not sure if units or formula were the problem.]
-
-  if (!(units %in% c('miles', 'km'))) {stop('units must be unspecified (i.e., miles) or miles or km')}
-  if (units=='miles' & !missing(radius) ) {radius <- convert( radius, 'miles', 'km') }
-  
-  # Here, May need to fix cases where only a single row is in frompoints or topoints ( get.distances() handles that well.)
-    
   # handle cases where an input is only one row (one point)
   if (is.vector(frompoints)) {mycols <- names(frompoints); frompoints <- matrix(frompoints, nrow=1); dimnames(frompoints)[[2]] = mycols }
   if (is.vector(topoints)) {mycols <- names(topoints); topoints <- matrix(topoints, nrow=1); dimnames(topoints)[[2]] = mycols }
@@ -92,74 +75,85 @@ get.nearest <- function(frompoints, topoints, units='miles', ignore0=FALSE,
   colnames(frompoints) <- latlon.colnames.check(frompoints)
   colnames(topoints)   <- latlon.colnames.check(topoints)
   
-  #require(sp)
+  n.from <- length(frompoints[,1])
+  n.to <- length(topoints[,1])
+  #frompoints and topoints each must be a matrix with 'lat' and 'lon' colnames (or only 2 cols that are lat and lon in that order)
   
-  n.from <- NROW(frompoints[,1])
-  n.to   <- NROW(topoints[,1])
-  
-  if (!return.latlons) {nearest <- matrix(nrow=n.from, ncol=2) } # will have 1 or 3, but 2 for now
-  if (return.latlons)  {nearest <- matrix(nrow=n.from, ncol=6)} # will have 5 or 7, but 6 for now. 
+  # ***** Notes on performance/ speed: ******
+  # It might be easy to speed this up (for very large numbers of topoints) by using a box to search within (as get.distances does) and only enlarge the search box if no topoints are found in it.
+  # One could assume topoints are uniformly distributed in extent defined by range(c(frompoints$lat, topoints$lat)) and range(c(frompoints$lon, topoints$lon))
+  # Then do initial search for nearest by using get.distances(frompoints, topoints, max.miles=x) 
+  # where max.miles is chosen so there is a 95% chance that at least one topoint will be within max.miles ***
+  # *** BUT doesn't that assume frompoint is in the center of all the topoints? and that box is close to square not long rectangle?
+  # So full extent of A sqkm for N topoints means avg of N/A topoints per sqkm, or A/N sqkms have 1 topoint on avg, and 
+  # Each of N topoints has box/A chance of being in box, and 
+  # chance of at least one being in box is 1-(1-box/A)^N = 0.95, so box/A= 1 - (1-0.95)^(1/N)
+  #
+  #   searchRadiuskm <- function(frompoints, topoints, prob=0.95) {
+  #     meanlat = mean(topoints$lat)
+  #     latrangekm = meters.per.degree.lat(meanlat ) * abs(diff(range(c(frompoints$lat, topoints$lat))))  / 1000
+  #     lonrangekm = meters.per.degree.lon(meanlat ) * abs(diff(range(c(frompoints$lon, topoints$lon))))  / 1000
+  #     allPointsSqkm = latrangekm * lonrangekm 
+  #     n.to=length(topoints$lat)
+  #     searchboxarea = allPointsSqkm * (1-(1-prob)^(1/n.to)) 
+  #     searchRadius1 = sqrt(searchboxarea) / 2
+  #     return(searchRadius1)
+  #   }
+  #   searchRadius1 <- searchRadiuskm(frompoints, topoints, 0.95)
+  #   searchRadiusLat <- searchRadius1 / ( meters.per.degree.lat(mean(topoints$lat))/1000 )
+  #   searchRadiusLon <- searchRadius1 / ( meters.per.degree.lon(mean(topoints$lat))/1000 )
+  #   # There is a high probability that within ± this search radius you will find
+  #   #   the nearest (at least one of) the topoints.
+  #   if (usebox) {
+  #     # would want to limit search for a given frompoint, using box, but that is slower than just getting ALL distances in sp package.
+  #   }
   
   frompoints <- sp::SpatialPoints(coords = data.frame(x = frompoints[,'lon'], y = frompoints[,'lat']), proj4string=sp::CRS("+proj=longlat +datum=WGS84"))
   topoints   <- sp::SpatialPoints(coords = data.frame(x = topoints[  ,'lon'], y = topoints[  ,'lat']), proj4string=sp::CRS("+proj=longlat +datum=WGS84"))
   
-  ###########################################################
+  distances <- sp::spDists(frompoints, topoints, longlat=TRUE)
   
-  for (i in 1:n.from) {
-    
-    distances <- sp::spDists(frompoints[i], topoints, longlat=TRUE)
-    # result is a matrix    
-    if (ignore0) {distances[distances==0] <- Inf}
-    
-#cat('str distances is \n'); print(str(distances))
-#cat('\n str nearest is \n');print(str(nearest))
-    
-    # distances is just a 1 row and 1+column matrix now
-    distances[distances > radius] <- Inf
-    
-    nearest[i, 1] <- which.min(distances)
-    nearest[i, 2] <- distances[ nearest[i, 1] ]
-
-    if (return.latlons) {
-      #need fromlat, fromlon, tolat, tolon
-# cat('str nearest is \n');print(str(nearest))
-# cat('str frompoints is \n');print(str(frompoints))
-      
-      nearest[i, 3:4] <- frompoints@coords[i, c('y','x')]
-      nearest[i, 5:6] <- topoints@coords[ nearest[i,1], c('y','x')]
-# cat('str nearest is \n');print(str(nearest))
-    }
+  if (ignore0) {
+    # This could be improved to consider machine precision to handle zero vs nearly zero values correctly.
+    distances[distances==0] <- Inf
   }
-  ###########################################################
   
-  if (return.latlons) {
-    colnames(nearest) <- c('torow', 'd', 'fromlat', 'fromlon', 'tolat', 'tolon')
-  } else {
-    colnames(nearest) <- c('torow', 'd')
-  }
+  d = rowMins( distances, na.rm = TRUE)
   
   if (units=='miles') {
-    nearest[ , 'd'] <- convert( nearest[ , 'd'], 'km', 'miles')
+    miles.per.km <- convert( 1, 'km', 'miles')
+    d <- d * miles.per.km
   }
   
-  if (return.rownums) {
-    mynames <- colnames(nearest)
-    nearest <- matrix( c(fromrow=1:n.from, nearest), ncol=1+NCOL(nearest))
-    colnames(nearest) <- c('fromrow' , mynames)
-  } else {
-    if (return.latlons) {
-      nearest <- nearest[ , colnames(nearest)!='torow', drop=FALSE]
-    } else {
-      # make it a vector if it shouldn't have any cols for fromrow torow lat lon
-      
-#      print(str(nearest))
-#       > get.nearest(testpoints(9), testpoints(20), return.rownums = FALSE, return.latlons=FALSE)
-#       Error in nearest$d : $ operator is invalid for atomic vectors
-#       
-      
-      as.vector( nearest <- nearest[ , 'd'] )
-    }
+  d[d > radius] <- Inf
+  
+  if (return.rownums || return.latlons) {
+    #torow <- apply( distances, 1, which.min ) # this was slightly slower than line below approach
+    torow <- max.col(distances)
   }
-  # nearest <- as.data.frame(nearest) # prior version
+  
+  if (return.rownums & return.latlons) { 
+    nearest <- matrix(nrow=n.from, ncol=7)
+    nearest[ , ] <- c(d, 1:n.from, torow, as.vector(frompoints@coords[ , c('y','x')]), as.vector(topoints@coords[ torow, c('y','x')]))
+    colnames(nearest) <- c('d', 'fromrow', 'torow', 'fromlat', 'fromlon', 'tolat', 'tolon')
+  }
+  
+  if (!return.rownums & return.latlons) { 
+    nearest <- matrix(nrow=n.from, ncol=5)
+    nearest[ , ] <- c(d, as.vector(frompoints@coords[ , c('y','x')]), as.vector(topoints@coords[ torow, c('y','x')]))
+    colnames(nearest) <- c('d', 'fromlat', 'fromlon', 'tolat', 'tolon')
+  }
+  
+  if (return.rownums & !return.latlons) { 
+    nearest <- matrix(nrow=n.from, ncol=3)
+    nearest[ , ] <- c(d, 1:n.from, torow)
+    colnames(nearest) <- c('d', 'fromrow', 'torow')
+  }
+  
+  if (!return.rownums & !return.latlons) { 
+    nearest <- matrix(d, ncol = 1)
+    colnames(nearest) <- 'd'
+  }
+  
   return(nearest)
 }

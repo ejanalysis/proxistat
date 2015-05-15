@@ -3,8 +3,8 @@
 #' @description Returns the distances from one set of points to nearby members of another set of points.
 #'   ** Documentation copied from get.distances, not edited to be relevant to this alt version.
 #' 
-#' @details ** note- provides incorrect search box if a point is within radius of max or min lat or lon allowed or where it is zero **
-#'   This function returns a matrix or vector of distances, 
+#' @details
+#'  This function returns a matrix or vector of distances, 
 #'  which are the distances from one set of points to the nearby members of another set of points.
 #'  It searches within a circle (of radius = radius, defining what is considered nearby), 
 #'  to calculate distance (in miles or km) from each of frompoints to each of topoints that is within the specified radius.

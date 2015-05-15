@@ -66,7 +66,4 @@
 #'
 #' get.nearest(test.from, test.to)
 #'
-#' \dontrun{
-#' proxistat() # requires a test dataset to be provided in later version
-#' }
 NULL
