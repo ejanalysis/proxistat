@@ -13,7 +13,7 @@ gcd(frompoints, topoints, dfunc = "hf", units = "km")
 
 \item{dfunc}{Character string "hf" for Haversine by default, or "slc" for Spherical Law of Cosines
 (and may add "vif" for Vincenty inverse formula but that is not implemented here).
-For "sp" algorithm (\pkg{sp}), see \code{\link{get.distances3}}}
+For "sp" algorithm (\pkg{sp}), see \code{\link{get.distances}}}
 
 \item{units}{Optional character variable specifying 'km' or 'miles', 'km' by default.}
 }

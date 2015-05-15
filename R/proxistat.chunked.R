@@ -1,11 +1,13 @@
 #' @title Call proxistat once per chunk & save output as file (breaks large input data into chunks)
 #' @description Call proxistat function in chunks, when list of frompoints is so long it taxes RAM (e.g. 11m blocks),
 #'   saving each chunk as a separate .RData file in current working directory
-#' @details   filesizes if crosstab format (FASTEST & avoid needing rownums which take >twice as long & 1.25x sized file):
+#' @details   
+#'   Still too slow for all blocks in USA & 10k topoints, which could take 5 days if returning 
+#'   Filesizes if crosstab format (FASTEST & avoid needing rownums which take >twice as long & 1.25x sized file):
 #'   80MB file/chunk if   1k blocks x 11k topoints/chunk:  y=get.distances.chunked(testpoints(11e6), testpoints(11000), 1e3, units='km',return.crosstab=TRUE)
 #'   800MB file/chunk if 10k blocks x 11k topoints/chunk:  y=get.distances.chunked(testpoints(11e6), testpoints(11000), 1e4, units='km',return.crosstab=TRUE)
-#' @param frompoints Require matrix or data.frame of lat/lon vauels that can be passed to get.distances3 function (colnames 'lat' and 'lon')
-#' @param topoints Require matrix or data.frame of lat/lon vauels that can be passed to get.distances3 function (colnames 'lat' and 'lon')
+#' @param frompoints Require matrix or data.frame of lat/lon vauels that can be passed to get.distances function (colnames 'lat' and 'lon')
+#' @param topoints Require matrix or data.frame of lat/lon vauels that can be passed to get.distances function (colnames 'lat' and 'lon')
 #' @param fromchunksize Required, number specifying how many points to analyze at a time (per chunk).
 #' @param tochunksize (not currently required - current default is to use all topoints at once) number specifying how many points to analyze at a time (per chunk).
 #' @param savechunks Optional logical defaults to TRUE. Specifies whether to save .RData file of each chunk
@@ -13,7 +15,7 @@
 #'   Currently, still must pass entire dataset to this function even if some of the earlier chunks have already been analyzed.
 #' @param assemble Optional logical defaults to TRUE. Specifies whether to assemble all chunks into one variable called outputs, 
 #'     which is saved as outputs.RData and returned by this function.
-#' @param ... Other parameters to pass to \code{\link{get.distances3}}, such as units
+#' @param ... Other parameters to pass to \code{\link{get.distances}}, such as units
 #' @param folder Optional path specifying where to save .RData files, default is getwd()
 #' @param FUN Optional function, \code{\link{proxistat}} by default, and other values not implemented yet.
 #' @return If assemble=TRUE, returns assembled set of all chunks as vector or matrix. 
@@ -79,7 +81,7 @@ proxistat.chunked <- function(frompoints, topoints, fromchunksize, tochunksize, 
     }
     
     # later might also try to chunk the topoints:
-    #output <- get.distances3(frompoints=frompoints[fromrow.start:fromrow.end, ], topoints=topoints[torow.start:torow.end, ], ...) 
+    #output <- get.distances(frompoints=frompoints[fromrow.start:fromrow.end, ], topoints=topoints[torow.start:torow.end, ], ...) 
     
     # ***  area needs to be chunked just like frompoints or topoints, when proxistat is called:
     if (!missing(area)) {

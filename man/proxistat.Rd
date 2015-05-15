@@ -20,7 +20,7 @@ in square miles by default (or square kilometers if units is 'km'). Optional.
   Default is 0, in which case no adjustment is made for small or even zero distance,
   which can cause unrealistically large or even infinite/undefined scores. For zero distance if area=0, Inf will be returned for the score.}
 
-\item{radius}{*NOTE: This default is not the same as the default in get.distances3!
+\item{radius}{*NOTE: This default is not the same as the default in \code{\link{get.distances}}!
 Optional, a number giving distance defining nearby, i.e. the search radius,
 in km by default (or miles if units is 'miles'). Default is 5 kilometers. Max is 5200 miles (roughly the distance from Hawaii to Maine).}
 
@@ -58,7 +58,7 @@ Calculate proximity statistic for each location,
   \code{proxistat} returns a proximity statistic (score) for each location (e.g., Census block).
 }
 \details{
-This version uses get.distances3 with return.crosstab=TRUE.
+This uses \code{\link{get.distances}} with return.crosstab=TRUE.
 This function returns a vector of proximity scores, one for each location such as a Census block.
 For example, the proximity score may be used to represent how many hazardous waste sites are near any given neighborhood and how close they are.
 A proximity score quantifies the proximity and count of nearby points using a specified formula.

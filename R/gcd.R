@@ -10,7 +10,7 @@
 #'   and parameters changed to keep lat/lon as a matrix or data.frame rather than 2 separate vectors.
 #' @param dfunc Character string "hf" for Haversine by default, or "slc" for Spherical Law of Cosines 
 #'   (and may add "vif" for Vincenty inverse formula but that is not implemented here). 
-#'   For "sp" algorithm (\pkg{sp}), see \code{\link{get.distances3}}
+#'   For "sp" algorithm (\pkg{sp}), see \code{\link{get.distances}}
 #' @param frompoints Required matrix or data.frame of 2 columns, named lat and lon, with latitude and longitude(s) in degrees, one row per point.
 #' @param topoints Required matrix or data.frame of 2 columns, named lat and lon, with latitude and longitude(s) in degrees, one row per point.
 #' @param units Optional character variable specifying 'km' or 'miles', 'km' by default.

@@ -4,7 +4,7 @@
 #'   quantifying number of and proximities of nearby points.
 #'   \code{proxistat} returns a proximity statistic (score) for each location (e.g., Census block).
 #' @details
-#' This version uses get.distances3 with return.crosstab=TRUE.
+#' This uses \code{\link{get.distances}} with return.crosstab=TRUE.
 #' This function returns a vector of proximity scores, one for each location such as a Census block.
 #' For example, the proximity score may be used to represent how many hazardous waste sites are near any given neighborhood and how close they are.
 #' A proximity score quantifies the proximity and count of nearby points using a specified formula.
@@ -71,7 +71,7 @@
 #'   in square miles by default (or square kilometers if units is 'km'). Optional. 
 #'     Default is 0, in which case no adjustment is made for small or even zero distance, 
 #'     which can cause unrealistically large or even infinite/undefined scores. For zero distance if area=0, Inf will be returned for the score.
-#' @param radius *NOTE: This default is not the same as the default in get.distances3! 
+#' @param radius *NOTE: This default is not the same as the default in \code{\link{get.distances}}! 
 #'   Optional, a number giving distance defining nearby, i.e. the search radius, 
 #'   in km by default (or miles if units is 'miles'). Default is 5 kilometers. Max is 5200 miles (roughly the distance from Hawaii to Maine).
 #' @param units A string that is 'miles' by default, or 'km' for kilometers, specifying units for distances returned and for radius input.
@@ -135,7 +135,7 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   
    warning('NOT NECESSARILY WORKING YET- THIS IS A WORK IN PROGRESS')
 
-  # Error checking -- also uses the error checking that get.distances3() does
+  # Error checking -- also uses the error checking that get.distances() does
   
   if (missing(frompoints) | missing(topoints)) {stop('frompoints and topoints must be specified')}
   if (!(units %in% c('km', 'miles'))) {stop('units must be "km" or "miles" ')  }
@@ -188,8 +188,8 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   # 1) get distances <= radius
   #########################################
   
-  ddf <- get.distances3(frompoints, topoints, units=units, dfunc=dfunc, return.crosstab = TRUE)
-  # NOTE: DO NOT SPECIFY radius IN get.distances3 here, so it will use default radius of 5200 miles, so that
+  ddf <- get.distances(frompoints, topoints, units=units, dfunc=dfunc, return.crosstab = TRUE)
+  # NOTE: DO NOT SPECIFY radius IN get.distances here, so it will use default radius of 5200 miles, so that
   # this function can use distances greater than radius that was passed to proxistat, 
   # in case there are none within radius and it needs nearest single one outside radius.
   

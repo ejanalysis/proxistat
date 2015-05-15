@@ -9,9 +9,9 @@ proxistat.chunked(frompoints, topoints, fromchunksize, tochunksize,
   savechunks = TRUE, assemble = TRUE, ...)
 }
 \arguments{
-\item{frompoints}{Require matrix or data.frame of lat/lon vauels that can be passed to get.distances3 function (colnames 'lat' and 'lon')}
+\item{frompoints}{Require matrix or data.frame of lat/lon vauels that can be passed to get.distances function (colnames 'lat' and 'lon')}
 
-\item{topoints}{Require matrix or data.frame of lat/lon vauels that can be passed to get.distances3 function (colnames 'lat' and 'lon')}
+\item{topoints}{Require matrix or data.frame of lat/lon vauels that can be passed to get.distances function (colnames 'lat' and 'lon')}
 
 \item{fromchunksize}{Required, number specifying how many points to analyze at a time (per chunk).}
 
@@ -29,7 +29,7 @@ Currently, still must pass entire dataset to this function even if some of the e
 \item{assemble}{Optional logical defaults to TRUE. Specifies whether to assemble all chunks into one variable called outputs,
 which is saved as outputs.RData and returned by this function.}
 
-\item{...}{Other parameters to pass to \code{\link{get.distances3}}, such as units}
+\item{...}{Other parameters to pass to \code{\link{get.distances}}, such as units}
 }
 \value{
 If assemble=TRUE, returns assembled set of all chunks as vector or matrix.
@@ -41,7 +41,8 @@ Call proxistat function in chunks, when list of frompoints is so long it taxes R
   saving each chunk as a separate .RData file in current working directory
 }
 \details{
-filesizes if crosstab format (FASTEST & avoid needing rownums which take >twice as long & 1.25x sized file):
+Still too slow for all blocks in USA & 10k topoints, which could take 5 days if returning
+  Filesizes if crosstab format (FASTEST & avoid needing rownums which take >twice as long & 1.25x sized file):
   80MB file/chunk if   1k blocks x 11k topoints/chunk:  y=get.distances.chunked(testpoints(11e6), testpoints(11000), 1e3, units='km',return.crosstab=TRUE)
   800MB file/chunk if 10k blocks x 11k topoints/chunk:  y=get.distances.chunked(testpoints(11e6), testpoints(11000), 1e4, units='km',return.crosstab=TRUE)
 }

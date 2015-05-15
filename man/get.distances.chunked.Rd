@@ -5,28 +5,28 @@
 \title{Call a function once per chunk & save output as file (breaks large input data into chunks)}
 \usage{
 get.distances.chunked(frompoints, topoints, fromchunksize, tochunksize,
-  FUN = get.distances3, folder = getwd(), ...)
+  FUN = get.distances, folder = getwd(), ...)
 }
 \arguments{
-\item{frompoints}{Require matrix or data.frame of lat/lon vauels that can be passed to get.distances3 function (colnames 'lat' and 'lon')}
+\item{frompoints}{Require matrix or data.frame of lat/lon vauels that can be passed to get.distances function (colnames 'lat' and 'lon')}
 
-\item{topoints}{Require matrix or data.frame of lat/lon vauels that can be passed to get.distances3 function (colnames 'lat' and 'lon')}
+\item{topoints}{Require matrix or data.frame of lat/lon vauels that can be passed to get.distances function (colnames 'lat' and 'lon')}
 
 \item{fromchunksize}{Required, number specifying how many points to analyze at a time (per chunk).}
 
 \item{tochunksize}{(not currently required - current default is to use all topoints at once) number specifying how many points to analyze at a time (per chunk).}
 
-\item{FUN}{Optional function, \code{\link{get.distances3}} by default, no other value allowed currently.}
+\item{FUN}{Optional function, \code{\link{get.distances}} by default, no other value allowed currently.}
 
 \item{folder}{Optional path specifying where to save .RData files, default is getwd()}
 
-\item{...}{Other parameters to pass to \code{\link{get.distances3}}, such as units}
+\item{...}{Other parameters to pass to \code{\link{get.distances}}, such as units}
 }
 \value{
 Returns vector of character elements that are filenames for saved .RData output files in current working directory or specified folder.
 }
 \description{
-Call get.distances3 function in chunks, when list of frompoints is so long it taxes RAM (e.g. 11m blocks),
+Call get.distances function in chunks, when list of frompoints is so long it taxes RAM (e.g. 11m blocks),
   saving each chunk as a separate .RData file in current working directory
 }
 \details{
