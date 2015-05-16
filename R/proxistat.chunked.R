@@ -73,7 +73,7 @@ proxistat.chunked <- function(frompoints, topoints, fromchunksize, tochunksize, 
     
     if (fchunk == fromchunks) {
       # last chunk
-      fromrow.start = 1 + (fchunk - 1) * fromchunklast
+      fromrow.start = 1 + (fchunk - 1) * fromchunksize
       fromrow.end = fromrow.start -1 + fromchunklast
     } else {
       fromrow.start = 1 + (fchunk - 1) * fromchunksize
