@@ -7,7 +7,6 @@
 # RStudio files
 .Rproj.user/
 .Rproj.user
-proxistat.Rproj
 *.Rproj
-
 countyinfo.txt
+*.Rproj
