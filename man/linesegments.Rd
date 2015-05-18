@@ -14,6 +14,8 @@ linesegments(xfrom, yfrom, xto, yto, ...)
 \item{xto}{required numeric vector of x values for ending points}
 
 \item{yto}{required numeric vector of y values for ending points}
+
+\item{...}{optional additional parameters to pass to \code{\link{lines}}}
 }
 \value{
 Draws lines(), one line segment from each starting point to its corresponding ending point.

@@ -20,7 +20,8 @@ get.bg.latlons <- function( myyear=2014, mytempdir, mystatenums, overwrite=FALSE
   yeartxt <- as.character(myyear)
   
   if (missing(mystatenums)) {
-      statenums <- get.state.info()$FIPS
+      data("lookup.states")
+      statenums <- lookup.states$FIPS.ST
       statenums <- statenums[!is.na(statenums)]
   } else {
     statenums <- mystatenums
@@ -30,14 +31,12 @@ get.bg.latlons <- function( myyear=2014, mytempdir, mystatenums, overwrite=FALSE
   zipnames <- paste('tl_', yeartxt, '_', statenums,'_bg.zip',sep='')
   dbfnames <- paste('tl_', yeartxt, '_', statenums,'_bg.dbf',sep='')
   
-  x=download.files(ftpurl, zipnames, mytempdir, overwrite=overwrite, silent=silent)
+  x=analyze.stuff::download.files(ftpurl, zipnames, mytempdir, overwrite=overwrite, silent=silent)
   #if (!silent) {cat(x, '\n\n')}
   
-  x=unzip.files(file.path(mytempdir, zipnames), as.list(dbfnames), exdir = mytempdir, overwrite=overwrite)
+  x=analyze.stuff::unzip.files(file.path(mytempdir, zipnames), as.list(dbfnames), exdir = mytempdir, overwrite=overwrite)
   #if (!silent) {print(x); cat('\n\n')}
 
-  require(foreign)
-  
   out=compile.dbfs(file.path(mytempdir, dbfnames))
   
   out$INTPTLAT <- as.numeric(out$INTPTLAT)

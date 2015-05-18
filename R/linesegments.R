@@ -11,6 +11,7 @@
 #' @param yfrom required numeric vector of y values for starting points
 #' @param xto required numeric vector of x values for ending points
 #' @param yto required numeric vector of y values for ending points
+#' @param ... optional additional parameters to pass to \code{\link{lines}}
 #' @return Draws lines(), one line segment from each starting point to its corresponding ending point.
 #' @seealso \code{\link{testpoints}} and \code{\link{get.nearest}} 
 #' @examples

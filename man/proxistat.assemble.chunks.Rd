@@ -19,7 +19,8 @@ read files storing proxistat result chunks and assemble into one result
 }
 \examples{
 \dontrun{
- fnames=proxistat.chunked(testpoints(10), testpoints(5), fromchunksize = 4, assemble=FALSE, folder=file.path(getwd(), 'temp'))
+ fnames=proxistat.chunked(testpoints(10), testpoints(5), fromchunksize = 4, assemble=FALSE,
+   folder=file.path(getwd(), 'temp'))
  output=proxistat.assemble.chunks(files=fnames, folder=file.path(getwd(), 'temp'))
   }
 }

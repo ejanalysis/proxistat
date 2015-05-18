@@ -16,15 +16,15 @@ A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed. 
 A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed. Decimal degrees. Required.}
 
 \item{area}{A number or vector of numbers giving size of each spatial unit with FIPS.pop,
-in square miles by default (or square kilometers if units is 'km'). Optional.
+in square miles or square kilometers depending on the \code{units} parameter. Optional.
   Default is 0, in which case no adjustment is made for small or even zero distance,
   which can cause unrealistically large or even infinite/undefined scores. For zero distance if area=0, Inf will be returned for the score.}
 
 \item{radius}{*NOTE: This default is not the same as the default in \code{\link{get.distances}}!
 Optional, a number giving distance defining nearby, i.e. the search radius,
-in km by default (or miles if units is 'miles'). Default is 5 kilometers. Max is 5200 miles (roughly the distance from Hawaii to Maine).}
+in km or miles depending on the code{units} parameter. Default is 5 (km if units='km'). Max is 5200 miles (roughly the distance from Hawaii to Maine).}
 
-\item{units}{A string that is 'miles' by default, or 'km' for kilometers, specifying units for distances returned and for radius input.}
+\item{units}{A string that is 'miles' or 'km' for kilometers (default is 'km'), specifying units for distances returned and for radius input.}
 
 \item{decay}{A string specifying type of function to use when weighting by distance. Default is '1/d'
 For '1/d' decay weighting (default), score is count of points within radius, divided by harmonic mean of distances (when count>0).
@@ -34,11 +34,11 @@ Decay weighting also can be '1/d^2' or '1/1' to represent decay by inverse of sq
 
 \item{return.nearest}{Optional, logical, defaults to FALSE, specifies if results returned should include a column with the distance to the nearest single of the topoints, for each of the frompoints}
 
-\item{FIPS}{NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE.
+\item{FIPS}{**NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE.
 A vector of strings designating places that will be assigned scores where each is the Census FIPS code or other ID. Optional.
 Might want to have this be a factor not string to be faster, or ensure it is indexed on fips, or have separate FIPS.BG passed to this function.}
 
-\item{pop}{NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE.
+\item{pop}{**NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE.
 A number or vector of numbers giving population count of each spatial unit.
 Default is 1, which would give the unweighted average.}
 
@@ -72,7 +72,7 @@ where d is the distance from census unit's internal point to user-defined point.
 The default proximity score, using 1/d, is the count of nearby points divided by the harmonic mean of their distances (n/harmean),
 (but adjusted when distance is very small, and using the nearest single one if none are nearby).
 This is the same as the sum of inverse distances.
-The harmonic mean distance (see \code{\link[proxistat]{harmean}}) is the inverse of the arithmetic mean of the inverses, or n / (sum of inverses).
+The harmonic mean distance (see \code{\link[analyze.stuff]{harmean}}) is the inverse of the arithmetic mean of the inverses, or n / (sum of inverses).
 
 "Nearby" is defined as a user-specified parameter, so only points within the specified distance are counted, except if none are nearby,
 the single nearest point (at any distance) is used.
@@ -142,11 +142,23 @@ subunitscores = proxistat(frompoints=test.from, topoints=test.to,
   area=rep(0.2, length(test.from[,1])), radius=1, units='km')
 print(subunitscores)
 subunitpop = rep(1000, length(test.from$lat))
-subunits = data.frame(FIPS=substr(rownames(test.from), 1, 5), pop=subunitpop, stringsAsFactors=FALSE )
+subunits = data.frame(FIPS=substr(rownames(test.from), 1, 5),
+  pop=subunitpop, stringsAsFactors=FALSE )
 unitscores = aggregate(subunits,
   by=list(subunits$FIPS), FUN=function(x) {Hmisc::wtd.mean(x$score, wts=x$pop, na.rm=TRUE)}
 )
 print(unitscores)
+\\donotrun{
+output = proxistat.chunked(blocks[ , c('lon','lat')], topoints=rmp, fromchunksize=10000, area=blocks$area / 1e6,
+   return.count=TRUE, return.nearest=TRUE )
+output=as.data.frame(output)
+if (class(blocks$fips)!='character') {blocks$fips <- lead.zeroes(blocks$fips, 15)}
+blocks$FIPS.BG <- get.fips.bg(blocks$fips)
+bg.proxi <- data.frame()
+bg.proxi$scores  <-  aggregate( cbind(d=output$scores, pop=blocks$pop), by=list(blocks$FIPS.BG), function(x) Hmisc::wtd.mean(1/x[,'d'], x[,'pop']))
+if ('nearestone.d' \%in\% colnames(output)) { bg.proxi$nearestone.d <- aggregate( output$d, by=list(blocks$FIPS.BG), min) }
+if ('count.near' \%in\% colnames(output))   { bg.proxi$count.near   <- aggregate( cbind(d=output$count.near, pop=blocks$pop), by=list(blocks$FIPS.BG), function(x) Hmisc::wtd.mean(1/x[,'d'], x[,'pop'])) }
+}
 }
 \seealso{
 \code{\link{get.distances}} and \code{\link{get.distances.all}} for distances between points, and

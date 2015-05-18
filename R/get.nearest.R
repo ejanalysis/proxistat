@@ -118,7 +118,7 @@ get.nearest <- function(frompoints, topoints, units='miles', ignore0=FALSE,
     distances[distances==0] <- Inf
   }
   
-  d = rowMins( distances, na.rm = TRUE)
+  d = analyze.stuff::rowMins( distances, na.rm = TRUE)
   
   if (units=='miles') {
     miles.per.km <- convert( 1, 'km', 'miles')

@@ -70,8 +70,10 @@
 #'     
 #'    #*** Can fail if radius=50 miles? ... Error in rbind() numbers of
 #'    #  columns of arguments do not match !
-#'    #big = get.distances(t100, t1k, radius=100, units='miles', return.latlons=TRUE); head(big); summary(big$d)
-#'    big = get.distances(t100, t1k, radius=100, units='miles', return.latlons=TRUE); head(big); summary(big$d)
+#'    #big = get.distances(t100, t1k, radius=100, units='miles', return.latlons=TRUE, as.df=TRUE); head(big)
+#'      #summary(big$d)
+#'    big = get.distances(t100, t1k, radius=100, units='miles', return.latlons=TRUE, as.df=TRUE); head(big)
+#'      summary(big$d)
 #'    
 #'    # see as map of many points
 #'     plot(big$fromlon, big$fromlat,main='from black circles... 
@@ -179,8 +181,8 @@ get.distances <- function(frompoints, topoints, radius=5200, units='miles', igno
     
     # reformat frompoints and topoints to have 1 row per combo (per from-to pair, i.e., per distance)
     latlonpairs = cbind(
-      expand.gridMatrix(frompoints$lat, topoints$lat), 
-      expand.gridMatrix(frompoints$lon, topoints$lon)
+      analyze.stuff::expand.gridMatrix(frompoints$lat, topoints$lat), 
+      analyze.stuff::expand.gridMatrix(frompoints$lon, topoints$lon)
     )
     colnames(latlonpairs) <- c('fromlat', 'tolat', 'fromlon', 'tolon')
     

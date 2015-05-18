@@ -5,8 +5,8 @@
 \title{Call proxistat once per chunk & save output as file (breaks large input data into chunks)}
 \usage{
 proxistat.chunked(frompoints, topoints, fromchunksize, tochunksize,
-  startchunk = 1, FUN = proxistat, area, folder = getwd(),
-  savechunks = TRUE, assemble = TRUE, ...)
+  startchunk = 1, FUN = proxistat, folder = getwd(), savechunks = FALSE,
+  assemble = TRUE, saveproxistats = FALSE, file = "proxistats.RData", ...)
 }
 \arguments{
 \item{frompoints}{Require matrix or data.frame of lat/lon vauels that can be passed to get.distances function (colnames 'lat' and 'lon')}
@@ -22,28 +22,33 @@ Currently, still must pass entire dataset to this function even if some of the e
 
 \item{FUN}{Optional function, \code{\link{proxistat}} by default, and other values not implemented yet.}
 
-\item{folder}{Optional path specifying where to save .RData files, default is getwd()}
+\item{folder}{Optional path specifying where to save .RData file(s) -- chunk-specific files and/or assembled results file -- default is getwd()}
 
-\item{savechunks}{Optional logical defaults to TRUE. Specifies whether to save .RData file of each chunk}
+\item{savechunks}{Optional logical defaults to FALSE. Specifies whether to save .RData file of each chunk}
 
-\item{assemble}{Optional logical defaults to TRUE. Specifies whether to assemble all chunks into one variable called outputs,
-which is saved as outputs.RData and returned by this function.}
+\item{assemble}{Optional logical defaults to TRUE. Specifies whether to assemble all chunks into one variable called proxistats,
+which is saved as \code{file} in \code{folder} and returned by this function.}
 
-\item{...}{Other parameters to pass to \code{\link{get.distances}}, such as units}
+\item{saveproxistats}{Optional logical defaults to FALSE. Specifies whether to save .RData file of assembled results as proxistats matrix. Ignored if assemble=FALSE.}
+
+\item{file}{Optional name of file created if assemble=TRUE and saveproxistats=TRUE, defaults to proxistats.RData using save(proxistats, 'proxistats.RData')}
+
+\item{...}{Other parameters to pass to \code{\link{proxistat}} such as \code{area} and \code{units}}
 }
 \value{
-If assemble=TRUE, returns assembled set of all chunks as vector or matrix.
-  If assemble=FALSE, returns vector of character elements that are filenames for saved .RData output files in current working directory or specified folder.
-  Each saved output is a vector of proximity scores if FUN=get.proxistat, or matrix with extra columns depending on return. parameters above.
+If assemble=TRUE, returns assembled set of all chunks as matrix of 1 or more columns.
+  If assemble=FALSE but savechunks=TRUE, returns vector of character elements that are filenames for saved .RData output files in current working directory or specified folder.
+  Each saved output is a vector of proximity scores if FUN=proxistat, or matrix with extra columns depending on return. parameters above.
+  Otherwise, returns NULL.
 }
 \description{
 Call proxistat function in chunks, when list of frompoints is so long it taxes RAM (e.g. 11m blocks),
   saving each chunk as a separate .RData file in current working directory
 }
 \details{
-Still too slow for all blocks in USA & 10k topoints, which could take 5 days if returning
-  Filesizes if crosstab format (FASTEST & avoid needing rownums which take >twice as long & 1.25x sized file):
-  80MB file/chunk if   1k blocks x 11k topoints/chunk:  y=get.distances.chunked(testpoints(11e6), testpoints(11000), 1e3, units='km',return.crosstab=TRUE)
-  800MB file/chunk if 10k blocks x 11k topoints/chunk:  y=get.distances.chunked(testpoints(11e6), testpoints(11000), 1e4, units='km',return.crosstab=TRUE)
+*** Still slow for all blocks in USA & 10k topoints (several hours)
+  Filesizes: \cr\cr
+  80MB file/chunk if   1k blocks x 11k topoints/chunk:  y=get.distances.chunked(testpoints(11e6), testpoints(11000), 1e3, units='km') \cr\cr
+  800MB file/chunk if 10k blocks x 11k topoints/chunk:  y=get.distances.chunked(testpoints(11e6), testpoints(11000), 1e4, units='km')
 }
 

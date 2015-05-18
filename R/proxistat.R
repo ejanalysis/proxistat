@@ -18,7 +18,7 @@
 #' The default proximity score, using 1/d, is the count of nearby points divided by the harmonic mean of their distances (n/harmean), 
 #' (but adjusted when distance is very small, and using the nearest single one if none are nearby). 
 #' This is the same as the sum of inverse distances. 
-#' The harmonic mean distance (see \code{\link[proxistat]{harmean}}) is the inverse of the arithmetic mean of the inverses, or n / (sum of inverses).
+#' The harmonic mean distance (see \code{\link[analyze.stuff]{harmean}}) is the inverse of the arithmetic mean of the inverses, or n / (sum of inverses).
 #' 
 #' "Nearby" is defined as a user-specified parameter, so only points within the specified distance are counted, except if none are nearby,
 #' the single nearest point (at any distance) is used.
@@ -68,17 +68,17 @@
 #' @param topoints Locations of nearby points of interest, proximity to which is the basis of each Census unit's score. 
 #'   A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed. Decimal degrees. Required.
 #' @param area A number or vector of numbers giving size of each spatial unit with FIPS.pop, 
-#'   in square miles by default (or square kilometers if units is 'km'). Optional. 
+#'   in square miles or square kilometers depending on the \code{units} parameter. Optional. 
 #'     Default is 0, in which case no adjustment is made for small or even zero distance, 
 #'     which can cause unrealistically large or even infinite/undefined scores. For zero distance if area=0, Inf will be returned for the score.
 #' @param radius *NOTE: This default is not the same as the default in \code{\link{get.distances}}! 
 #'   Optional, a number giving distance defining nearby, i.e. the search radius, 
-#'   in km by default (or miles if units is 'miles'). Default is 5 kilometers. Max is 5200 miles (roughly the distance from Hawaii to Maine).
-#' @param units A string that is 'miles' by default, or 'km' for kilometers, specifying units for distances returned and for radius input.
-#' @param FIPS NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE. 
+#'   in km or miles depending on the code{units} parameter. Default is 5 (km if units='km'). Max is 5200 miles (roughly the distance from Hawaii to Maine).
+#' @param units A string that is 'miles' or 'km' for kilometers (default is 'km'), specifying units for distances returned and for radius input.
+#' @param FIPS **NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE. 
 #'   A vector of strings designating places that will be assigned scores where each is the Census FIPS code or other ID. Optional.
 #'   Might want to have this be a factor not string to be faster, or ensure it is indexed on fips, or have separate FIPS.BG passed to this function.
-#' @param pop NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE. 
+#' @param pop **NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE. 
 #'   A number or vector of numbers giving population count of each spatial unit. 
 #'   Default is 1, which would give the unweighted average.
 #' @param return.count Optional, logical, defaults to FALSE, specifies if results returned should include a column with the count of topoints that were within radius, for each of the frompoints
@@ -120,12 +120,24 @@
 #'   area=rep(0.2, length(test.from[,1])), radius=1, units='km')
 #' print(subunitscores)
 #' subunitpop = rep(1000, length(test.from$lat))
-#' subunits = data.frame(FIPS=substr(rownames(test.from), 1, 5), pop=subunitpop, stringsAsFactors=FALSE )
+#' subunits = data.frame(FIPS=substr(rownames(test.from), 1, 5), 
+#'   pop=subunitpop, stringsAsFactors=FALSE )
 #' unitscores = aggregate(subunits,
 #'   by=list(subunits$FIPS), FUN=function(x) {Hmisc::wtd.mean(x$score, wts=x$pop, na.rm=TRUE)}
 #' )
 #' print(unitscores)
-#'
+#' \donotrun{
+#' output = proxistat.chunked(blocks[ , c('lon','lat')], topoints=rmp, fromchunksize=10000, area=blocks$area / 1e6,
+#'    return.count=TRUE, return.nearest=TRUE )
+#' output=as.data.frame(output)
+#' if (class(blocks$fips)!='character') {blocks$fips <- lead.zeroes(blocks$fips, 15)}
+#' blocks$FIPS.BG <- get.fips.bg(blocks$fips)
+#' bg.proxi <- data.frame()
+#' bg.proxi$scores  <-  aggregate( cbind(d=output$scores, pop=blocks$pop), by=list(blocks$FIPS.BG), function(x) Hmisc::wtd.mean(1/x[,'d'], x[,'pop']))
+#' if ('nearestone.d' %in% colnames(output)) { bg.proxi$nearestone.d <- aggregate( output$d, by=list(blocks$FIPS.BG), min) }
+#' if ('count.near' %in% colnames(output))   { bg.proxi$count.near   <- aggregate( cbind(d=output$count.near, pop=blocks$pop), by=list(blocks$FIPS.BG), function(x) Hmisc::wtd.mean(1/x[,'d'], x[,'pop'])) }
+#' }
+#' 
 #' @export
 proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay='1/d', return.count=FALSE, return.nearest=FALSE, FIPS, pop, testing=FALSE, dfunc='sp') {
   
@@ -154,7 +166,7 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
     if (!is.vector(area) || !is.numeric(area) || any(is.na(area)) || any(is.infinite(area)) || length(area)!=length(frompoints[,1])) {
       stop('area will not be recycled - if supplied, it must be a numeric vector of same length as number of points with no NA or Inf values')
     }
-	  if (any(area < 0)  ) {stop('area must be > 0 ')}
+	  if (any(area < 0)  ) {stop('area must be >= 0 ')}
 	}
   if (!(decay %in% c('1/d', '1/d^2', '1'))) {stop('invalid decay parameter')}
 
@@ -182,7 +194,7 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   # 2) where d < min.dist, set d <- min.dist to adjust it upwards
   # 3)     and for those, check again to see if new d is still <= radius. keep only if d<=radius now.
   # 4) for each frompoints, if no distances were found, get nearest single d at any radius,
-  #       perhaps by expanding outwards step by step until at least one is found (if worth the overhead vs just finding ALL d and picking min)
+  #       originally thought perhaps by expanding outwards step by step until at least one is found (but not worth the overhead vs just finding ALL d and picking min)
 
   #########################################
   # 1) get distances <= radius
@@ -193,7 +205,7 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   # this function can use distances greater than radius that was passed to proxistat, 
   # in case there are none within radius and it needs nearest single one outside radius.
   
-  #if (testing) {cat('\n\n ddf before fix min dist: \n\n');print(ddf);cat('\n\n')}
+  if (testing) {cat('\n\n ddf before fix min dist: \n\n');print(ddf);cat('\n\n')}
 
   #########################################
   # 2) Set distance to minimum allowed distance or true distance, whichever is greater.
@@ -202,27 +214,20 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   # use d or min.dist, whichever is greater
   if (length(area)==1) {area <- rep(area, n) }
   min.dist <- 0.9 * sqrt( area / pi )  # one per frompoints, which now that crosstab used is one per ddf row
-  # takes about 6 seconds for 10k x 10k matrix, for example
+  # takes a few seconds for 10k x 10k matrix, for example
   ddf <- apply(ddf, 2, FUN=function(x) pmax(x, min.dist))
   
   if (testing) {cat('ddf with d adjusted up if d<min.dist: \n\n'); print(ddf); cat('\n\n')}
   
-  # not done:?
-  # WHERE area = 0 FOR ONE OR ALL UNITS, AND DISTANCE=0 from that unit to 1+ topoints,
-  # THIS RETURNS +Inf FOR THE SCORE FOR THAT frompoint
-  #   (regardless of distances to any other topoints), unless no decay.
-  # i.e., just keep d=0 for those frompoint-topoint pairs,
-  # and 1/d or 1/d^2 will return Inf as will score, which is sum of those for a frompoint.
-  # ddf$d[ddf$d==0 & area==0] <- 0
-
   #########################################
   # ***** RETAIN SINGLE NEAREST IN CASE NEED THAT!! **** 
   #########################################
   
   # which topoint was the nearest?
+  # Accounts for maybe 10% of all time in this function
+  #nearestone.d <-  rowMins(ddf) # this was a bit slower than method below
   nearestone.colnum <- apply(ddf, 1, which.min)  # about 4 seconds for 10k x 10k matrix, for example
   # how far away was that one nearest to each frompoint?
-  #nearestone.d <-  rowMins(ddf)
   nearestone.d <- ddf[ cbind(1:NROW(ddf), nearestone.colnum) ]
   
   #########################################
@@ -230,10 +235,11 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   #########################################
   
   # set to NA any cell of matrix where distance is > search radius
+  # Accounts for maybe 10% of all time in this function
   ddf[ddf > radius] <- NA
   
   if (return.count) {
-    # record how many are within the radius
+    # record how many are within the radius (<<2% of all time is spent here)
     count.near <- rowSums(!is.na(ddf))
   }
 
@@ -248,10 +254,11 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   # use distance to nearest single topoint
   #########################################
   
-  # note which frompoints had zero within the radius
+  # note which frompoints had zero within the radius (negligible time)
   fromrow.0near <- which(rowSums(ddf, na.rm=TRUE)==0)
   
   # put back in the distance that was the nearest one, but only for rows where none were within radius
+  # fast
   ddf[ cbind(1:NROW(ddf), nearestone.colnum) ][fromrow.0near ] <- nearestone.d[fromrow.0near]
   
   if (testing) {cat('fromrow.0near = '); print(fromrow.0near)}
@@ -264,10 +271,10 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   # AGGREGATE SCORES ACROSS ALL TOPOINTS NEAR A GIVEN FROMPOINT
   ######################################
   
-  results <- cbind(scores=decayfunction(ddf))
+  results <- cbind(scores=decayfunction(ddf))  # fast
   
-  #      or get multiple metrics per block group:
   if (return.count) {
+    #    or get multiple metrics per block group:
     results <- cbind( scores=results, count.near=count.near)
   }
   
@@ -283,36 +290,25 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
 if (1==0) {
   ###########################################################################################################################
   
-  # Using aggregate for 11m blocks aggregated into 220k block groups might take something like 2 minutes! 
-  # #rollup to blockgroups is slow using aggregate:
-  # system.time({x = aggregate(pop ~ fips.bg, data=blocks, FUN=sum)})   TAKES ABOUT 40 SECONDS
-  
-  
-  # ANOTHER APPROACH I TRIED :
+  # ANOTHER APPROACH to get.distances?:
   # might be more efficient to LOOP OVER SITES, NOT BLOCKS, TO CALC DISTANCES, 
   #  running get.distances() on just all sites as frompoints, and then get.nearest as needed.
-
+  
   #########################################
-  # Get blocks as "blocks" with FIPS.BLOCK, FIPS.BG, lat, lon, pop, area
-  #########################################
-  #require("UScensus2010blocks")
-  blocks <- UScensus2010blocks::get.blocks()
-  blocks$FIPS.BG <- substr(blocks$FIPS.BLOCK, 1, 12)
-
-    # etc.
-
-  #########################################
-  # each site is treated as a frompoint, so create one row per facility/site:
+  # Could treat each site as a frompoint, so create one row per facility/site rather than per block???:
   #########################################
 
-  distances.to.blocks <- get.distances(frompoints=sites[,c('lat','lon')] , topoints=blocks[, c('lat', 'lon')] , radius=1.6, units='miles', return.latlons=FALSE, return.rownums=TRUE)
-  # CAN'T DO return.rownums=TRUE YET ??# use 5 kilometers, converted to miles
+  distances.to.blocks <- get.distances(frompoints=sites[,c('lat','lon')] , topoints=blocks[, c('lat', 'lon')] , radius=5, units='km', return.latlons=FALSE, return.rownums=TRUE)
   distances.to.blocks$FIPS.BG <- blocks$FIPS.BG[ distances.to.blocks$torow ] # not sure about this. CAN we get torownum back??
 
   #########################################
   # ROLLUP TO BLOCK GROUPS. For each BG:
   #########################################
 
+  # Using aggregate for 11m blocks aggregated into 220k block groups might take something like 2 minutes! 
+  # #rollup to blockgroups is slow using aggregate:
+  # system.time({x = aggregate(pop ~ fips.bg, data=blocks, FUN=sum)})   TAKES ABOUT 40 SECONDS
+  
   count.near      <- aggregate(distances.to.blocks$FACILITYID, by=list(distances.to.blocks$FIPS.BG), function(x) length(unique(x)))
   nearest.pts     <- aggregate(distances.to.blocks$d, by=list(distances.to.blocks$FIPS.BG), min)
   proximity.score <- aggregate(cbind(d=distances.to.blocks$d, pop=distances.to.blocks$pop), by=list(distances$FIPS.BG), function(x) Hmisc::wtd.mean(1/x[,'d'], x[,'pop']))
@@ -336,56 +332,10 @@ if (1==0) {
 if (1==0)  {
   
   #######################################################################################
-  # NOTES ON R CODE TO CALCULATE
-  #   PROXIMITY SCORES,
-  #    DISTANCE TO NEAREST SITE, AND
-  #   COUNT OF SITES NEARBY (WITHIN X MILES)
-  # FOR EVERY BLOCK OR BLOCK GROUP IN THE US,
-  # FOR A USER-DEFINED SET OF SITES (E.G. REGULATED FACILITIES IN ONE SECTOR)
-  # AND SUMMARY STATISTICS ON DISTRIBUTIONS OF THESE BY DEMOGRAPHIC GROUP.
-  #
-  # Started work on this around 9/24/2013
-  
-  
-  
-  
-  # #######################################################################################
-  #
-  #	TOOL TO CALCULATE PROXIMITY SCORE FOR EVERY BLOCK GROUP IN THE US
-  #	FOR PROXIMITY AND COUNT OF USER-SPECIFIED SET OF FACILITIES OR POINTS
-  #	AND
-  #	THEN CALCULATE US SUMMARY STATS ON
-  #
-  #	DISTRIBUTION OF PROXIMITY SCORES WITHIN EACH DEMOGRAPHIC GROUP INCLUDING US POP OVERALL, SUCH AS:
-  #
-  # DISTANCE TO NEAREST SITE:
-  #
-  #	1A- DIST. FOR EACH %ILE OF POP.: DISTANCE TO CLOSEST SITE FOR EACH DEMOG GROUP (AVG/MEDIAN/DISTRIBUTION OVER PEOPLE)
-  #	1B- %ILE OF POP., FOR EACH DISTANCE: WHAT % OF EACH DEMOG GROUP IS WITHIN X MILES OF ANY ONE SITE? (%ILES OF # OF MILES)
-  #	1C- RR AS RATIO OF AVG PERSON'S DISTANCE TO NEAREST SITE, FOR DEMOG GROUP VS REST OF THE US POPULATION
-  #
-  # COUNT OF SITES NEARBY:
-  #
-  #	2A- # OF SITES NEARBY, FOR EACH %ILE OF POP.: # OF SITES WITHIN X MILES, FOR EACH DEMOG GROUP (AVG/MEDIAN/DISTRIB OVER PEOPLE)
-  #		- POSSIBLY FOR EACH OF SEVERAL DISTANCES X
-  #	2B- %ILE OF POP., FOR EACH # OF SITES NEARBY: WHAT % FOR EACH DEMOG GROUP HAS Y SITES NEARBY (WITHIN X MILES)?
-  #		- POSSIBLY FOR EACH OF SEVERAL DISTANCES X
-  #	2C- RR AS RATIO OF AVG PERSON'S COUNT OF SITES NEARBY, FOR DEMOG GROUP VS REST OF THE US POPULATION
-  #
-  # PROXIMITY SCORE (DISTANCE AND COUNT):
-  #
-  #	3A- PROXIMITY SCORE FOR A GIVEN %ILE OF POP.: AVG/MEDIAN/DISTRIBUTION OF PROXIMITY SCORES IN US, FOR JUST LOW-INCOME, ETC.
-  #	3B- %ILE OF POP., FOR EACH PROXIMITY SCORE: WHAT % OF EACH DEMOG GROUP HAS PROXIMITY SCORE OF Z?
-  #	3C- RR AS RATIO OF AVG PERSON'S PROXIMITY SCORE, FOR DEMOG GROUP VS REST OF THE US POPULATION
-  #
-  #
-  #
-  #######################################################################################
-  
-  
-  #######################################################################################
   # notes on how to calc distances
   #######################################################################################
+  
+  
   
   # Formula for distance between two lat/lon points
   # see http://stackoverflow.com/questions/27928/how-do-i-calculate-distance-between-two-latitude-longitude-points
@@ -393,9 +343,6 @@ if (1==0)  {
   #
   # or maybe just
   #=ACOS(COS(RADIANS(90-Lat1)) *COS(RADIANS(90-Lat2)) +SIN(RADIANS(90-Lat1)) *SIN(RADIANS(90-Lat2)) *COS(RADIANS(Long1-Long2))) *6371
-  #and my final version that uses Excel cell references is:
-  #
-  #=ACOS(COS(RADIANS(90-A2)) *COS(RADIANS(90-A3)) +SIN(RADIANS(90-A2)) *SIN(RADIANS(90-A3)) *COS(RADIANS(B2-B3))) *6371
   #PS. To calculate distances in miles, substitute R (6371) with 3958.756 (and for nautical miles, use 3440.065).
   # http://bluemm.blogspot.com/2007/01/excel-formula-to-calculate-distance.html
   
@@ -406,26 +353,4 @@ if (1==0)  {
   # furthest north is roughly 48.99 (1 mile buffer is a bit into Canada), OR 49
   # furthest west is roughly  -124.771694
   #   but AK/HI are further.
-  
-  #######################################################################################
-  # old examples of distance functions - but see get.distance() etc. now
-  #######################################################################################
-  #
-  # get.distance <- function(lat1, lon1, lat2, lon2) {
-  #   sqrt( (lat2-lat1)^2 + (lon2-lon1)^2)
-  #   # this could return a single number or vectorized should return a vector, but
-  #   # all 4 inputs have to be same length
-  #   # or if one is a single point it will be recycled.
-  #   # *** Replace this with the more accurate formula for spheroid
-  # }
-  #
-  # get.distance.matrix <- function(frompoints, topoints) {
-  #   apply(frompoints, 1, FUN=function(x) get.distance(x$lat, x$lon, topoints$lat, topoints$lon) )
-  #   # This can return a matrix of all pairs, where it returns one row for each combo of frompoints & topoints.
-  #   # It loops over the rows in frompoints[,c('lat', 'lon')] and for each finds the distances to all the points in topoints[,c('lat','lon')]
-  #   # frompoints$lat1 & frompoints$lon1 can be different length than topoints$lat2, topoints$lon2
-  # }
-  
-  
-  ################# ################# ################# ################# ################# ################# #################
 }

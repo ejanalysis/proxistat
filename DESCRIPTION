@@ -22,12 +22,12 @@ Description: This package has functions helping to calculate distances between
   once made public can be installed from github using the devtools package:
   devtools::install_github(c("ejanalysis/analyze.stuff", "ejanalysis/proxistat",
   "ejanalysis/ejanalysis", "ejanalysis/countyhealthrankings"))
-License: Artistic-2.0
+License: Artistic-2.0 + file LICENSE
 Depends:
   R (>= 3.1.2)
 Imports:
-  sp, data.table, analyze.stuff
+  sp, data.table, analyze.stuff, Hmisc
 Suggests:
-  matrixStats
+  matrixStats, UScensus2010blocks
 URL: https://github.com/ejanalysis/ejanalysis/
         http://www.ejanalysis.com/

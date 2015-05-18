@@ -89,8 +89,10 @@ t1m=testpoints(1e6)
 
    #*** Can fail if radius=50 miles? ... Error in rbind() numbers of
    #  columns of arguments do not match !
-   #big = get.distances(t100, t1k, radius=100, units='miles', return.latlons=TRUE); head(big); summary(big$d)
-   big = get.distances(t100, t1k, radius=100, units='miles', return.latlons=TRUE); head(big); summary(big$d)
+   #big = get.distances(t100, t1k, radius=100, units='miles', return.latlons=TRUE, as.df=TRUE); head(big)
+     #summary(big$d)
+   big = get.distances(t100, t1k, radius=100, units='miles', return.latlons=TRUE, as.df=TRUE); head(big)
+     summary(big$d)
 
    # see as map of many points
     plot(big$fromlon, big$fromlat,main='from black circles...

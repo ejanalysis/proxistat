@@ -8,12 +8,13 @@
 #'
 #' @examples
 #' \dontrun{
-#'  fnames=proxistat.chunked(testpoints(10), testpoints(5), fromchunksize = 4, assemble=FALSE, folder=file.path(getwd(), 'temp'))
+#'  fnames=proxistat.chunked(testpoints(10), testpoints(5), fromchunksize = 4, assemble=FALSE, 
+#'    folder=file.path(getwd(), 'temp'))
 #'  output=proxistat.assemble.chunks(files=fnames, folder=file.path(getwd(), 'temp'))
 #'   }
 proxistat.assemble.chunks <- function(files, folder=getwd()) {
   load(file.path(folder, files[1]))
-  outputs <- output
+  if (exists('output')) {  try(outputs <- output)} else {stop('Each .RData file must have a saved matrix called output')}
   for (thisfilename in files[-1]) {
     cat('Getting', thisfilename, '\n')
     load(file.path(folder, thisfilename))

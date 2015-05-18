@@ -160,7 +160,7 @@ get.distances.all <- function(frompoints, topoints, units='miles', return.crosst
   if (!return.rownums & return.latlons) { 
     # return tall matrix with 'fromlat', 'fromlon', 'tolat', 'tolon', 'd'
     
-    results <- cbind( expand.gridMatrix(topoints[,'lat'], frompoints[,'lat']), expand.gridMatrix(topoints[,'lon'], frompoints[,'lon']) , as.vector( t(results.matrix) ) )
+    results <- cbind( analyze.stuff::expand.gridMatrix(topoints[,'lat'], frompoints[,'lat']), analyze.stuff::expand.gridMatrix(topoints[,'lon'], frompoints[,'lon']) , as.vector( t(results.matrix) ) )
     colnames(results) <- c('tolat', 'fromlat', 'tolon', 'fromlon', 'd')
     if (as.df) {
       return(as.data.frame(results[ , c('fromlat', 'fromlon', 'tolat', 'tolon', 'd'), drop=FALSE] )  )  
@@ -171,9 +171,9 @@ get.distances.all <- function(frompoints, topoints, units='miles', return.crosst
   
   if (return.rownums & !return.latlons) { 
     # return tall matrix with fromrow, torow, d
-    # **** BUT THIS IS TOO SLOW OR FAILS FOR LARGE NUMBERS LIKE 100k frompoints x 10K topoints
+    # **** BUT THIS MAY BE TOO SLOW OR FAILS FOR LARGE NUMBERS LIKE 100k frompoints x 10K topoints
 
-    results=cbind( expand.gridMatrix(1:length(topoints[,'lat']), 1:length(frompoints[,'lat'])), as.vector( t(results.matrix) )  )
+    results=cbind( analyze.stuff::expand.gridMatrix(1:length(topoints[,'lat']), 1:length(frompoints[,'lat'])), as.vector( t(results.matrix) )  )
     colnames(results) <- c('torow', 'fromrow', 'd')
     if (as.df) {
       return(as.data.frame(results[ , c('fromrow', 'torow', 'd'), drop=FALSE] )  )  
@@ -186,10 +186,10 @@ get.distances.all <- function(frompoints, topoints, units='miles', return.crosst
   if (return.rownums & return.latlons) { 
     # return tall matrix with 'fromrow', 'torow', 'fromlat', 'fromlon', 'tolat', 'tolon', 'd'
 
-    results=cbind( expand.gridMatrix(1:length(topoints[,'lat']), 1:length(frompoints[,'lat'])), as.vector( t(results.matrix) )  )
+    results=cbind( analyze.stuff::expand.gridMatrix(1:length(topoints[,'lat']), 1:length(frompoints[,'lat'])), as.vector( t(results.matrix) )  )
     colnames(results) <- c('torow', 'fromrow', 'd')
 
-    results <- cbind( expand.gridMatrix(topoints[,'lat'], frompoints[,'lat']), expand.gridMatrix(topoints[,'lon'], frompoints[,'lon']) , results)
+    results <- cbind( analyze.stuff::expand.gridMatrix(topoints[,'lat'], frompoints[,'lat']), analyze.stuff::expand.gridMatrix(topoints[,'lon'], frompoints[,'lon']) , results)
     colnames(results) <- c('tolat', 'fromlat', 'tolon', 'fromlon', 'torow', 'fromrow', 'd')
     if (as.df) {
       return(as.data.frame(results[ , c('fromrow', 'torow', 'fromlat', 'fromlon', 'tolat', 'tolon', 'd'), drop=FALSE]  )  )  

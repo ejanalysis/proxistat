@@ -4,7 +4,7 @@
 #' @title States and related areas dataset
 #' @description This data set provides a variety of fields for US States, DC, PR, and Island Areas,
 #'  including FIPS codes and area in square miles or square kilometers, for example, from the Census Bureau.
-#'  @details For information on FIPS codes, see \url{http://www.census.gov/geo/reference/ansi.html},
+#' @details For information on FIPS codes, see \url{http://www.census.gov/geo/reference/ansi.html},
 #'   and also see \url{https://www.census.gov/geo/reference/geoidentifiers.html} \cr\cr
 #'   Regarding Island Areas see \url{http://www.census.gov/geo/reference/gtc/gtc_island.html} which states the following: 
 #'   Separate from the Island Areas is the term "U.S. Minor Outlying Islands."  
@@ -21,31 +21,31 @@
 #' @keywords datasets
 #' @format A data.frame with 58 rows (States etc.) and 26 columns (variables like statename)
 #' \itemize{
-#'  item  [1,] "statename"       
-#'  item  [2,] "FIPS.ST"         
-#'  item  [3,] "ST"              
-#'  item  [4,] "ftpname"         
-#'  item  [5,] "REGION"          
-#'  item  [6,] "is.usa.plus.pr"  
-#'  item  [7,] "is.usa"          
-#'  item  [8,] "is.state"        
-#'  item  [9,] "is.contiguous.us"
-#'  item [10,] "is.island.areas" 
-#'  item [11,] "area.sqmi"       
-#'  item [12,] "area.sqkm"       
-#'  item [13,] "landarea.sqmi"   
-#'  item [14,] "landarea.sqkm"   
-#'  item [15,] "waterarea.sqmi"  
-#'  item [16,] "waterarea.sqkm"  
-#'  item [17,] "inland.sqmi"     
-#'  item [18,] "inland.sqkm"     
-#'  item [19,] "coastal.sqmi"    
-#'  item [20,] "coastal.sqkm"    
-#'  item [21,] "greatlakes.sqmi" 
-#'  item [22,] "greatlakes.sqkm" 
-#'  item [23,] "territorial.sqmi"
-#'  item [24,] "territorial.sqkm"
-#'  item [25,] "lat"             
-#'  item [26,] "lon"  
+#'  \item  [1,] "statename"       
+#'  \item  [2,] "FIPS.ST"         
+#'  \item  [3,] "ST"              
+#'  \item  [4,] "ftpname"         
+#'  \item  [5,] "REGION"          
+#'  \item  [6,] "is.usa.plus.pr"  
+#'  \item  [7,] "is.usa"          
+#'  \item  [8,] "is.state"        
+#'  \item  [9,] "is.contiguous.us"
+#'  \item [10,] "is.island.areas" 
+#'  \item [11,] "area.sqmi"       
+#'  \item [12,] "area.sqkm"       
+#'  \item [13,] "landarea.sqmi"   
+#'  \item [14,] "landarea.sqkm"   
+#'  \item [15,] "waterarea.sqmi"  
+#'  \item [16,] "waterarea.sqkm"  
+#'  \item [17,] "inland.sqmi"     
+#'  \item [18,] "inland.sqkm"     
+#'  \item [19,] "coastal.sqmi"    
+#'  \item [20,] "coastal.sqkm"    
+#'  \item [21,] "greatlakes.sqmi" 
+#'  \item [22,] "greatlakes.sqkm" 
+#'  \item [23,] "territorial.sqmi"
+#'  \item [24,] "territorial.sqkm"
+#'  \item [25,] "lat"             
+#'  \item [26,] "lon"  
 #' }
 NULL
