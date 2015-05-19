@@ -59,11 +59,19 @@
 #' test.to <- structure(list(tolat = c(38.9575019287, 38.9507043428, 38.9514152435),
 #'   tolon = c(-77.0892818598, -77.0896199948, -77.0972395245)),
 #'   .Names = c("lat","lon"), class = "data.frame", row.names = c("6054762", "6054763", "6054764"))
-#'
+#' t100=testpoints(100)
+#' t10=testpoints(10)
+#' t3=testpoints(3)
+#' 
 #' get.distances(
-#'   test.from[1:2,], test.to[1:3, ], max.km=0.7, return.rownums=TRUE, return.latlons=TRUE
+#'   test.from[1:2,], test.to[1:3, ], radius=0.7, units='km', return.rownums=TRUE, return.latlons=TRUE
 #' )
-#'
 #' get.nearest(test.from, test.to)
-#'
+#' 
+#' 
+#' get.distances(  t3, t10, units='km', return.crosstab=TRUE)
+#' get.distances(  t3, t10, units='km')
+#' get.distances(  t3, t10, radius=300, units='km')
+#' proxistat(  t3, t10, radius=300, units='km')
+#' 1/get.nearest(   t3, t10, radius=300, units='km')
 NULL
