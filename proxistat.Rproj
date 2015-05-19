@@ -10,7 +10,7 @@ NumSpacesForTab: 2
 Encoding: UTF-8
 
 RnwWeave: Sweave
-LaTeX: pdfLaTeX
+LaTeX: XeLaTeX
 
 AutoAppendNewline: Yes
 
@@ -19,4 +19,4 @@ PackageUseDevtools: Yes
 PackageInstallArgs: --no-multiarch --with-keep.source
 PackageBuildArgs: --resave-data
 PackageBuildBinaryArgs: --resave-data
-PackageRoxygenize: rd,collate,namespace
+PackageRoxygenize: rd,collate,namespace,vignette
