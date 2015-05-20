@@ -162,7 +162,8 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
     )) 
   }
   if (is.na(radius) || !is.numeric(radius) || radius < 0 || is.infinite(radius)  ) {stop('invalid radius')}
-	if (!missing(area)) {
+  if (length(area)==1) {if (area==0) {area <- rep(0,length(frompoints[,1]))}}
+	if (!missing(area) ) {
     if (!is.vector(area) || !is.numeric(area) || any(is.na(area)) || any(is.infinite(area)) || length(area)!=length(frompoints[,1])) {
       stop('area will not be recycled - if supplied, it must be a numeric vector of same length as number of points with no NA or Inf values')
     }

@@ -6,7 +6,8 @@
 \usage{
 proxistat.chunked(frompoints, topoints, fromchunksize, tochunksize,
   startchunk = 1, FUN = proxistat, folder = getwd(), savechunks = FALSE,
-  assemble = TRUE, saveproxistats = FALSE, file = "proxistats.RData", ...)
+  assemble = TRUE, saveproxistats = FALSE, area,
+  file = "proxistats.RData", ...)
 }
 \arguments{
 \item{frompoints}{Require matrix or data.frame of lat/lon vauels that can be passed to get.distances function (colnames 'lat' and 'lon')}
@@ -31,9 +32,14 @@ which is saved as \code{file} in \code{folder} and returned by this function.}
 
 \item{saveproxistats}{Optional logical defaults to FALSE. Specifies whether to save .RData file of assembled results as proxistats matrix. Ignored if assemble=FALSE.}
 
+\item{area}{Optional number or vector of numbers giving size of each spatial unit with FIPS.pop,
+in square miles or square kilometers depending on the \code{units} parameter. Optional.
+  Default is to pass nothing to proxistat, and default there is 0, in which case no adjustment is made for small or even zero distance,
+  which can cause unrealistically large or even infinite/undefined scores. For zero distance if area=0, Inf will be returned for the score.}
+
 \item{file}{Optional name of file created if assemble=TRUE and saveproxistats=TRUE, defaults to proxistats.RData using save(proxistats, 'proxistats.RData')}
 
-\item{...}{Other parameters to pass to \code{\link{proxistat}} such as \code{area} and \code{units}}
+\item{...}{Other parameters to pass to \code{\link{proxistat}} such as \code{units}}
 }
 \value{
 If assemble=TRUE, returns assembled set of all chunks as matrix of 1 or more columns.

@@ -19,13 +19,17 @@
 #' @param folder Optional path specifying where to save .RData file(s) -- chunk-specific files and/or assembled results file -- default is getwd()
 #' @param file Optional name of file created if assemble=TRUE and saveproxistats=TRUE, defaults to proxistats.RData using save(proxistats, 'proxistats.RData')
 #' @param FUN Optional function, \code{\link{proxistat}} by default, and other values not implemented yet.
-#' @param ... Other parameters to pass to \code{\link{proxistat}} such as \code{area} and \code{units}
+#' @param area Optional number or vector of numbers giving size of each spatial unit with FIPS.pop, 
+#'   in square miles or square kilometers depending on the \code{units} parameter. Optional. 
+#'     Default is to pass nothing to proxistat, and default there is 0, in which case no adjustment is made for small or even zero distance, 
+#'     which can cause unrealistically large or even infinite/undefined scores. For zero distance if area=0, Inf will be returned for the score.
+#' @param ... Other parameters to pass to \code{\link{proxistat}} such as \code{units}
 #' @return If assemble=TRUE, returns assembled set of all chunks as matrix of 1 or more columns.
 #'   If assemble=FALSE but savechunks=TRUE, returns vector of character elements that are filenames for saved .RData output files in current working directory or specified folder.
 #'   Each saved output is a vector of proximity scores if FUN=proxistat, or matrix with extra columns depending on return. parameters above.
 #'   Otherwise, returns NULL.
 #' @export
-proxistat.chunked <- function(frompoints, topoints, fromchunksize, tochunksize, startchunk=1, FUN=proxistat, folder=getwd(), savechunks=FALSE, assemble=TRUE, saveproxistats=FALSE, file='proxistats.RData', ...) {
+proxistat.chunked <- function(frompoints, topoints, fromchunksize, tochunksize, startchunk=1, FUN=proxistat, folder=getwd(), savechunks=FALSE, assemble=TRUE, saveproxistats=FALSE, area, file='proxistats.RData', ...) {
   
   nfrom = length(frompoints[ , 1])
   nto   = length(  topoints[ , 1])
@@ -89,6 +93,7 @@ proxistat.chunked <- function(frompoints, topoints, fromchunksize, tochunksize, 
     
     # ***  area needs to be chunked just like frompoints or topoints, when proxistat is called:
     if (!missing(area)) {
+      if (length(area)==1) {area <- rep(area,length(frompoints[,1]))}
       output <- proxistat(frompoints=frompoints[fromrow.start:fromrow.end, ], topoints=topoints, 
                           area=area[fromrow.start:fromrow.end], ...)
     } else {
