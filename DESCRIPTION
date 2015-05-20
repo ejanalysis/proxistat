@@ -29,5 +29,6 @@ Imports:
   sp, data.table, analyze.stuff, Hmisc
 Suggests:
   matrixStats, UScensus2010blocks
-URL: https://github.com/ejanalysis/ejanalysis/
-        http://www.ejanalysis.com/
+URL:
+  http://ejanalysis.github.io
+  http://www.ejanalysis.com/

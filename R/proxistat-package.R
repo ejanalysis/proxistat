@@ -37,7 +37,11 @@
 #' }
 #' @author info@@ejanalysis.com<info@@ejanalysis.com>
 #'
-#' @references \pkg{sp} package documentation for basic distance function.\cr
+#' @references 
+#' 
+#' \code{\link{http://ejanalysis.github.io}} \cr
+#' \code{\link{http://www.ejanalysis.com/}} \cr
+#' \pkg{sp} package documentation for basic distance function.\cr
 #' Some discussion of this type of proximity indicator is available in the EJSCREEN mapping tool documentation: \cr
 #' U.S. Environmental Protection Agency (2015). EJSCREEN Technical Documentation. 
 #' \url{http://www.epa.gov/ejscreen}\cr
