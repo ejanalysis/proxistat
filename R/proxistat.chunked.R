@@ -23,7 +23,7 @@
 #'   in square miles or square kilometers depending on the \code{units} parameter. Optional. 
 #'     Default is to pass nothing to proxistat, and default there is 0, in which case no adjustment is made for small or even zero distance, 
 #'     which can cause unrealistically large or even infinite/undefined scores. For zero distance if area=0, Inf will be returned for the score.
-#' @param ... Other parameters to pass to \code{\link{proxistat}} such as \code{units}
+#' @param ... Other parameters to pass to \code{\link{proxistat}} such as \code{units} or \code{wts}
 #' @return If assemble=TRUE, returns assembled set of all chunks as matrix of 1 or more columns.
 #'   If assemble=FALSE but savechunks=TRUE, returns vector of character elements that are filenames for saved .RData output files in current working directory or specified folder.
 #'   Each saved output is a vector of proximity scores if FUN=proxistat, or matrix with extra columns depending on return. parameters above.
@@ -62,6 +62,7 @@ proxistat.chunked <- function(frompoints, topoints, fromchunksize, tochunksize, 
     
     # loop over topoint chunks would go here??, but would need to keep track of rownums and 
     #   still would have to assemble results of all topoints for a given frompoint to be able to find nearest one point, for example, to a given frompoint
+    # and would need to break up wts on topoints if used, etc.
 
     elapsedSec <- as.numeric(difftime(Sys.time() , started, units='secs'))
     elapsed <- round(difftime(Sys.time() , started), 1)

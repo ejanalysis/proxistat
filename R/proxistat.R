@@ -9,11 +9,11 @@
 #' For example, the proximity score may be used to represent how many hazardous waste sites are near any given neighborhood and how close they are.
 #' A proximity score quantifies the proximity and count of nearby points using a specified formula.
 #' \cr
-#' Proximity Score = distance-weighted count of points nearby (within search radius)
+#' Proximity Score = distance-weighted count of points nearby (within search radius) (or with another optional weight for each topoint)
 #' \cr
 #' (or weighted distance to nearest single point if there are none within the radius).
 #' \cr
-#' This is the sum of 1/d or 1/d^2 or 1/1, depending on the decay weighting,
+#' This is the sum of 1/d or 1/d^2 or 1/1, depending on the decay weighting, (or with another optional weight for each topoint instead of the number 1)
 #' where d is the distance from census unit's internal point to user-defined point.
 #' The default proximity score, using 1/d, is the count of nearby points divided by the harmonic mean of their distances (n/harmean), 
 #' (but adjusted when distance is very small, and using the nearest single one if none are nearby). 
@@ -81,9 +81,13 @@
 #' @param pop **NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE. 
 #'   A number or vector of numbers giving population count of each spatial unit. 
 #'   Default is 1, which would give the unweighted average.
+#' @param wts Optional vector of numbers same length as number of topoints. 
+#'   If wts is specified, the score for each of the frompoints will be the weighted sum of influences of topoints. 
+#'   For example, if decay='1/d' (default), proximity score = sum(wts/d) for all the topoints nearby. 
+#'   If decay='1/1', proximity score = sum(wts) for all the topoints nearby.
 #' @param return.count Optional, logical, defaults to FALSE, specifies if results returned should include a column with the count of topoints that were within radius, for each of the frompoints
 #' @param return.nearest Optional, logical, defaults to FALSE, specifies if results returned should include a column with the distance to the nearest single of the topoints, for each of the frompoints
-#' @param decay A string specifying type of function to use when weighting by distance. Default is '1/d'
+#' @param decay A string specifying type of function to use when weighting by distance. The Default is '1/d'
 #'   For '1/d' decay weighting (default), score is count of points within radius, divided by harmonic mean of distances (when count>0).
 #'   Decay weighting also can be '1/d^2' or '1/1' to represent decay by inverse of squared distance, or no decay (equal weighting for all points).
 #' @param dfunc Optional character element "hf" or "slc" to specify distance function Haversine or spherical law of cosines.
@@ -139,7 +143,7 @@
 #' }
 #' 
 #' @export
-proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay='1/d', return.count=FALSE, return.nearest=FALSE, FIPS, pop, testing=FALSE, dfunc='sp') {
+proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay='1/d', wts, return.count=FALSE, return.nearest=FALSE, FIPS, pop, testing=FALSE, dfunc='sp') {
   
   maxradius.miles <- 5200
 
@@ -161,15 +165,16 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
       ' miles, or the distance from Hawaii to Maine)'
     )) 
   }
-  if (is.na(radius) || !is.numeric(radius) || radius < 0 || is.infinite(radius)  ) {stop('invalid radius')}
+  if (is.na(radius) | !is.numeric(radius) | radius < 0 | is.infinite(radius)  ) {stop('invalid radius')}
   if (length(area)==1) {if (area==0) {area <- rep(0,length(frompoints[,1]))}}
 	if (!missing(area) ) {
-    if (!is.vector(area) || !is.numeric(area) || any(is.na(area)) || any(is.infinite(area)) || length(area)!=length(frompoints[,1])) {
+    if (!is.vector(area) | !is.numeric(area) | any(is.na(area)) | any(is.infinite(area)) | length(area)!=length(frompoints[,1])) {
       stop('area will not be recycled - if supplied, it must be a numeric vector of same length as number of points with no NA or Inf values')
     }
 	  if (any(area < 0)  ) {stop('area must be >= 0 ')}
 	}
   if (!(decay %in% c('1/d', '1/d^2', '1'))) {stop('invalid decay parameter')}
+  if (!missing(wts) & any( !is.numeric(wts) | !is.vector(wts) | length(wts)!=length(topoints[,1]) )) {stop('If specified, wts must be a numeric vector of same length as number of topoints')} 
 
   # handle cases where an input is only one row (one point)
   if (is.vector(frompoints)) {mycols <- names(frompoints); frompoints <- matrix(frompoints, nrow=1); dimnames(frompoints)[[2]] = mycols }
@@ -272,7 +277,12 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   # AGGREGATE SCORES ACROSS ALL TOPOINTS NEAR A GIVEN FROMPOINT
   ######################################
   
-  results <- cbind(scores=decayfunction(ddf))  # fast
+  if (!missing(wts)) {
+    # wts is as long as a row of ddf (one for each of the topoints), so use t(t(ddf)*wts) to multiply by wts correctly
+    results <- cbind(scores=decayfunction(t(t(ddf)*wts)))
+  } else {
+    results <- cbind(scores=decayfunction(ddf))  # fast if unwtd
+  }
   
   if (return.count) {
     #    or get multiple metrics per block group:
