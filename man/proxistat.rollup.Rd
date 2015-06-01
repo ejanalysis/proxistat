@@ -26,7 +26,11 @@ Aggregate proximity statistics already calculated for each Census block, up to o
   population-weighted mean of values in the blocks within a given block group.
 }
 \details{
-The population-weighted mean might not be the only statistic of interest.
+The population-weighted mean might not be the only statistic of interest. \cr
+  To get the maximum count of sites near any single block in the block group, try         aggregate(output[ , 'count.near'],   by=list(blocks$FIPS.BG), FUN=max). \cr
+  To get the shortest distance from any block in the block group to the nearest site, try aggregate(output[ , 'nearestone.d'], by=list(blocks$FIPS.BG), FUN=min). \cr
+  To find out how many unique sites are within X km of the internal point of any block in the block group, for example,
+  is harder, because it requires retaining details on which sites were near a given block, i.e., much more data would be the input to an aggregating function.
 }
 \examples{
 \\donotrun{

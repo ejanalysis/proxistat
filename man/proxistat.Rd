@@ -5,8 +5,8 @@
 \title{Proximity Statistic for Each Location and Nearby Points}
 \usage{
 proxistat(frompoints, topoints, area = 0, radius = 5, units = "km",
-  decay = "1/d", return.count = FALSE, return.nearest = FALSE, FIPS, pop,
-  testing = FALSE, dfunc = "sp")
+  decay = "1/d", wts, return.count = FALSE, return.nearest = FALSE, FIPS,
+  pop, testing = FALSE, dfunc = "sp")
 }
 \arguments{
 \item{frompoints}{Locations of internal points of Census subunits.
@@ -26,9 +26,14 @@ in km or miles depending on the code{units} parameter. Default is 5 (km if units
 
 \item{units}{A string that is 'miles' or 'km' for kilometers (default is 'km'), specifying units for distances returned and for radius input.}
 
-\item{decay}{A string specifying type of function to use when weighting by distance. Default is '1/d'
+\item{decay}{A string specifying type of function to use when weighting by distance. The Default is '1/d'
 For '1/d' decay weighting (default), score is count of points within radius, divided by harmonic mean of distances (when count>0).
 Decay weighting also can be '1/d^2' or '1/1' to represent decay by inverse of squared distance, or no decay (equal weighting for all points).}
+
+\item{wts}{Optional vector of numbers same length as number of topoints.
+If wts is specified, the score for each of the frompoints will be the weighted sum of influences of topoints.
+For example, if decay='1/d' (default), proximity score = sum(wts/d) for all the topoints nearby.
+If decay='1/1', proximity score = sum(wts) for all the topoints nearby.}
 
 \item{return.count}{Optional, logical, defaults to FALSE, specifies if results returned should include a column with the count of topoints that were within radius, for each of the frompoints}
 
@@ -63,11 +68,11 @@ This function returns a vector of proximity scores, one for each location such a
 For example, the proximity score may be used to represent how many hazardous waste sites are near any given neighborhood and how close they are.
 A proximity score quantifies the proximity and count of nearby points using a specified formula.
 \cr
-Proximity Score = distance-weighted count of points nearby (within search radius)
+Proximity Score = distance-weighted count of points nearby (within search radius) (or with another optional weight for each topoint)
 \cr
 (or weighted distance to nearest single point if there are none within the radius).
 \cr
-This is the sum of 1/d or 1/d^2 or 1/1, depending on the decay weighting,
+This is the sum of 1/d or 1/d^2 or 1/1, depending on the decay weighting, (or with another optional weight for each topoint instead of the number 1)
 where d is the distance from census unit's internal point to user-defined point.
 The default proximity score, using 1/d, is the count of nearby points divided by the harmonic mean of their distances (n/harmean),
 (but adjusted when distance is very small, and using the nearest single one if none are nearby).
@@ -102,17 +107,17 @@ to a random point in the circle (facility or point of interest).
 The use of a minimum distance per areal unit is intended to help approximate the distance from the average resident
 rather than from the internal point or center of the areal unit. The approximation assumes distance to the average resident can be estimated
 as if homes and facilities were on average uniformly distributed within blocks (or whatever units are used) that were roughly circular on average.
-It relies on the fact that the average distance between two random points in a circle of radius R is 90% of R
-(Weisstein, Eric W. "Disk Line Picking." From MathWorld--A Wolfram Web Resource. \url{http://mathworld.wolfram.com/DiskLinePicking.html} ).
+It relies on the fact that the average distance between two random points in a circle of radius R is 90 percent of R
+(Weisstein, Eric W. Disk Line Picking."From MathWorld--A Wolfram Web Resource. \url{http://mathworld.wolfram.com/DiskLinePicking.html} ).
 This means that if a population is randomly spread over a roughly circular block, a facility inside the block (i.e., very close to the internal point)
 typically would be 0.9R from the average person. The same math shows that the average point in the circle is 0.67R from the center,
 and 1.13R from the edge of the circle. We can describe this relationship using an equation that is a portion of the formula for the
-distance between two random points in a circle of radius=1. The formula uses b= the facility’s distance from the center as a fraction of the radius,
+distance between two random points in a circle of radius = 1. The formula uses b = the distance of the facility from the center as a fraction of the radius,
 and the integral over a represents distances of residences from the center.
-We can solve the equation using \url{http://WolframAlpha.com}, for b=0, 0.5, or 1, representing points at the center, halfway to the edge,
-and at the edge of the circle. For example, we can use this equation for b=0.5 to find that the average person, if randomly located in a circle of radius R,
+We can solve the equation using \url{http://WolframAlpha.com}, for b = 0, 0.5, or 1, representing points at the center, halfway to the edge,
+and at the edge of the circle. For example, we can use this equation for b = 0.5 to find that the average person, if randomly located in a circle of radius R,
 is a distance of about 0.8 R from a facility that is halfway between the center and edge of the circle.
-Note this is not the same as the expected location of a randomly placed facility, which would use b=sqrt(0.5) instead and gives a distance of about 0.9R.
+Note this is not the same as the expected location of a randomly placed facility, which would use b = sqrt(0.5) instead and gives a distance of about 0.9R.
 The following would be used as the input to WolframAlpha to derive the 0.9 approximation:
 Integrate[(1/Pi) Sqrt[a + (Sqrt(0.5))^2 - 2 * (Sqrt(0.5)) * Sqrt[a] cos(t)], {a,  0,  1},  {t, 0, pi}]
  \url{http://bit.ly/1GJ9UID}

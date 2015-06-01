@@ -48,17 +48,17 @@
 #' The use of a minimum distance per areal unit is intended to help approximate the distance from the average resident 
 #' rather than from the internal point or center of the areal unit. The approximation assumes distance to the average resident can be estimated 
 #' as if homes and facilities were on average uniformly distributed within blocks (or whatever units are used) that were roughly circular on average.
-#' It relies on the fact that the average distance between two random points in a circle of radius R is 90% of R 
-#' (Weisstein, Eric W. "Disk Line Picking." From MathWorld--A Wolfram Web Resource. \url{http://mathworld.wolfram.com/DiskLinePicking.html} ). 
+#' It relies on the fact that the average distance between two random points in a circle of radius R is 90 percent of R 
+#' (Weisstein, Eric W. Disk Line Picking."From MathWorld--A Wolfram Web Resource. \url{http://mathworld.wolfram.com/DiskLinePicking.html} ). 
 #' This means that if a population is randomly spread over a roughly circular block, a facility inside the block (i.e., very close to the internal point)
 #' typically would be 0.9R from the average person. The same math shows that the average point in the circle is 0.67R from the center, 
 #' and 1.13R from the edge of the circle. We can describe this relationship using an equation that is a portion of the formula for the 
-#' distance between two random points in a circle of radius=1. The formula uses b= the facility’s distance from the center as a fraction of the radius, 
+#' distance between two random points in a circle of radius = 1. The formula uses b = the distance of the facility from the center as a fraction of the radius, 
 #' and the integral over a represents distances of residences from the center. 
-#' We can solve the equation using \url{http://WolframAlpha.com}, for b=0, 0.5, or 1, representing points at the center, halfway to the edge, 
-#' and at the edge of the circle. For example, we can use this equation for b=0.5 to find that the average person, if randomly located in a circle of radius R, 
+#' We can solve the equation using \url{http://WolframAlpha.com}, for b = 0, 0.5, or 1, representing points at the center, halfway to the edge, 
+#' and at the edge of the circle. For example, we can use this equation for b = 0.5 to find that the average person, if randomly located in a circle of radius R, 
 #' is a distance of about 0.8 R from a facility that is halfway between the center and edge of the circle. 
-#' Note this is not the same as the expected location of a randomly placed facility, which would use b=sqrt(0.5) instead and gives a distance of about 0.9R. 
+#' Note this is not the same as the expected location of a randomly placed facility, which would use b = sqrt(0.5) instead and gives a distance of about 0.9R. 
 #' The following would be used as the input to WolframAlpha to derive the 0.9 approximation: 
 #' Integrate[(1/Pi) Sqrt[a + (Sqrt(0.5))^2 - 2 * (Sqrt(0.5)) * Sqrt[a] cos(t)], {a,  0,  1},  {t, 0, pi}]  
 #'  \url{http://bit.ly/1GJ9UID}

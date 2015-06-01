@@ -39,7 +39,7 @@ in square miles or square kilometers depending on the \code{units} parameter. Op
 
 \item{file}{Optional name of file created if assemble=TRUE and saveproxistats=TRUE, defaults to proxistats.RData using save(proxistats, 'proxistats.RData')}
 
-\item{...}{Other parameters to pass to \code{\link{proxistat}} such as \code{units}}
+\item{...}{Other parameters to pass to \code{\link{proxistat}} such as \code{units} or \code{wts}}
 }
 \value{
 If assemble=TRUE, returns assembled set of all chunks as matrix of 1 or more columns.
