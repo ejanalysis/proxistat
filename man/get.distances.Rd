@@ -2,7 +2,7 @@
 % Please edit documentation in R/get.distances.R
 \name{get.distances}
 \alias{get.distances}
-\title{Alt method MUCH faster/no loop & simpler distance formula approx - to Find distances between nearby points, just within specified radius. **work in progress}
+\title{Find distances between nearby points, within specified radius.}
 \usage{
 get.distances(frompoints, topoints, radius = 5200, units = "miles",
   ignore0 = FALSE, dfunc = "sp", as.df = FALSE, return.rownums = TRUE,
@@ -46,8 +46,7 @@ By default, returns a dataframe that has 3 columns: fromrow, torow, distance
   See parameters for details on other formats that may be returned if specified.
 }
 \description{
-Returns the distances from one set of points to nearby members of another set of points.
-  ** Documentation copied from get.distances, not edited to be relevant to this alt version.
+WORK IN PROGRESS. Returns the distances from one set of points to nearby members of another set of points.
 }
 \details{
 This function returns a matrix or vector of distances,
@@ -63,7 +62,7 @@ This function returns a matrix or vector of distances,
  and \url{http://www.r-bloggers.com/great-circle-distance-calculations-in-r/}.
  \cr\cr
  Finding distance to all of the 11 million census blocks in usa within 5 km, for 100 points, can take a while.
- May need to switch to just use a js library like turf,
+ May want to look at js library like turf,
  or investigate using data.table to index and more quickly subset the (potentially 11 million Census blocks of) topoints
  (or pre-index that block point dataset and allow this function to accept a data.table as input).
 }

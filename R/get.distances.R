@@ -1,7 +1,6 @@
-#' @title Alt method MUCH faster/no loop & simpler distance formula approx - to Find distances between nearby points, just within specified radius. **work in progress
+#' @title Find distances between nearby points, within specified radius.
 #'
-#' @description Returns the distances from one set of points to nearby members of another set of points.
-#'   ** Documentation copied from get.distances, not edited to be relevant to this alt version.
+#' @description WORK IN PROGRESS. Returns the distances from one set of points to nearby members of another set of points.
 #' 
 #' @details 
 #'  This function returns a matrix or vector of distances, 
@@ -17,7 +16,7 @@
 #'  and \url{http://www.r-bloggers.com/great-circle-distance-calculations-in-r/}.
 #'  \cr\cr
 #'  Finding distance to all of the 11 million census blocks in usa within 5 km, for 100 points, can take a while.
-#'  May need to switch to just use a js library like turf, 
+#'  May want to look at js library like turf, 
 #'  or investigate using data.table to index and more quickly subset the (potentially 11 million Census blocks of) topoints
 #'  (or pre-index that block point dataset and allow this function to accept a data.table as input).
 #' @param frompoints A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed.
