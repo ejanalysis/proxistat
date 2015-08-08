@@ -1,7 +1,7 @@
 #' @title Distance between two points by Haversine, Spherical Law of Cosines, or Vincenty inverse formula
 #' @description Calculates the geodesic distance between two points (or multiple pairs of points) specified by degrees (DD) latitude/longitude using
-#' Haversine formula (hf), Spherical Law of Cosines (slc) and Vincenty inverse formula for ellipsoids (vif)
-#' Taken from \url{http://www.r-bloggers.com/great-circle-distance-calculations-in-r/}
+#' Haversine formula (hf), Spherical Law of Cosines (slc) and Vincenty inverse formula for ellipsoids (vif) \cr
+#' Taken from \url{http://www.r-bloggers.com/great-circle-distance-calculations-in-r/} \cr
 #' Note these are not the most accurate method for long distances (e.g., >1000 km) nor the fastest. 
 #' @details *** frompoints and topoints must have same number of rows, defining all pairs of points.
 #'   Alternatively can define a single point while topoints defines a series of points, or vice versa.

@@ -30,8 +30,10 @@ Call get.distances function in chunks, when list of frompoints is so long it tax
   saving each chunk as a separate .RData file in current working directory
 }
 \details{
-filesizes if crosstab format (FASTEST & avoid needing rownums which take >twice as long & 1.25x sized file):
-  80MB file/chunk if   1k blocks x 11k topoints/chunk:  y=get.distances.chunked(testpoints(11e6), testpoints(11000), 1e3, units='km',return.crosstab=TRUE)
-  800MB file/chunk if 10k blocks x 11k topoints/chunk:  y=get.distances.chunked(testpoints(11e6), testpoints(11000), 1e4, units='km',return.crosstab=TRUE)
+filesizes if crosstab format (FASTEST & avoid needing rownums which take >twice as long & 1.25x sized file): \cr
+  80MB file/chunk if   1k blocks x 11k topoints/chunk:  \cr
+    y=get.distances.chunked(testpoints(11e6), testpoints(11000), 1e3, units='km',return.crosstab=TRUE)\cr
+  800MB file/chunk if 10k blocks x 11k topoints/chunk:  \cr
+    y=get.distances.chunked(testpoints(11e6), testpoints(11000), 1e4, units='km',return.crosstab=TRUE)\cr
 }
 

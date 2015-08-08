@@ -1,9 +1,11 @@
 #' @title Call a function once per chunk & save output as file (breaks large input data into chunks)
 #' @description Call get.distances function in chunks, when list of frompoints is so long it taxes RAM (e.g. 11m blocks),
 #'   saving each chunk as a separate .RData file in current working directory
-#' @details   filesizes if crosstab format (FASTEST & avoid needing rownums which take >twice as long & 1.25x sized file):
-#'   80MB file/chunk if   1k blocks x 11k topoints/chunk:  y=get.distances.chunked(testpoints(11e6), testpoints(11000), 1e3, units='km',return.crosstab=TRUE)
-#'   800MB file/chunk if 10k blocks x 11k topoints/chunk:  y=get.distances.chunked(testpoints(11e6), testpoints(11000), 1e4, units='km',return.crosstab=TRUE)
+#' @details   filesizes if crosstab format (FASTEST & avoid needing rownums which take >twice as long & 1.25x sized file): \cr
+#'   80MB file/chunk if   1k blocks x 11k topoints/chunk:  \cr
+#'     y=get.distances.chunked(testpoints(11e6), testpoints(11000), 1e3, units='km',return.crosstab=TRUE)\cr
+#'   800MB file/chunk if 10k blocks x 11k topoints/chunk:  \cr
+#'     y=get.distances.chunked(testpoints(11e6), testpoints(11000), 1e4, units='km',return.crosstab=TRUE)\cr
 #' @param frompoints Require matrix or data.frame of lat/lon vauels that can be passed to get.distances function (colnames 'lat' and 'lon')
 #' @param topoints Require matrix or data.frame of lat/lon vauels that can be passed to get.distances function (colnames 'lat' and 'lon')
 #' @param fromchunksize Required, number specifying how many points to analyze at a time (per chunk).
