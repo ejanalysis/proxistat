@@ -3,8 +3,11 @@
 \docType{data}
 \name{lookup.states}
 \alias{lookup.states}
+\alias{lookup.states,}
+\alias{states}
 \title{States and related areas dataset}
-\format{A data.frame with 58 rows (States etc.) and 26 columns (variables like statename)
+\format{A data.frame with 58 rows (States etc.) and 26 columns (variables like statename).
+  See \code{\link[ejanalysis]{get.state.info}} for more details.
 \itemize{
  \item  [1,] "statename"
  \item  [2,] "FIPS.ST"
@@ -38,7 +41,7 @@ Derived from \url{https://www.census.gov/geo/reference/state-area.html} (for are
   obtained 4/2015, and FIPS codes from Census Bureau.
 }
 \usage{
-data('lookup.states')
+data('lookup.states', package='proxistat')
 }
 \description{
 This data set provides a variety of fields for US States, DC, PR, and Island Areas,
@@ -56,7 +59,7 @@ For information on FIPS codes, see \url{http://www.census.gov/geo/reference/ansi
     These areas usually are not part of standard data products.
 }
 \seealso{
-\code{\link{state}} via \code{data(state)}
+\code{\link[ejanalysis]{get.state.info}} in \pkg{ejanalysis} package (\url{http://ejanalysis.github.io/ejanalysis/}), and \code{\link{state.abb}} via \code{data(state)}
   and the Census 2010 packages \url{http://lakshmi.calit2.uci.edu/census2000/}  and \url{http://www.jstatsoft.org/v37/i06}
 }
 \keyword{datasets}

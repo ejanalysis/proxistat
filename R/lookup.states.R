@@ -1,6 +1,6 @@
 #' @name lookup.states
 #' @docType data
-#' @aliases lookup.states
+#' @aliases lookup.states, states
 #' @title States and related areas dataset
 #' @description This data set provides a variety of fields for US States, DC, PR, and Island Areas,
 #'  including FIPS codes and area in square miles or square kilometers, for example, from the Census Bureau.
@@ -13,13 +13,14 @@
 #'   The U.S. Minor Outlying Islands refers to certain small islands under U.S. jurisdiction in the Caribbean and Pacific:  
 #'     Baker Island, Howland Island, Jarvis Island, Johnston Atoll, Kingman Reef, Midway Islands, Navassa Island, Palmyra Atoll, and Wake Island.  
 #'     These areas usually are not part of standard data products.
-#' @seealso \code{\link{state}} via \code{data(state)} 
+#' @seealso \code{\link[ejanalysis]{get.state.info}} in \pkg{ejanalysis} package (\url{http://ejanalysis.github.io/ejanalysis/}), and \code{\link{state.abb}} via \code{data(state)} 
 #'   and the Census 2010 packages \url{http://lakshmi.calit2.uci.edu/census2000/}  and \url{http://www.jstatsoft.org/v37/i06}
-#' @usage data('lookup.states')
+#' @usage data('lookup.states', package='proxistat')
 #' @source Derived from \url{https://www.census.gov/geo/reference/state-area.html} (for area data in square miles etc.)
 #'   obtained 4/2015, and FIPS codes from Census Bureau. 
 #' @keywords datasets
-#' @format A data.frame with 58 rows (States etc.) and 26 columns (variables like statename)
+#' @format A data.frame with 58 rows (States etc.) and 26 columns (variables like statename). 
+#'   See \code{\link[ejanalysis]{get.state.info}} for more details.
 #' \itemize{
 #'  \item  [1,] "statename"       
 #'  \item  [2,] "FIPS.ST"         
