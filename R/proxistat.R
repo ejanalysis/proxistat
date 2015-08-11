@@ -7,44 +7,32 @@
 #' This uses \code{\link{get.distances}} with return.crosstab=TRUE.
 #' This function returns a vector of proximity scores, one for each location such as a Census block.
 #' For example, the proximity score may be used to represent how many hazardous waste sites are near any given neighborhood and how close they are.
-#' A proximity score quantifies the proximity and count of nearby points using a specified formula.
-#' \cr
-#' Proximity Score = distance-weighted count of points nearby (within search radius) (or with another optional weight for each topoint)
-#' \cr
-#' (or weighted distance to nearest single point if there are none within the radius).
-#' \cr
+#' A proximity score quantifies the proximity and count of nearby points using a specified formula. \cr
+#' Proximity Score = distance-weighted count of points nearby (within search radius) (or with another optional weight for each topoint) \cr
+#' (or weighted distance to nearest single point if there are none within the radius). \cr
 #' This is the sum of 1/d or 1/d^2 or 1/1, depending on the decay weighting, (or with another optional weight for each topoint instead of the number 1)
 #' where d is the distance from census unit's internal point to user-defined point.
 #' The default proximity score, using 1/d, is the count of nearby points divided by the harmonic mean of their distances (n/harmean), 
 #' (but adjusted when distance is very small, and using the nearest single one if none are nearby). 
 #' This is the same as the sum of inverse distances. 
-#' The harmonic mean distance (see \code{\link[analyze.stuff]{harmean}}) is the inverse of the arithmetic mean of the inverses, or n / (sum of inverses).
-#' 
+#' The harmonic mean distance (see \code{\link[analyze.stuff]{harmean}}) is the inverse of the arithmetic mean of the inverses, or n / (sum of inverses). \cr \cr
 #' "Nearby" is defined as a user-specified parameter, so only points within the specified distance are counted, except if none are nearby,
-#' the single nearest point (at any distance) is used.
-#' \cr\cr
+#' the single nearest point (at any distance) is used. \cr\cr
 #' Default relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
-#' Other values of dfunc parameter are slower.
-#' \cr\cr
-#' IMPORTANT:
-#' \cr\cr
+#' Other values of dfunc parameter are slower. \cr\cr
+#' IMPORTANT: \cr\cr
 #' To create a proximity score for a block group, one can find the score for each block in the block group
-#' and then find the population-weighted average of those block scores, for a single block group.
-#' \cr
-#' FIPS for blocks can be used to find FIPS for block groups. FIPS for block groups can be used to find FIPS for tracts.
-#' \cr\cr
-#' ADJUSTMENT FOR SMALL DISTANCES: 
-#' \cr\cr
+#' and then find the population-weighted average of those block scores, for a single block group. \cr
+#' FIPS for blocks can be used to find FIPS for block groups. FIPS for block groups can be used to find FIPS for tracts. \cr\cr
+#' ADJUSTMENT FOR SMALL DISTANCES:  \cr\cr
 #' The adjustment for small distances ensure that each distance represents roughly the distance to the average resident within a spatial unit like a block,
 #' rather than just the distance to the center or internal point. 
 #' The adjustment uses the area of the spatial unit and assumes residents are evenly spread across the unit.
 #' Distance is adjusted in each place if area of each spatial unit is specified, to ensure it represents roughly distance to average resident in the unit:
 #' The distance is capped to be no less than 0.9 * radius of a circle of area equal to census unit's area.
-#' This approximation treats unit as if it were a circle and assumes pop is evenly distributed within that circle's area, since
-#' \cr
+#' This approximation treats unit as if it were a circle and assumes pop is evenly distributed within that circle's area, since \cr
 #'   0.9r = 0.9 * sqrt(area/pi) = approx solution to dist from avg point (resident) in circle
 #' to a random point in the circle (facility or point of interest).
-#' 
 #' The use of a minimum distance per areal unit is intended to help approximate the distance from the average resident 
 #' rather than from the internal point or center of the areal unit. The approximation assumes distance to the average resident can be estimated 
 #' as if homes and facilities were on average uniformly distributed within blocks (or whatever units are used) that were roughly circular on average.

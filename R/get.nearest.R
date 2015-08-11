@@ -7,17 +7,16 @@
 #' This function returns a vector of distances, 
 #' which are the distances from one set of points to the nearest single member (if any) of another set of points.
 #' Points are specified using latitude and longitude in decimal degrees.
-#' Relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
-#' \cr\cr
+#' Relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions. \cr \cr
+#' 
 #' A future version may use get.distances.all() but for performance only use it for distance pairs (pairs of points) that have been initially 
 #' quickly filtered using lat/lon to be not too far, in an attempt to go much faster in an initial pass.
 #' *** old get.nearest with loops takes 42 seconds vs 3 seconds for this version, for 100k frompoints and 100 topoints:  Sys.time(); x=get.nearest(t100k, t100); Sys.time()
-#' > Sys.time(); x=get.nearest(testpoints(1e6), testpoints(100)); Sys.time()
-#' [1] 14:33:05 EDT
+#' > Sys.time(); x=get.nearest(testpoints(1e6), testpoints(100)); Sys.time() \cr
+#' [1] 14:33:05 EDT \cr
 #' [1] 14:33:33 EDT  <30 seconds from 1 mill to 100 points, as in finding nearest of 100 sites for 9% of the US Census blocks.
 #' But R hung/crashed on 11mill frompoints -- Probably out of memory. *** Need to break it up into batches of maybe 1 to 100 million distances at a time? 
 #' There are 11,078,297 blocks according to \url{http://www.census.gov/geo/maps-data/data/tallies/national_geo_tallies.html}
-#' 
 #' @param frompoints A matrix or data.frame with two cols, 'lat' and 'lon' (or only 2 cols that are lat and lon in that order) with datum=WGS84 assumed.
 #' @param topoints A matrix or data.frame with two cols, 'lat' and 'lon' (or only 2 cols that are lat and lon in that order) with datum=WGS84 assumed.
 #' @param radius Optional number, default is Inf. Distance within which search should be limited, or max distance that will be returned.

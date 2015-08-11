@@ -29,7 +29,6 @@ Generate a number of randomly placed points, as latitude/longitude values.
 \details{
 This function returns n points at random locations using uniform distributions of latitude and longitude values, with specified ranges.
 Points are specified using latitude and longitude in decimal degrees.
-#' \cr\cr
 }
 \examples{
 testpoints(19,minlat=47,maxlat=48)

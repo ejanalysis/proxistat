@@ -5,8 +5,7 @@
 #' Lets you specify units and whether you need lat/lon etc, but essentially just a wrapper for 
 #' the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
 #' @details
-#' *** Probably slower than it needs to be partly by using data.frame instead of matrix class? Roughly 10-20% faster if as.df=FALSE than if TRUE.
-#' \cr\cr
+#' *** Probably slower than it needs to be partly by using data.frame instead of matrix class? Roughly 10-20% faster if as.df=FALSE than if TRUE. 
 #' Just using get.distances.all is reasonably fast? (30-40 seconds for 100 million distances, but slow working with results so large), 
 #' Sys.time(); x=get.distances.all(testpoints(1e5), testpoints(1000), return.crosstab=TRUE); Sys.time() \cr
 #' [1] "2015-03-10 18:59:08 EDT" \cr
@@ -28,8 +27,6 @@
 #' > Sys.time(); x=get.distances.all(testpoints(1e5), testpoints(1000), units='miles',return.rownums=TRUE)$d; Sys.time() \cr
 #' [1] "2015-03-09 21:18:47 EDT" \cr
 #' [1] "2015-03-09 21:19:26 EDT" 49 SECONDS IF DATA.FRAME ETC. DONE TO FORMAT RESULTS AND GET ROWNUMS IN get.distances.all \cr
-#'  \cr
-#' 
 #' @param frompoints A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed.
 #' @param topoints A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed.
 #' @param units A string that is 'miles' by default, or 'km' for kilometers, 

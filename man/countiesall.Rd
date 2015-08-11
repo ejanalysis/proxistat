@@ -14,8 +14,7 @@
 \item  $ FIPS.COUNTY: chr  "01003" "01005" "01007" "01009" ...
 \item  $ statename  : chr  "Alabama" "Alabama" "Alabama" "Alabama" ...
 \item  $ fullname   : chr  "Baldwin County, Alabama" "Barbour County, Alabama" "Bibb County, Alabama" "Blount County, Alabama" ...
-# > head(countiesall) \cr
-\cr
+# > head(countiesall) \cr \cr
   ST     countyname FIPS.COUNTY statename                fullname \cr
 1 AL Baldwin County       01003   Alabama Baldwin County, Alabama \cr
 2 AL Barbour County       01005   Alabama Barbour County, Alabama \cr

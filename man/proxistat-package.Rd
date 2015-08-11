@@ -26,10 +26,8 @@ This package relies on the \pkg{sp} package for the actual calculation of distan
 
 A vector of points can be specified using a data.frame of two columns, "lat" and "lon"
 which specify latitude and longitude in decimal degrees.
-It returns the distances from one or more \code{frompoints} to one or more \code{topoints}.
-\cr\cr
-Key functions include
-\cr
+It returns the distances from one or more \code{frompoints} to one or more \code{topoints}.\cr \cr
+Key functions include \cr
 \itemize{
 \item \code{\link{get.nearest}} to find the one among \code{topoints} nearest each \code{frompoints}
 \item \code{\link{get.distances}} to find distances quickly within an optional search radius
@@ -73,7 +71,6 @@ info@ejanalysis.com<info@ejanalysis.com>
 Some discussion of this type of proximity indicator is available in the EJSCREEN mapping tool documentation: \cr
 U.S. Environmental Protection Agency (2015). EJSCREEN Technical Documentation.
 \url{http://www.epa.gov/ejscreen}\cr
-
 \url{http://en.wikipedia.org/wiki/Longitude} and \url{http://en.wikipedia.org/wiki/Decimal_degrees}
 }
 \seealso{

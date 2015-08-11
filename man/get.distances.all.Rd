@@ -45,7 +45,6 @@ the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{Spati
 }
 \details{
 *** Probably slower than it needs to be partly by using data.frame instead of matrix class? Roughly 10-20% faster if as.df=FALSE than if TRUE.
-\cr\cr
 Just using get.distances.all is reasonably fast? (30-40 seconds for 100 million distances, but slow working with results so large),
 Sys.time(); x=get.distances.all(testpoints(1e5), testpoints(1000), return.crosstab=TRUE); Sys.time() \cr
 [1] "2015-03-10 18:59:08 EDT" \cr
@@ -67,7 +66,6 @@ Sys.time(); x=get.distances.all(testpoints(1e6), testpoints(300), return.crossta
 > Sys.time(); x=get.distances.all(testpoints(1e5), testpoints(1000), units='miles',return.rownums=TRUE)$d; Sys.time() \cr
 [1] "2015-03-09 21:18:47 EDT" \cr
 [1] "2015-03-09 21:19:26 EDT" 49 SECONDS IF DATA.FRAME ETC. DONE TO FORMAT RESULTS AND GET ROWNUMS IN get.distances.all \cr
- \cr
 }
 \examples{
 set.seed(999)

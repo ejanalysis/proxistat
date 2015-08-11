@@ -5,8 +5,7 @@
 #' 
 #' @details
 #' This function returns n points at random locations using uniform distributions of latitude and longitude values, with specified ranges.
-#' Points are specified using latitude and longitude in decimal degrees.
-#' #' \cr\cr
+#' Points are specified using latitude and longitude in decimal degrees. 
 #' @param n Numeric value, required, TRUE by default. Specifies how many testpoints to return. Must be an integer between zero and 50 million, and not NA.
 #' @param minlat Default 40. A number that is the minimum latitude in decimal degrees to use for generating random points within some range.
 #' @param maxlat Default 42. A number that is the maximum latitude in decimal degrees to use for generating random points within some range.

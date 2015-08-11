@@ -7,13 +7,10 @@
 #' This function returns the meters traveled North-South per decimal degree latitude, at a given latitude (Northern Hemisphere).
 #' This is an approximation and is less accurate further from the given latitude.
 #' Based on 
-#' \url{http://en.wikipedia.org/wiki/Latitude#Length_of_a_degree_of_latitude} and 
-#' \url{http://en.wikipedia.org/wiki/Longitude#Length_of_a_degree_of_longitude}
-#' \cr
-#' Input theta is latitude on WGS84.
-#' \cr
-#' Also see \url{http://en.wikipedia.org/wiki/Longitude} and \url{http://en.wikipedia.org/wiki/Decimal_degrees}
-#'
+#' \url{http://en.wikipedia.org/wiki/Latitude#Length_of_a_degree_of_latitude} and \cr 
+#' \url{http://en.wikipedia.org/wiki/Longitude#Length_of_a_degree_of_longitude} \cr
+#' Input theta is latitude on WGS84. \cr
+#' Also see \url{http://en.wikipedia.org/wiki/Longitude} and \url{http://en.wikipedia.org/wiki/Decimal_degrees} \cr
 #' @param theta The decimal degrees of latitude of the Northern Hemisphere location(s) of interest, as number or vector of numbers.
 #' @return Returns meters traveled N-S, as a number or vector of numbers the same length as the input.
 #' @seealso \code{\link{meters.per.degree.lon}} for a similar function but for travel East-West, with more detailed explanation/help,
