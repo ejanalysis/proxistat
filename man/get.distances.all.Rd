@@ -58,8 +58,7 @@ Sys.time(); x=get.distances.all(testpoints(1e6), testpoints(300), return.crossta
  plus 20 seconds or so for x[x>100] <- Inf  \cr
            #' so 11m blocks to 1k points could take >40 minutes!  \cr
            >3 minutes per 100 sites? \cr
-           About 2.6 seconds per site for 11m blocks?  \cr
-            \cr
+           About 2.6 seconds per site for 11m blocks?  \cr \cr
 > Sys.time(); x=get.distances.all(testpoints(1e5), testpoints(1000), units='miles',return.rownums=TRUE); Sys.time() \cr
 [1] "2015-03-09 21:23:04 EDT" \cr
 [1] "2015-03-09 21:23:40 EDT"  36 SECONDS IF DATA.FRAME ETC. DONE TO FORMAT RESULTS AND GET ROWNUMS \cr
