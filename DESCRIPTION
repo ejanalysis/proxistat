@@ -23,6 +23,7 @@ Description: This package has functions helping to calculate distances between
   devtools::install_github(c("ejanalysis/analyze.stuff", "ejanalysis/proxistat",
   "ejanalysis/ejanalysis", "ejanalysis/countyhealthrankings"))
 License: Artistic-2.0 + file LICENSE
+LazyData: true
 Depends:
   R (>= 3.1.2)
 Imports:
