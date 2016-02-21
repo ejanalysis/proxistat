@@ -17,7 +17,7 @@
 #' [1] "2015-03-10 21:56:11 EDT" \cr
 #' [1] "2015-03-10 21:57:18 EDT"  67 seconds for 300 million pairs.  \cr
 #'  plus 20 seconds or so for x[x>100] <- Inf  \cr
-#'            #' so 11m blocks to 1k points could take >40 minutes!  \cr
+#'            #' so 11m blocks to 1k points could take >40 minutes! (you would want to more quickly remove the ones outside some radius)  \cr
 #'            >3 minutes per 100 sites? \cr
 #'            About 2.6 seconds per site for 11m blocks?  \cr \cr
 #' > Sys.time(); x=get.distances.all(testpoints(1e5), testpoints(1000), units='miles',return.rownums=TRUE); Sys.time() \cr
@@ -75,6 +75,12 @@
 #' x=get.distances.all(t10, t1k, units='km'); head(x);summary(x$d)
 #' x=get.distances.all(t10, t1k, units='km'); head(x);summary(x$d)
 #'
+#'\donotrun{
+#' require(UScensus2010blocks)
+#' blocks <- get.blocks(fields=c('fips','lat','lon'),charfips = FALSE)
+#' 
+#'}
+#' 
 #'    test.from <- structure(list(fromlat = c(38.9567309094, 45),
 #'      fromlon = c(-77.0896572305, -100)), .Names = c("lat", "lon"),
 #'      row.names = c("1", "2"), class = "data.frame")

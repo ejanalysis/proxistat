@@ -40,9 +40,11 @@ bgp <- proxistat.rollup(output=output, blocksfips=blocks$fips, blocksfipsbg=bloc
 }
 }
 \seealso{
-\code{\link{proxistat}} and \code{\link{proxistat.chunked}} to create proximity statistics, and see \code{\link{get.distances}} and \code{\link{get.distances.all}} for distances between points, and
+\code{\link{proxistat}} and \code{\link{proxistat.chunked}} to create proximity statistics,
+  and see \code{\link{get.distances}} and \code{\link{get.distances.all}} for distances between points, and
   \code{\link{get.nearest}} which finds the distance to the single nearest point
   within a specified search radius instead of all topoints.
+  See also \code{\link[ejanalysis]{rollup}} via \url{http://ejanalysis.github.io/ejanalysis/}
 }
 \concept{
 proximity

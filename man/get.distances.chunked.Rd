@@ -14,13 +14,13 @@ get.distances.chunked(frompoints, topoints, fromchunksize, tochunksize,
 
 \item{fromchunksize}{Required, number specifying how many points to analyze at a time (per chunk).}
 
-\item{tochunksize}{(not currently required - current default is to use all topoints at once) number specifying how many points to analyze at a time (per chunk).}
+\item{tochunksize}{(not yet implemented - current default is to use all topoints at once) number specifying how many points to analyze at a time (per chunk).}
 
 \item{FUN}{Optional function, \code{\link{get.distances}} by default, no other value allowed currently.}
 
 \item{folder}{Optional path specifying where to save .RData files, default is getwd()}
 
-\item{...}{Other parameters to pass to \code{\link{get.distances}}, such as units}
+\item{...}{Other parameters to pass to \code{\link{get.distances}}, such as \code{radius} or \code{units}}
 }
 \value{
 Returns vector of character elements that are filenames for saved .RData output files in current working directory or specified folder.
@@ -35,5 +35,8 @@ filesizes if crosstab format (FASTEST & avoid needing rownums which take >twice 
     y=get.distances.chunked(testpoints(11e6), testpoints(11000), 1e3, units='km',return.crosstab=TRUE)\cr
   800MB file/chunk if 10k blocks x 11k topoints/chunk:  \cr
     y=get.distances.chunked(testpoints(11e6), testpoints(11000), 1e4, units='km',return.crosstab=TRUE)\cr
+}
+\seealso{
+\lspkg{ff} and others related to parallelization, etc.
 }
 

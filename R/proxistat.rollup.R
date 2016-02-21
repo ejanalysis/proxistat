@@ -15,9 +15,11 @@
 #' @param blockspop Required numeric vector of population counts in Census blocks. Same length and order as blocksfips.
 #' @return Returns a data.frame with FIPS.BG and same fields proxistat can provide (depending on what is in the parameter called output): scores, nearestone.d, count.near, but with one row for each of the block groups defined by FIPS.BG. 
 #'   Units (miles or km) are unchanged from those used to create input parameters.
-#' @seealso \code{\link{proxistat}} and \code{\link{proxistat.chunked}} to create proximity statistics, and see \code{\link{get.distances}} and \code{\link{get.distances.all}} for distances between points, and
+#' @seealso \code{\link{proxistat}} and \code{\link{proxistat.chunked}} to create proximity statistics, 
+#'   and see \code{\link{get.distances}} and \code{\link{get.distances.all}} for distances between points, and
 #'   \code{\link{get.nearest}} which finds the distance to the single nearest point
-#'   within a specified search radius instead of all topoints.
+#'   within a specified search radius instead of all topoints. 
+#'   See also \code{\link[ejanalysis]{rollup}} via \url{http://ejanalysis.github.io/ejanalysis/}
 #' @concept proximity
 #' @examples
 #' \donotrun{

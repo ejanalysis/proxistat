@@ -9,11 +9,12 @@
 #' @param frompoints Require matrix or data.frame of lat/lon vauels that can be passed to get.distances function (colnames 'lat' and 'lon')
 #' @param topoints Require matrix or data.frame of lat/lon vauels that can be passed to get.distances function (colnames 'lat' and 'lon')
 #' @param fromchunksize Required, number specifying how many points to analyze at a time (per chunk).
-#' @param tochunksize (not currently required - current default is to use all topoints at once) number specifying how many points to analyze at a time (per chunk).
-#' @param ... Other parameters to pass to \code{\link{get.distances}}, such as units
+#' @param tochunksize (not yet implemented - current default is to use all topoints at once) number specifying how many points to analyze at a time (per chunk).
+#' @param ... Other parameters to pass to \code{\link{get.distances}}, such as \code{radius} or \code{units}
 #' @param folder Optional path specifying where to save .RData files, default is getwd()
 #' @param FUN Optional function, \code{\link{get.distances}} by default, no other value allowed currently. 
 #' @return Returns vector of character elements that are filenames for saved .RData output files in current working directory or specified folder.
+#' @seealso \lspkg{ff} and others related to parallelization, etc.
 #' @export
 get.distances.chunked <- function(frompoints, topoints, fromchunksize, tochunksize, FUN=get.distances, folder=getwd(), ...) {
   
@@ -34,7 +35,8 @@ get.distances.chunked <- function(frompoints, topoints, fromchunksize, tochunksi
     }
   
   fromchunks = ceiling(nfrom / fromchunksize) 
-  tochunks =   ceiling(nto     / tochunksize) 
+  # tochunks is not yet implemented
+  # tochunks =   ceiling(nto     / tochunksize) 
   
   fromchunklast =  nfrom %% fromchunksize; if (fromchunklast==0) {fromchunklast=fromchunksize}
   tochunklast = nto %% tochunksize; if (tochunklast==0) {tochunklast=tochunksize}

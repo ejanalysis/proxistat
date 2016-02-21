@@ -74,7 +74,7 @@ U.S. Environmental Protection Agency (2015). EJSCREEN Technical Documentation.
 \url{http://en.wikipedia.org/wiki/Longitude} and \url{http://en.wikipedia.org/wiki/Decimal_degrees}
 }
 \seealso{
-\pkg{sp}, \code{\link{deltalon.per.km}}, \code{\link{deltalon.per.km}}, \code{\link{meters.per.degree.lat}}, \code{\link{meters.per.degree.lon}}
+\pkg{sp}, US block points dataset: \url{http://ejanalysis.github.io/UScensus2010blocks/}, \code{\link{deltalon.per.km}}, \code{\link{deltalon.per.km}}, \code{\link{meters.per.degree.lat}}, \code{\link{meters.per.degree.lon}}
 }
 \concept{
 distance

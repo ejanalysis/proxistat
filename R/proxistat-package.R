@@ -46,7 +46,7 @@
 #' @concept proximity
 #' @concept environmental justice
 #' @concept EJ
-#' @seealso \pkg{sp}, \code{\link{deltalon.per.km}}, \code{\link{deltalon.per.km}}, \code{\link{meters.per.degree.lat}}, \code{\link{meters.per.degree.lon}}
+#' @seealso \pkg{sp}, US block points dataset: \url{http://ejanalysis.github.io/UScensus2010blocks/}, \code{\link{deltalon.per.km}}, \code{\link{deltalon.per.km}}, \code{\link{meters.per.degree.lat}}, \code{\link{meters.per.degree.lon}}
 #' @examples
 #' test.from <- structure(list(fromlat = c(38.9567309094, 38.9507043428),
 #'   fromlon = c(-77.0896572305, -77.0896199948)),
