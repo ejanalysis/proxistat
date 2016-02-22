@@ -14,7 +14,7 @@
 #' @param folder Optional path specifying where to save .RData files, default is getwd()
 #' @param FUN Optional function, \code{\link{get.distances}} by default, no other value allowed currently. 
 #' @return Returns vector of character elements that are filenames for saved .RData output files in current working directory or specified folder.
-#' @seealso \lspkg{ff} and others related to parallelization, etc.
+#' @seealso \pkg{ff} and others related to parallelization, etc.
 #' @export
 get.distances.chunked <- function(frompoints, topoints, fromchunksize, tochunksize, FUN=get.distances, folder=getwd(), ...) {
   

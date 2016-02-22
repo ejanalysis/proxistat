@@ -37,6 +37,6 @@ filesizes if crosstab format (FASTEST & avoid needing rownums which take >twice 
     y=get.distances.chunked(testpoints(11e6), testpoints(11000), 1e4, units='km',return.crosstab=TRUE)\cr
 }
 \seealso{
-\lspkg{ff} and others related to parallelization, etc.
+\pkg{ff} and others related to parallelization, etc.
 }
 
