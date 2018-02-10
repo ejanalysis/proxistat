@@ -42,4 +42,3 @@ Can help with a series of downloaded Census data files, such as one file per Sta
 \seealso{
 \code{\link{countypointmap}}
 }
-

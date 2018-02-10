@@ -85,4 +85,3 @@ get.nearest(testpoints(10), testpoints(30))
 \concept{
 proximity
 }
-

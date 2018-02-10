@@ -2,8 +2,8 @@
 % Please edit documentation in R/countiesall.R
 \docType{data}
 \name{countiesall}
-\alias{counties}
 \alias{countiesall}
+\alias{counties}
 \title{Counties information from U.S. Census Bureau from 2015}
 \format{A data.frame of 3234 U.S. Counties or County equivalents, with 5 variables. \cr\cr
 > str(countiesall) \cr
@@ -39,4 +39,3 @@ This data set provides names and FIPS codes for U.S. Counties and County equival
   and the Census 2010 packages \url{http://lakshmi.calit2.uci.edu/census2000/} and \url{http://www.jstatsoft.org/v37/i06}
 }
 \keyword{datasets}
-

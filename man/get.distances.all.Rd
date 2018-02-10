@@ -152,4 +152,3 @@ round(get.distances.all(test.from[1:2,],test.to[1:3, ],return.crosstab=TRUE, uni
 \concept{
 proximity
 }
-

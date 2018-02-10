@@ -57,4 +57,3 @@ Call proxistat function in chunks, when list of frompoints is so long it taxes R
   80MB file/chunk if   1k blocks x 11k topoints/chunk:  y=get.distances.chunked(testpoints(11e6), testpoints(11000), 1e3, units='km') \cr\cr
   800MB file/chunk if 10k blocks x 11k topoints/chunk:  y=get.distances.chunked(testpoints(11e6), testpoints(11000), 1e4, units='km')
 }
-

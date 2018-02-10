@@ -39,4 +39,3 @@ filesizes if crosstab format (FASTEST & avoid needing rownums which take >twice 
 \seealso{
 \pkg{ff} and others related to parallelization, etc.
 }
-

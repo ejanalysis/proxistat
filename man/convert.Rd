@@ -54,4 +54,3 @@ convert(c(1e6, 1), 'sqm', 'sqkm')
 \concept{
 proximity
 }
-

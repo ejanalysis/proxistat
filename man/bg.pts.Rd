@@ -26,4 +26,3 @@ This data set provides a data.frame with 220740 block groups, with 5 variables.
   and the Census 2010 packages \url{http://lakshmi.calit2.uci.edu/census2000/}  and \url{http://www.jstatsoft.org/v37/i06}
 }
 \keyword{datasets}
-

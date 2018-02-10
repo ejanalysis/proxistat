@@ -146,4 +146,3 @@ get.distances(test.from[1:2,],test.to[1:3, ], radius=0.7, return.crosstab=TRUE)
 \concept{
 proximity
 }
-

@@ -32,4 +32,3 @@ long1 and lat1 must be same length. long2 and lat1 must be same length.
 \seealso{
 \code{\link{convert}}, \code{\link{gcd}}, \code{\link{get.distances}}, \code{\link{get.distances.all}}
 }
-

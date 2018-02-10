@@ -49,4 +49,3 @@ bgp <- proxistat.rollup(output=output, blocksfips=blocks$fips, blocksfipsbg=bloc
 \concept{
 proximity
 }
-

@@ -162,4 +162,3 @@ if ('count.near' \%in\% colnames(output))   { bg.proxi$count.near   <- aggregate
 \concept{
 proximity
 }
-

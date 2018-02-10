@@ -31,4 +31,3 @@ Note this is obsolete if used to create data() containing the results:
 \examples{
 #get.bg.latlons(mystatenums=c('09','10'))
 }
-

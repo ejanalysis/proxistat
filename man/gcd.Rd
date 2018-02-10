@@ -36,4 +36,3 @@ Note these are not the most accurate method for long distances (e.g., >1000 km) 
 \seealso{
 \code{\link{convert}}, \code{\link{gcd}}, \code{\link{get.distances}}, \code{\link{get.distances.all}}
 }
-

@@ -35,4 +35,3 @@ meters.per.degree.lat(c(0,45,72))
 \concept{
 proximity
 }
-

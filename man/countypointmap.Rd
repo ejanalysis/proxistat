@@ -19,4 +19,3 @@ very simple mapping
 \seealso{
 \code{\link{pointmap}}
 }
-

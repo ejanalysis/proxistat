@@ -43,4 +43,3 @@ deltalon.per.km(c(0,45,72))
 \concept{
 proximity
 }
-

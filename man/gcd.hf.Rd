@@ -2,6 +2,7 @@
 % Please edit documentation in R/gcd.hf.R, R/gcd.hf.c.R
 \name{gcd.hf}
 \alias{gcd.hf}
+\alias{gcd.hf}
 \title{Distance based on Haversine formula}
 \usage{
 gcd.hf(long1, lat1, long2, lat2)
@@ -55,4 +56,3 @@ long1 and lat1 must be same length. long2 and lat1 must be same length.
 
 \code{\link{convert}}, \code{\link{gcd}}, \code{\link{get.distances}}, \code{\link{get.distances.all}}
 }
-

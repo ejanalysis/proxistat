@@ -63,4 +63,3 @@ For information on FIPS codes, see \url{http://www.census.gov/geo/reference/ansi
   and the Census 2010 packages \url{http://lakshmi.calit2.uci.edu/census2000/}  and \url{http://www.jstatsoft.org/v37/i06}
 }
 \keyword{datasets}
-

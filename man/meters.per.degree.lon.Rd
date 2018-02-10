@@ -49,4 +49,3 @@ meters.per.degree.lon(c(0,45,72))
 \concept{
 proximity
 }
-

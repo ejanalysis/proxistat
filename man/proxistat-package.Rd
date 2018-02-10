@@ -61,9 +61,6 @@ proxistat(t3, t10, radius = 300, units = "km", area = c(100001:100003))
 proxistat(  t3, t10, radius=300, units='km')
 1/get.nearest(   t3, t10, radius=300, units='km')
 }
-\author{
-info@ejanalysis.com<info@ejanalysis.com>
-}
 \references{
 \url{http://ejanalysis.github.io} \cr
 \url{http://www.ejanalysis.com/} \cr
@@ -76,6 +73,9 @@ U.S. Environmental Protection Agency (2015). EJSCREEN Technical Documentation.
 \seealso{
 \pkg{sp}, US block points dataset: \url{http://ejanalysis.github.io/UScensus2010blocks/}, \code{\link{deltalon.per.km}}, \code{\link{deltalon.per.km}}, \code{\link{meters.per.degree.lat}}, \code{\link{meters.per.degree.lon}}
 }
+\author{
+info@ejanalysis.com<info@ejanalysis.com>
+}
 \concept{
 distance
 
@@ -85,4 +85,3 @@ environmental justice
 
 EJ
 }
-

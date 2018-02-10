@@ -44,4 +44,3 @@ get.distances.prepaired(data.frame(
 \concept{
 proximity
 }
-

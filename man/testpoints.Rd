@@ -45,4 +45,3 @@ get.distances(testpoints(1000),testpoints[10],radius=999,return.rownums=TRUE,ret
 \concept{
 proximity
 }
-

@@ -35,4 +35,3 @@ Used by functions like \code{\link{get.distances}} to check input parameters fro
 \concept{
 proximity
 }
-

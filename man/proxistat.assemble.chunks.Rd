@@ -24,4 +24,3 @@ read files storing proxistat result chunks and assemble into one result
  output=proxistat.assemble.chunks(files=fnames, folder=file.path(getwd(), 'temp'))
   }
 }
-

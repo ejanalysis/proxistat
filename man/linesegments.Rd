@@ -41,4 +41,3 @@ This function also silently returns a matrix of two columns.
 \seealso{
 \code{\link{testpoints}} and \code{\link{get.nearest}}
 }
-
