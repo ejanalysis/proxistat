@@ -1,3 +1,0 @@
-useDynLib(proxistat)
-exportPattern("^[[:alpha:]]+")
-importFrom(Rcpp, evalCpp)
