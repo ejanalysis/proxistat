@@ -6,7 +6,6 @@
 #' @seealso \code{\link[ejanalysis]{get.county.info}} from the \pkg{ejanalysis} package (\url{http://ejanalysis.github.io/ejanalysis/}), 
 #'   and the \pkg{UScensus2010county} package and the \pkg{acs} package
 #'   and the Census 2010 packages \url{http://lakshmi.calit2.uci.edu/census2000/} and \url{http://www.jstatsoft.org/v37/i06}
-#' @usage data('bg.pts', package='proxistat')
 #' @source Derived from Census Bureau, obtained early 2015.
 #' @keywords datasets
 #' @format A data.frame of 3234 U.S. Counties or County equivalents, with 5 variables. \cr\cr

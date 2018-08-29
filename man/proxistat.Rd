@@ -5,8 +5,8 @@
 \title{Proximity Statistic for Each Location and Nearby Points}
 \usage{
 proxistat(frompoints, topoints, area = 0, radius = 5, units = "km",
-  decay = "1/d", wts, return.count = FALSE, return.nearest = FALSE, FIPS,
-  pop, testing = FALSE, dfunc = "sp")
+  decay = "1/d", wts, return.count = FALSE, return.nearest = FALSE,
+  FIPS, pop, testing = FALSE, dfunc = "sp")
 }
 \arguments{
 \item{frompoints}{Locations of internal points of Census subunits. 
@@ -20,7 +20,7 @@ in square miles or square kilometers depending on the \code{units} parameter. Op
   Default is 0, in which case no adjustment is made for small or even zero distance, 
   which can cause unrealistically large or even infinite/undefined scores. For zero distance if area=0, Inf will be returned for the score.}
 
-\item{radius}{*NOTE: This default is not the same as the default in \code{\link{get.distances}}! 
+\item{radius}{NOTE: This default is not the same as the default in \code{\link{get.distances}}! 
 Optional, a number giving distance defining nearby, i.e. the search radius, 
 in km or miles depending on the code{units} parameter. Default is 5 (km if units='km'). Max is 5200 miles (roughly the distance from Hawaii to Maine).}
 
@@ -39,18 +39,18 @@ If decay='1/1', proximity score = sum(wts) for all the topoints nearby.}
 
 \item{return.nearest}{Optional, logical, defaults to FALSE, specifies if results returned should include a column with the distance to the nearest single of the topoints, for each of the frompoints}
 
-\item{FIPS}{**NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE. 
+\item{FIPS}{NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE. 
 A vector of strings designating places that will be assigned scores where each is the Census FIPS code or other ID. Optional.
 Might want to have this be a factor not string to be faster, or ensure it is indexed on fips, or have separate FIPS.BG passed to this function.}
 
-\item{pop}{**NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE. 
+\item{pop}{NOT USED CURRENTLY - COULD BE USED LATER TO AGGREGATE (rollup) TO BLOCK GROUPS FROM BLOCKS, FOR EXAMPLE. 
 A number or vector of numbers giving population count of each spatial unit. 
 Default is 1, which would give the unweighted average.}
 
 \item{testing}{Logical during work in progress}
 
-\item{dfunc}{Optional character element "hf" or "slc" to specify distance function Haversine or spherical law of cosines.
-If "sp" (default, fastest), it uses the \pkg{sp} package to find distances more accurately and more quickly.}
+\item{dfunc}{Optional character element hf or slc to specify distance function Haversine or spherical law of cosines.
+If sp (default, fastest), it uses the \pkg{sp} package to find distances more accurately and more quickly.}
 }
 \value{
 By default, returns a vector of numbers, the proximity scores, one for each of the frompoints (or if testing, a matrix with 2 columns: fromrow and d for distance).
@@ -75,7 +75,7 @@ The default proximity score, using 1/d, is the count of nearby points divided by
 (but adjusted when distance is very small, and using the nearest single one if none are nearby). 
 This is the same as the sum of inverse distances. 
 The harmonic mean distance (see \code{\link[analyze.stuff]{harmean}}) is the inverse of the arithmetic mean of the inverses, or n / (sum of inverses). \cr \cr
-"Nearby" is defined as a user-specified parameter, so only points within the specified distance are counted, except if none are nearby,
+Nearby is defined as a user-specified parameter, so only points within the specified distance are counted, except if none are nearby,
 the single nearest point (at any distance) is used. \cr\cr
 Default relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
 Other values of dfunc parameter are slower. \cr\cr
@@ -88,15 +88,15 @@ The adjustment for small distances ensure that each distance represents roughly 
 rather than just the distance to the center or internal point. 
 The adjustment uses the area of the spatial unit and assumes residents are evenly spread across the unit.
 Distance is adjusted in each place if area of each spatial unit is specified, to ensure it represents roughly distance to average resident in the unit:
-The distance is capped to be no less than 0.9 * radius of a circle of area equal to census unit's area.
+The distance is capped to be no less than 0.9 x radius of a circle of area equal to census unit's area.
 This approximation treats unit as if it were a circle and assumes pop is evenly distributed within that circle's area, since \cr
-  0.9r = 0.9 * sqrt(area/pi) = approx solution to dist from avg point (resident) in circle
+  0.9r = 0.9 x sqrt(area/pi) = approx solution to dist from avg point (resident) in circle
 to a random point in the circle (facility or point of interest).
 The use of a minimum distance per areal unit is intended to help approximate the distance from the average resident 
 rather than from the internal point or center of the areal unit. The approximation assumes distance to the average resident can be estimated 
 as if homes and facilities were on average uniformly distributed within blocks (or whatever units are used) that were roughly circular on average.
 It relies on the fact that the average distance between two random points in a circle of radius R is 90 percent of R 
-(Weisstein, Eric W. Disk Line Picking."From MathWorld--A Wolfram Web Resource. \url{http://mathworld.wolfram.com/DiskLinePicking.html} ). 
+(Weisstein, Eric W. Disk Line Picking. From MathWorld--A Wolfram Web Resource. \url{http://mathworld.wolfram.com/DiskLinePicking.html} ). 
 This means that if a population is randomly spread over a roughly circular block, a facility inside the block (i.e., very close to the internal point)
 typically would be 0.9R from the average person. The same math shows that the average point in the circle is 0.67R from the center, 
 and 1.13R from the edge of the circle. We can describe this relationship using an equation that is a portion of the formula for the 
@@ -107,7 +107,7 @@ and at the edge of the circle. For example, we can use this equation for b = 0.5
 is a distance of about 0.8 R from a facility that is halfway between the center and edge of the circle. 
 Note this is not the same as the expected location of a randomly placed facility, which would use b = sqrt(0.5) instead and gives a distance of about 0.9R. 
 The following would be used as the input to WolframAlpha to derive the 0.9 approximation: 
-Integrate[(1/Pi) Sqrt[a + (Sqrt(0.5))^2 - 2 * (Sqrt(0.5)) * Sqrt[a] cos(t)], {a,  0,  1},  {t, 0, pi}]  
+  Integrate((1/Pi) Sqrt(a + (Sqrt(0.5))^2 - 2(Sqrt(0.5)) Sqrt(a) cos(t)), {a,  0,  1},  {t, 0, pi})
  \url{http://bit.ly/1GJ9UID}
 }
 \examples{
@@ -159,6 +159,4 @@ if ('count.near' \%in\% colnames(output))   { bg.proxi$count.near   <- aggregate
   \code{\link{get.nearest}} which finds the distance to the single nearest point
   within a specified search radius instead of all topoints.
 }
-\concept{
-proximity
-}
+\concept{proximity}

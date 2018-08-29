@@ -2,7 +2,6 @@
 % Please edit documentation in R/gcd.hf.R, R/gcd.hf.c.R
 \name{gcd.hf}
 \alias{gcd.hf}
-\alias{gcd.hf}
 \title{Distance based on Haversine formula}
 \usage{
 gcd.hf(long1, lat1, long2, lat2)
@@ -10,13 +9,13 @@ gcd.hf(long1, lat1, long2, lat2)
 gcd.hf(long1, lat1, long2, lat2)
 }
 \arguments{
-\item{long1}{longitude(s) in radians, vector of one or more numbers}
+\item{long1}{longitudes in radians, vector of one or more numbers}
 
-\item{lat1}{latitude(s) in radians, vector of one or more numbers}
+\item{lat1}{latitudes in radians, vector of one or more numbers}
 
-\item{long2}{longitude(s) in radians, vector of one or more numbers}
+\item{long2}{longitudes in radians, vector of one or more numbers}
 
-\item{lat2}{latitude(s) in radians, vector of one or more numbers}
+\item{lat2}{latitudes in radians, vector of one or more numbers}
 
 \item{long1}{longitude(s) in radians, vector of one or more numbers}
 
@@ -32,8 +31,8 @@ Distance in kilometers
 Distance in kilometers
 }
 \description{
-Calculates the geodesic distance between two points 
-  (or multiple pairs of points) specified by radian latitude/longitude.
+Calculates the geodesic distance between two points,
+  or multiple pairs of points, specified by radian latitude/longitude.
 
 Calculates the geodesic distance between two points 
   (or multiple pairs of points) specified by radian latitude/longitude.

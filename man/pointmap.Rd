@@ -5,7 +5,8 @@
 \title{Read a series of dbf files and join compile them as a single data.frame}
 \usage{
 pointmap(bin, lat, lon, vartext = "x", areatext = "area",
-  coloring = rainbow(length(unique(bin))), asp = c(1, 1), pch = ".", ...)
+  coloring = rainbow(length(unique(bin))), asp = c(1, 1), pch = ".",
+  ...)
 }
 \arguments{
 \item{bin}{Indicates color of each point. A vector of integers used to index the coloring vector. That would ideally include just 1:n where n is the n number of unique values and the index to the coloring vector, so each unique value 1:5, for example, is assigned a map color that is coloring[bin]}

@@ -5,8 +5,8 @@
 \title{Find all distances between two sets of points (based on lat/lon)}
 \usage{
 get.distances.all(frompoints, topoints, units = "miles",
-  return.crosstab = FALSE, return.rownums = TRUE, return.latlons = TRUE,
-  as.df = TRUE)
+  return.crosstab = FALSE, return.rownums = TRUE,
+  return.latlons = TRUE, as.df = TRUE)
 }
 \arguments{
 \item{frompoints}{A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed.}
@@ -149,6 +149,4 @@ round(get.distances.all(test.from[1:2,],test.to[1:3, ],return.crosstab=TRUE, uni
   \code{\link{proxistat}} which calculates a proximity score for each spatial unit
   based on distances to nearby points.
 }
-\concept{
-proximity
-}
+\concept{proximity}

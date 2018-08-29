@@ -32,6 +32,4 @@ meters.per.degree.lat(c(0,45,72))
 \code{\link{meters.per.degree.lon}} for a similar function but for travel East-West, with more detailed explanation/help,
   and \code{\link{get.distances.all}} and \code{\link{get.distances}} for distances between points, and related functions.
 }
-\concept{
-proximity
-}
+\concept{proximity}

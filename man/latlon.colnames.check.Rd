@@ -32,6 +32,4 @@ Used by functions like \code{\link{get.distances}} to check input parameters fro
   within a specified search radius instead of all topoints, and 
   \code{\link{proxistat}} which calculates a proximity score for each spatial unit
 }
-\concept{
-proximity
-}
+\concept{proximity}

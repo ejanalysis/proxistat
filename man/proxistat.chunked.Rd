@@ -5,8 +5,8 @@
 \title{Call proxistat once per chunk & save output as file (breaks large input data into chunks)}
 \usage{
 proxistat.chunked(frompoints, topoints, fromchunksize, tochunksize,
-  startchunk = 1, FUN = proxistat, folder = getwd(), savechunks = FALSE,
-  assemble = TRUE, saveproxistats = FALSE, area,
+  startchunk = 1, FUN = proxistat, folder = getwd(),
+  savechunks = FALSE, assemble = TRUE, saveproxistats = FALSE, area,
   file = "proxistats.RData", ...)
 }
 \arguments{

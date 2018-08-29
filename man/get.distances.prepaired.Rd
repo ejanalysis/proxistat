@@ -41,6 +41,4 @@ get.distances.prepaired(data.frame(
   \code{\link{proxistat}} which calculates a proximity score for each spatial unit
   based on distances to nearby points.
 }
-\concept{
-proximity
-}
+\concept{proximity}

@@ -46,6 +46,4 @@ meters.per.degree.lon(c(0,45,72))
   and \code{\link{deltalon.per.km}} for the inverse of this function (other than a factor of 1000),
   and \code{\link{get.distances.all}} and also \code{\link{get.distances}} to get distances between points, and related functions.
 }
-\concept{
-proximity
-}
+\concept{proximity}

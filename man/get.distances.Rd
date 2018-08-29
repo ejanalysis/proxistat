@@ -5,9 +5,9 @@
 \title{Find distances between nearby points, within specified radius.}
 \usage{
 get.distances(frompoints, topoints, radius = 5200, units = "miles",
-  ignore0 = FALSE, dfunc = "sp", as.df = FALSE, return.rownums = TRUE,
-  return.latlons = FALSE, return.crosstab = FALSE,
-  tailored.deltalon = FALSE)
+  ignore0 = FALSE, dfunc = "sp", as.df = FALSE,
+  return.rownums = TRUE, return.latlons = FALSE,
+  return.crosstab = FALSE, tailored.deltalon = FALSE)
 }
 \arguments{
 \item{frompoints}{A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed.}
@@ -143,6 +143,4 @@ get.distances(test.from[1:2,],test.to[1:3, ], radius=0.7, return.crosstab=TRUE)
   within a specified search radius instead of all topoints, and 
   \code{\link{proxistat}} which calculates a proximity score for each spatial unit based on distances to nearby points.
 }
-\concept{
-proximity
-}
+\concept{proximity}

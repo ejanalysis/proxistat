@@ -51,6 +51,4 @@ convert(c(1e6, 1), 'sqm', 'sqkm')
 \code{\link{get.distances}} which allows you to specify a search radius and 
   get distances only within that radius, and related functions.
 }
-\concept{
-proximity
-}
+\concept{proximity}

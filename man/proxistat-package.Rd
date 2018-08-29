@@ -76,12 +76,7 @@ U.S. Environmental Protection Agency (2015). EJSCREEN Technical Documentation.
 \author{
 info@ejanalysis.com<info@ejanalysis.com>
 }
-\concept{
-distance
-
-proximity
-
-environmental justice
-
-EJ
-}
+\concept{EJ}
+\concept{distance}
+\concept{environmental justice}
+\concept{proximity}

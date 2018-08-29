@@ -27,9 +27,6 @@
 \source{
 Derived from Census Bureau, obtained early 2015.
 }
-\usage{
-data('bg.pts', package='proxistat')
-}
 \description{
 This data set provides names and FIPS codes for U.S. Counties and County equivalents.
 }

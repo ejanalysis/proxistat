@@ -82,6 +82,4 @@ get.nearest(testpoints(10), testpoints(30))
   \code{\link{get.distances.prepaired}} for finding distances when data are already formatted as pairs of points, and
   \code{\link{proxistat}} which calculates a proximity score for each spatial unit based on distances to nearby points.
 }
-\concept{
-proximity
-}
+\concept{proximity}

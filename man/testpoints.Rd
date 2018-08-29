@@ -4,8 +4,8 @@
 \alias{testpoints}
 \title{Generate a number of randomly placed points, as latitude/longitude values.}
 \usage{
-testpoints(n, minlat = 40, maxlat = 42, minlon = -125, maxlon = -70,
-  as.df = TRUE)
+testpoints(n, minlat = 40, maxlat = 42, minlon = -125,
+  maxlon = -70, as.df = TRUE)
 }
 \arguments{
 \item{n}{Numeric value, required, TRUE by default. Specifies how many testpoints to return. Must be an integer between zero and 50 million, and not NA.}
@@ -42,6 +42,4 @@ get.distances(testpoints(1000),testpoints[10],radius=999,return.rownums=TRUE,ret
   within a specified search radius instead of all topoints, and 
   \code{\link{proxistat}} which calculates a proximity score for each spatial unit based on distances to nearby points.
 }
-\concept{
-proximity
-}
+\concept{proximity}

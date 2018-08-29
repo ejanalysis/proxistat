@@ -46,6 +46,4 @@ bgp <- proxistat.rollup(output=output, blocksfips=blocks$fips, blocksfipsbg=bloc
   within a specified search radius instead of all topoints. 
   See also \code{\link[ejanalysis]{rollup}} via \url{http://ejanalysis.github.io/ejanalysis/}
 }
-\concept{
-proximity
-}
+\concept{proximity}

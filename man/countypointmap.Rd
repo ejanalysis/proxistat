@@ -4,11 +4,25 @@
 \alias{countypointmap}
 \title{Simple map of color-coded block group centroids in county}
 \usage{
-countypointmap(query, vartext, varname, breaks = 5, coloring, asp = c(1, 1),
-  pch = 1, ......)
+countypointmap(query, vartext, varname, breaks = 5, coloring,
+  asp = c(1, 1), pch = 1, ...)
 }
 \arguments{
 \item{query}{See \code{\link[ejanalysis]{get.county.info}}}
+
+\item{vartext}{required, passed to \code{\link{pointmap}}.}
+
+\item{varname}{required Name of column in data.frame bg, which must be in memory already.}
+
+\item{breaks}{Default is 5, passed to \code{\link{cut}}}
+
+\item{coloring}{Default is colors[1:(length(breaks) + 1)] (unless breaks is 1, and then it is colors[1])}
+
+\item{asp}{Default is c(1,1), passed to \code{\link{pointmap}}.}
+
+\item{pch}{Default is 1, passed to \code{\link{pointmap}}.}
+
+\item{...}{Additional parameters to pass to \code{\link{pointmap}}.}
 }
 \value{
 Just draws a map

@@ -15,7 +15,6 @@
 #'     These areas usually are not part of standard data products.
 #' @seealso \code{\link[ejanalysis]{get.state.info}} in \pkg{ejanalysis} package (\url{http://ejanalysis.github.io/ejanalysis/}), and \code{\link{state.abb}} via \code{data(state)} 
 #'   and the Census 2010 packages \url{http://lakshmi.calit2.uci.edu/census2000/}  and \url{http://www.jstatsoft.org/v37/i06}
-#' @usage data('lookup.states', package='proxistat')
 #' @source Derived from \url{https://www.census.gov/geo/reference/state-area.html} (for area data in square miles etc.)
 #'   obtained 4/2015, and FIPS codes from Census Bureau. 
 #' @keywords datasets

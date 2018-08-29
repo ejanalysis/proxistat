@@ -40,9 +40,6 @@
 Derived from \url{https://www.census.gov/geo/reference/state-area.html} (for area data in square miles etc.)
   obtained 4/2015, and FIPS codes from Census Bureau.
 }
-\usage{
-data('lookup.states', package='proxistat')
-}
 \description{
 This data set provides a variety of fields for US States, DC, PR, and Island Areas,
  including FIPS codes and area in square miles or square kilometers, for example, from the Census Bureau.
