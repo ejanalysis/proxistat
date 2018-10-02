@@ -1,39 +1,38 @@
 Package: proxistat
-Type: Package
-Title: Create a proximity score for each Census unit, based on distances to
-    nearby points of interest
-Version: 0.1.0
-Date: 2015-03-14
-Author: info@ejanalysis.com
-Maintainer: ejanalysis.com<info@ejanalysis.com>
+Title: Create a Proximity Score in Each Census Unit, Based on Distances to
+    Specified Points
+Version: 0.1.1
 Description: This package has functions helping to calculate distances between
     geographic points, such as the distances between all points, distances to
     all points within some maximum distance, distance to nearest single point,
     etc. It also can create a proximity score for each spatial unit like a Census
     block group, to quantify the distance-weighted count of nearby points. This
     proximity score can be used in environmental justice (EJ) analysis, for example.
-    This package uses the sp package for the basic distance calculation. Key
-    functions include get.nearest() to find the one topoint nearest each frompoint,
+    This package uses the sp package for the basic distance calculation.
+    Key functions include get.nearest() to find the one topoint nearest each frompoint,
     get.distances() to find distances quickly within an optional search radius, and
     get.distances.all() to find distances from all frompoints to alltopoints. The
     function proxistat() creates a proximity score that quantifies, for each spatial
     unit like a Census block group, how many topoints are nearby and how close
-    they are. The analyze.stuff, proxistat, ejanalysis, and countyhealthrankings
-    packages, once made public can be installed from github using the devtools
-    package: devtools::install_github(c("ejanalysis/analyze.stuff", "ejanalysis/
-    proxistat", "ejanalysis/ejanalysis", "ejanalysis/countyhealthrankings"))
-License: Artistic-2.0 + file LICENSE
-LazyData: true
-Depends:
-    R (>= 3.1.2)
+    they are.
+    For any imported/suggested packages not on CRAN, see http://ejanalysis.github.io
 Imports:
     sp,
-    data.table,
     analyze.stuff,
-    Hmisc
+    Hmisc,
+    data.table
 Suggests:
     matrixStats,
     UScensus2010blocks
-URL: http://ejanalysis.github.io
-    http://www.ejanalysis.com/
+URL: http://ejanalysis.github.io, https://github.com/ejanalysis/proxistat, http://www.ejanalysis.com/
+BugReports: https://github.com/ejanalysis/proxistat/issues
+Date: 2018-09-01
+Depends: R (>= 3.1.0)
 RoxygenNote: 6.1.0
+License: MIT + file LICENSE
+Repository: GitHub
+Author: info@ejanalysis.com
+Maintainer: info@ejanalysis.com <info@ejanalysis.com>
+NeedsCompilation: no
+LazyData: true
+Encoding: UTF-8
