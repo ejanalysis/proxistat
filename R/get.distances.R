@@ -162,7 +162,7 @@ get.distances <- function(frompoints, topoints, radius=5200, units='miles', igno
   if (!return.rownums & !return.latlons & !return.crosstab) {wantvector <- TRUE} else {wantvector <- FALSE}
   
   
-  ############# KEY FUNCTION -- gets distance for every pair of from-to: ################
+  ############# KEY FUNCTION -- gets distance for every pair of from-to: ############### #
   
   # *** ideally to avoid warning HAVE TO NAME THE COLS lat lon lat lon here:
   

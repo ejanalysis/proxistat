@@ -23,7 +23,7 @@ pointmap <- function(bin, lat, lon, vartext='x', areatext='area', coloring=rainb
   
   ############ 
   # Very basic, simple color-coded points map of area based on user providing bin, lat lon, labels:
-  ############
+  ########### #
   # or maybe default could be 
   #  <- c('gray', 'yellow','orange', 'red')
   if (length(coloring) != length(unique(bin))) {warning('Number of colors is not equal to number of unique values of bin parameter')}

@@ -179,9 +179,9 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   
   n <- length(frompoints[,1])
   
-  #########################################
+  ######################################## #
   # Sequence of steps in finding d value(s):
-  #########################################
+  ######################################## #
   #
   # 1) get distances that are <=radius using get.distances()
   # 2) where d < min.dist, set d <- min.dist to adjust it upwards
@@ -189,9 +189,9 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   # 4) for each frompoints, if no distances were found, get nearest single d at any radius,
   #       originally thought perhaps by expanding outwards step by step until at least one is found (but not worth the overhead vs just finding ALL d and picking min)
 
-  #########################################
+  ######################################## #
   # 1) get distances <= radius
-  #########################################
+  ######################################## #
   
   ddf <- get.distances(frompoints, topoints, units = units, dfunc = dfunc, return.crosstab = TRUE)
   # NOTE: DO NOT SPECIFY radius IN get.distances here, so it will use default radius of 5200 miles, so that
@@ -200,9 +200,9 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   
   if (testing) {cat('\n\n ddf before fix min dist: \n\n');print(ddf);cat('\n\n')}
 
-  #########################################
+  ######################################## #
   # 2) Set distance to minimum allowed distance or true distance, whichever is greater.
-  #########################################
+  ######################################## #
 
   # use d or min.dist, whichever is greater
   if (length(area) == 1) {area <- rep(area, n) }
@@ -212,9 +212,9 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   
   if (testing) {cat('ddf with d adjusted up if d<min.dist: \n\n'); print(ddf); cat('\n\n')}
   
-  #########################################
+  ######################################## #
   #  RETAIN SINGLE NEAREST IN CASE NEED THAT!! 
-  #########################################
+  ######################################## #
   
   # which topoint was the nearest?
   # Accounts for maybe 10% of all time in this function
@@ -223,9 +223,9 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   # how far away was that one nearest to each frompoint?
   nearestone.d <- ddf[ cbind(1:NROW(ddf), nearestone.colnum) ]
   
-  #########################################
+  ######################################## #
   # 3) keep only if new adjusted d <=radius  (or if it is the minimum of all for the given fromrow)
-  #########################################
+  ######################################## #
   
   # set to NA any cell of matrix where distance is > search radius
   # Accounts for maybe 10% of all time in this function
@@ -241,11 +241,11 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   #### *** May want to retain info on which fromrows had a score that was based on any distances that were adjusted upwards based on min.dist? ****
   # min.dist.adjustment.used <- which()
   
-  #########################################
+  ######################################## #
   # 4) where None within radius.... 
   # For any frompoint that had no topoint within radius,
   # use distance to nearest single topoint
-  #########################################
+  ######################################## #
   
   # note which frompoints had zero within the radius (negligible time)
   fromrow.0near <- which(rowSums(ddf, na.rm = TRUE) == 0)
@@ -260,9 +260,9 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
     if (testing) {cat(' some fromrows were not in results of get.distances in ddf \n')}
   }
   
-  ######################################
+  ##################################### #
   # AGGREGATE SCORES ACROSS ALL TOPOINTS NEAR A GIVEN FROMPOINT
-  ######################################
+  ##################################### #
   
   if (!missing(wts)) {
     # wts is as long as a row of ddf (one for each of the topoints), so use t(t(ddf)*wts) to multiply by wts correctly
@@ -286,22 +286,22 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
 
 
 if (1 == 0) {
-  ###########################################################################################################################
+  ########################################################################################################################## #
   
   # ANOTHER APPROACH to get.distances?:
   # might be more efficient to LOOP OVER SITES, NOT BLOCKS, TO CALC DISTANCES, 
   #  running get.distances() on just all sites as frompoints, and then get.nearest as needed.
   
-  #########################################
+  ######################################## #
   # Could treat each site as a frompoint, so create one row per facility/site rather than per block???:
-  #########################################
+  ######################################## #
 
   distances.to.blocks <- get.distances(frompoints = sites[,c('lat','lon')] , topoints = blocks[, c('lat', 'lon')] , radius = 5, units = 'km', return.latlons = FALSE, return.rownums = TRUE)
   distances.to.blocks$FIPS.BG <- blocks$FIPS.BG[ distances.to.blocks$torow ] # not sure about this. CAN we get torownum back??
 
-  #########################################
+  ######################################## #
   # ROLLUP TO BLOCK GROUPS. For each BG:
-  #########################################
+  ######################################## #
 
   # Using aggregate for 11m blocks aggregated into 220k block groups might take something like 2 minutes! 
   # #rollup to blockgroups is slow using aggregate:
@@ -329,9 +329,9 @@ if (1 == 0) {
 
 if (1 == 0)  {
   
-  #######################################################################################
+  ###################################################################################### #
   # notes on how to calc distances
-  #######################################################################################
+  ###################################################################################### #
 
   # Formula for distance between two lat/lon points
   # see http://stackoverflow.com/questions/27928/how-do-i-calculate-distance-between-two-latitude-longitude-points

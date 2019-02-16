@@ -13,9 +13,9 @@
 #' @seealso \code{\link{pointmap}}
 #' @export
 countypointmap <- function(query, vartext, varname, breaks=5, coloring, asp=c(1,1), pch=1, ...) {
-  ###########
+  ########## #
   # SIMPLE MAP OF BLOCK GROUP CENTROIDS IN COUNTY(IES)  - color-coded block group points
-  ##########
+  ######### #
   # given county query and name of field, and breaks cutoffs?, look in bg and bg.pts to map that county as bg points colored by bin
   # query Vector of search terms. Can be county's 5-digit FIPS code(s) (as numbers or strings with numbers), and also could be 'countyname, statename' (fullname, exactly matching formats in countiesall$fullname, but case insensitive).
   if (!exists('bg.pts') | !exists('bg')) {stop('requires data.frames called bg and bg.pts, to already be in memory, with varname col and FIPS and FIPS.COUNTY in bg, FIPS and lat and lon in bg.pts which is in proxistat pkg')}
