@@ -117,7 +117,7 @@
 #'   by=list(subunits$FIPS), FUN=function(x) {Hmisc::wtd.mean(x$score, wts=x$pop, na.rm=TRUE)}
 #' )
 #' print(unitscores)
-#' \donotrun{
+#' \dontrun{
 #' output = proxistat.chunked(blocks[ , c('lon','lat')], topoints=rmp, fromchunksize=10000, area=blocks$area / 1e6,
 #'    return.count=TRUE, return.nearest=TRUE )
 #' output=as.data.frame(output)

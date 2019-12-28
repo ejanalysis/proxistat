@@ -4,8 +4,14 @@
 \alias{testpoints}
 \title{Generate a number of randomly placed points, as latitude/longitude values.}
 \usage{
-testpoints(n, minlat = 40, maxlat = 42, minlon = -125,
-  maxlon = -70, as.df = TRUE)
+testpoints(
+  n,
+  minlat = 40,
+  maxlat = 42,
+  minlon = -125,
+  maxlon = -70,
+  as.df = TRUE
+)
 }
 \arguments{
 \item{n}{Numeric value, required, TRUE by default. Specifies how many testpoints to return. Must be an integer between zero and 50 million, and not NA.}

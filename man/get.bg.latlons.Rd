@@ -4,8 +4,13 @@
 \alias{get.bg.latlons}
 \title{Was used to get block group internal points directly from Census shapefiles}
 \usage{
-get.bg.latlons(myyear = 2014, mytempdir, mystatenums,
-  overwrite = FALSE, silent = FALSE)
+get.bg.latlons(
+  myyear = 2014,
+  mytempdir,
+  mystatenums,
+  overwrite = FALSE,
+  silent = FALSE
+)
 }
 \arguments{
 \item{myyear}{Year such as 2014 (default)}

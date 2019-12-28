@@ -4,10 +4,21 @@
 \alias{proxistat.chunked}
 \title{Call proxistat once per chunk & save output as file (breaks large input data into chunks)}
 \usage{
-proxistat.chunked(frompoints, topoints, fromchunksize, tochunksize,
-  startchunk = 1, FUN = proxistat, folder = getwd(),
-  savechunks = FALSE, assemble = TRUE, saveproxistats = FALSE, area,
-  file = "proxistats.RData", ...)
+proxistat.chunked(
+  frompoints,
+  topoints,
+  fromchunksize,
+  tochunksize,
+  startchunk = 1,
+  FUN = proxistat,
+  folder = getwd(),
+  savechunks = FALSE,
+  assemble = TRUE,
+  saveproxistats = FALSE,
+  area,
+  file = "proxistats.RData",
+  ...
+)
 }
 \arguments{
 \item{frompoints}{Require matrix or data.frame of lat/lon vauels that can be passed to get.distances function (colnames 'lat' and 'lon')}

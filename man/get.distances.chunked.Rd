@@ -4,8 +4,15 @@
 \alias{get.distances.chunked}
 \title{Call a function once per chunk & save output as file (breaks large input data into chunks)}
 \usage{
-get.distances.chunked(frompoints, topoints, fromchunksize, tochunksize,
-  FUN = get.distances, folder = getwd(), ...)
+get.distances.chunked(
+  frompoints,
+  topoints,
+  fromchunksize,
+  tochunksize,
+  FUN = get.distances,
+  folder = getwd(),
+  ...
+)
 }
 \arguments{
 \item{frompoints}{Require matrix or data.frame of lat/lon vauels that can be passed to get.distances function (colnames 'lat' and 'lon')}

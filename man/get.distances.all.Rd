@@ -4,9 +4,15 @@
 \alias{get.distances.all}
 \title{Find all distances between two sets of points (based on lat/lon)}
 \usage{
-get.distances.all(frompoints, topoints, units = "miles",
-  return.crosstab = FALSE, return.rownums = TRUE,
-  return.latlons = TRUE, as.df = TRUE)
+get.distances.all(
+  frompoints,
+  topoints,
+  units = "miles",
+  return.crosstab = FALSE,
+  return.rownums = TRUE,
+  return.latlons = TRUE,
+  as.df = TRUE
+)
 }
 \arguments{
 \item{frompoints}{A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed.}
@@ -88,7 +94,7 @@ x=get.distances.all(t10, t1k); head(x);summary(x$d)
 x=get.distances.all(t10, t1k, units='km'); head(x);summary(x$d)
 x=get.distances.all(t10, t1k, units='km'); head(x);summary(x$d)
 
-\\donotrun{
+\dontrun{
 require(UScensus2010blocks)
 blocks <- get.blocks(fields=c('fips','lat','lon'),charfips = FALSE)
 

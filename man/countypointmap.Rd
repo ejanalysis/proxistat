@@ -4,8 +4,16 @@
 \alias{countypointmap}
 \title{Simple map of color-coded block group centroids in county}
 \usage{
-countypointmap(query, vartext, varname, breaks = 5, coloring,
-  asp = c(1, 1), pch = 1, ...)
+countypointmap(
+  query,
+  vartext,
+  varname,
+  breaks = 5,
+  coloring,
+  asp = c(1, 1),
+  pch = 1,
+  ...
+)
 }
 \arguments{
 \item{query}{See \code{\link[ejanalysis]{get.county.info}}}

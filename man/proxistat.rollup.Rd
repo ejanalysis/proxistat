@@ -33,7 +33,7 @@ The population-weighted mean might not be the only statistic of interest. \cr
   is harder, because it requires retaining details on which sites were near a given block, i.e., much more data would be the input to an aggregating function.
 }
 \examples{
-\\donotrun{
+\dontrun{
 require(UScensus2010blocks); require(Hmisc); require(data.table); require(analyze.stuff); require(ejanalysis)
 blocks=get.blocks()
 bgp <- proxistat.rollup(output=output, blocksfips=blocks$fips, blocksfipsbg=blocks$FIPS.BG, blockspop=blocks$pop)

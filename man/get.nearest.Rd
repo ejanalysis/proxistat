@@ -4,8 +4,15 @@
 \alias{get.nearest}
 \title{Find distance from each point in a set to the nearest of a second set of points (by lat/lon).}
 \usage{
-get.nearest(frompoints, topoints, units = "miles", ignore0 = FALSE,
-  return.rownums = FALSE, return.latlons = FALSE, radius = Inf)
+get.nearest(
+  frompoints,
+  topoints,
+  units = "miles",
+  ignore0 = FALSE,
+  return.rownums = FALSE,
+  return.latlons = FALSE,
+  radius = Inf
+)
 }
 \arguments{
 \item{frompoints}{A matrix or data.frame with two cols, 'lat' and 'lon' (or only 2 cols that are lat and lon in that order) with datum=WGS84 assumed.}

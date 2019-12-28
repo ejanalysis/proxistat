@@ -4,10 +4,19 @@
 \alias{get.distances}
 \title{Find distances between nearby points, within specified radius.}
 \usage{
-get.distances(frompoints, topoints, radius = 5200, units = "miles",
-  ignore0 = FALSE, dfunc = "sp", as.df = FALSE,
-  return.rownums = TRUE, return.latlons = FALSE,
-  return.crosstab = FALSE, tailored.deltalon = FALSE)
+get.distances(
+  frompoints,
+  topoints,
+  radius = 5200,
+  units = "miles",
+  ignore0 = FALSE,
+  dfunc = "sp",
+  as.df = FALSE,
+  return.rownums = TRUE,
+  return.latlons = FALSE,
+  return.crosstab = FALSE,
+  tailored.deltalon = FALSE
+)
 }
 \arguments{
 \item{frompoints}{A matrix or data.frame with two cols, 'lat' and 'lon' with datum=WGS84 assumed.}

@@ -22,7 +22,7 @@
 #'   See also \code{\link[ejanalysis]{rollup}} via \url{http://ejanalysis.github.io/ejanalysis/}
 #' @concept proximity
 #' @examples
-#' \donotrun{
+#' \dontrun{
 #' require(UScensus2010blocks); require(Hmisc); require(data.table); require(analyze.stuff); require(ejanalysis)
 #' blocks=get.blocks()
 #' bgp <- proxistat.rollup(output=output, blocksfips=blocks$fips, blocksfipsbg=blocks$FIPS.BG, blockspop=blocks$pop)

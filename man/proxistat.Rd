@@ -4,9 +4,21 @@
 \alias{proxistat}
 \title{Proximity Statistic for Each Location and Nearby Points}
 \usage{
-proxistat(frompoints, topoints, area = 0, radius = 5, units = "km",
-  decay = "1/d", wts, return.count = FALSE, return.nearest = FALSE,
-  FIPS, pop, testing = FALSE, dfunc = "sp")
+proxistat(
+  frompoints,
+  topoints,
+  area = 0,
+  radius = 5,
+  units = "km",
+  decay = "1/d",
+  wts,
+  return.count = FALSE,
+  return.nearest = FALSE,
+  FIPS,
+  pop,
+  testing = FALSE,
+  dfunc = "sp"
+)
 }
 \arguments{
 \item{frompoints}{Locations of internal points of Census subunits. 
@@ -141,7 +153,7 @@ unitscores = aggregate(subunits,
   by=list(subunits$FIPS), FUN=function(x) {Hmisc::wtd.mean(x$score, wts=x$pop, na.rm=TRUE)}
 )
 print(unitscores)
-\\donotrun{
+\dontrun{
 output = proxistat.chunked(blocks[ , c('lon','lat')], topoints=rmp, fromchunksize=10000, area=blocks$area / 1e6,
    return.count=TRUE, return.nearest=TRUE )
 output=as.data.frame(output)

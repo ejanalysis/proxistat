@@ -9,14 +9,6 @@ gcd.hf(long1, lat1, long2, lat2)
 gcd.hf(long1, lat1, long2, lat2)
 }
 \arguments{
-\item{long1}{longitudes in radians, vector of one or more numbers}
-
-\item{lat1}{latitudes in radians, vector of one or more numbers}
-
-\item{long2}{longitudes in radians, vector of one or more numbers}
-
-\item{lat2}{latitudes in radians, vector of one or more numbers}
-
 \item{long1}{longitude(s) in radians, vector of one or more numbers}
 
 \item{lat1}{latitude(s) in radians, vector of one or more numbers}

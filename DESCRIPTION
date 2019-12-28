@@ -1,7 +1,8 @@
 Package: proxistat
 Title: Create a Proximity Score in Each Census Unit, Based on Distances to
     Specified Points
-Version: 0.1.1
+Version: 1.0.0
+Date: 2020-01-01
 Description: This package has functions helping to calculate distances between
     geographic points, such as the distances between all points, distances to
     all points within some maximum distance, distance to nearest single point,
@@ -26,9 +27,8 @@ Suggests:
     UScensus2010blocks
 URL: http://ejanalysis.github.io, https://github.com/ejanalysis/proxistat, http://www.ejanalysis.com/
 BugReports: https://github.com/ejanalysis/proxistat/issues
-Date: 2018-09-01
 Depends: R (>= 3.1.0)
-RoxygenNote: 6.1.0
+RoxygenNote: 7.0.2
 License: MIT + file LICENSE
 Repository: GitHub
 Author: info@ejanalysis.com
