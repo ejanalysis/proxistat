@@ -2,42 +2,40 @@
 % Please edit documentation in R/countypointmap.R
 \name{countypointmap}
 \alias{countypointmap}
-\title{Simple map of color-coded block group centroids in county}
+\title{Simple map of color-coded counties, wrapper for county_choropleth}
 \usage{
-countypointmap(
-  query,
-  vartext,
-  varname,
-  breaks = 5,
-  coloring,
-  asp = c(1, 1),
-  pch = 1,
-  ...
-)
+countypointmap(x, query = NULL, state_zoom, title = "", num_colors = 1, ...)
 }
 \arguments{
-\item{query}{See \code{\link[ejanalysis]{get.county.info}}}
+\item{x}{required vector of numeric values to plot}
 
-\item{vartext}{required, passed to \code{\link{pointmap}}.}
+\item{query}{flexible way to define what locations - default is all US counties - a set of countyfips  - See \code{\link[ejanalysis]{get.county.info}}}
 
-\item{varname}{required Name of column in data.frame bg, which must be in memory already.}
+\item{state_zoom}{optional but more flexible than in county_choropleth, which requires it be 
+the full state name all lowercase. This function instead accepts case-insensitive state name
+or two letter state abbreviation or state fips as number or text.}
 
-\item{breaks}{Default is 5, passed to \code{\link{cut}}}
+\item{title}{required, used in \code{\link[choroplethr]{county_choropleth}}}
 
-\item{coloring}{Default is colors[1:(length(breaks) + 1)] (unless breaks is 1, and then it is colors[1])}
+\item{num_colors}{Default is 1 (unlike default in county_choroplethr) for graded colors to show outliers well, passed to \code{\link[choroplethr]{county_choropleth}} . Max allowed is 9.}
 
-\item{asp}{Default is c(1,1), passed to \code{\link{pointmap}}.}
-
-\item{pch}{Default is 1, passed to \code{\link{pointmap}}.}
-
-\item{...}{Additional parameters to pass to \code{\link{pointmap}}.}
+\item{...}{Additional parameters like state_zoom (but in ), to pass to \code{\link[choroplethr]{county_choropleth}}}
 }
 \value{
 Just draws a map
 }
 \description{
-very simple mapping
+very simple mapping of color coded map of US counties.
+  This is just a wrapper for \code{\link[choroplethr]{county_choropleth}} 
+  but it is much more flexible in how the counties are specified.
+  While \code{\link[choroplethr]{county_choropleth}} requires statecounty fips numbers, 
+  and zooms in on a state defined by 2-digit fips, 
+  this wrapper lets you specify counties by full name like Cook County IL
+  or even one or more states 
+  
+  Also note acs package is useful such as for
+  county_choropleth_acs('B01001', endyear = 2018, state_zoom = 'new york')
 }
 \seealso{
-\code{\link{pointmap}}
+\code{\link[choroplethr]{county_choropleth}} \code{\link{pointmap}}
 }

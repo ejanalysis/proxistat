@@ -6,7 +6,8 @@
 \alias{lookup.states,}
 \alias{states}
 \title{States and related areas dataset}
-\format{A data.frame with 58 rows (States etc.) and 26 columns (variables like statename). 
+\format{
+A data.frame with 58 rows (States etc.) and 26 columns (variables like statename). 
   See \code{\link[ejanalysis]{get.state.info}} for more details.
 \itemize{
  \item  [1,] "statename"       
@@ -35,7 +36,8 @@
  \item [24,] "territorial.sqkm"
  \item [25,] "lat"             
  \item [26,] "lon"  
-}}
+}
+}
 \source{
 Derived from \url{https://www.census.gov/geo/reference/state-area.html} (for area data in square miles etc.)
   obtained 4/2015, and FIPS codes from Census Bureau.

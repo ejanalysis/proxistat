@@ -5,7 +5,8 @@
 \alias{countiesall}
 \alias{counties}
 \title{Counties information from U.S. Census Bureau from 2015}
-\format{A data.frame of 3234 U.S. Counties or County equivalents, with 5 variables. \cr\cr
+\format{
+A data.frame of 3234 U.S. Counties or County equivalents, with 5 variables. \cr\cr
 > str(countiesall) \cr
  'data.frame':	3235 obs. of  5 variables:
 \itemize{
@@ -23,7 +24,8 @@
  4 AL    Bibb County       01007   Alabama    Bibb County, Alabama \cr
  5 AL  Blount County       01009   Alabama  Blount County, Alabama \cr
  6 AL Bullock County       01011   Alabama Bullock County, Alabama \cr
-  }}
+  }
+}
 \source{
 Derived from Census Bureau, obtained early 2015.
 }
