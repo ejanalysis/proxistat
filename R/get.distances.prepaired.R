@@ -8,8 +8,8 @@
 #' This function returns a matrix or vector of distances, 
 #' between points specified as pairs of lat/lon values.
 #' Points are specified using latitude and longitude in decimal degrees.
-#' Relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
-#'
+#' Relies on the \pkg{sp} package for the \code{\link[sp]{spDistsN1}} and \code{\link[sp]{SpatialPoints}} functions.
+#' 
 #' @param pts A matrix or data.frame that has columns names 'fromlon', 'fromlat', 'tolon', 'tolat' with datum=WGS84 assumed.
 #' @return Returns a vector of distances as numbers, in kilometers. Each element corresponds to one row in pts.
 #' @seealso \code{\link{get.distances.all}} for a useful general function, \code{\link{get.distances}} for get.distances() which allows you to specify a search radius and 

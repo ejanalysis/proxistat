@@ -63,7 +63,8 @@ This function returns a matrix or vector of distances,
  It searches within a circle (of radius = radius, defining what is considered nearby), 
  to calculate distance (in miles or km) from each of frompoints to each of topoints that is within the specified radius.
  Points are specified using latitude and longitude in decimal degrees.  \cr \cr
- Uses \code{\link{get.distances.all}}. Relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.   \cr \cr
+ Uses \code{\link{get.distances.all}}. 
+ Relies on the \pkg{sp} package for the \code{\link[sp]{spDistsN1}} and \code{\link[sp]{SpatialPoints}} functions.   \cr \cr
  Regarding distance calculation, also see \url{http://en.wikipedia.org/wiki/Vincenty\%27s_formulae}, 
  \url{http://williams.best.vwh.net/avform.htm#Dist}, \url{http://sourceforge.net/projects/geographiclib/}, 
  and \url{http://www.r-bloggers.com/great-circle-distance-calculations-in-r/}.  \cr \cr

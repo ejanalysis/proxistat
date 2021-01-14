@@ -89,7 +89,7 @@ This is the same as the sum of inverse distances.
 The harmonic mean distance (see \code{\link[analyze.stuff]{harmean}}) is the inverse of the arithmetic mean of the inverses, or n / (sum of inverses). \cr \cr
 Nearby is defined as a user-specified parameter, so only points within the specified distance are counted, except if none are nearby,
 the single nearest point (at any distance) is used. \cr\cr
-Default relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
+Default relies on the \pkg{sp} package for the \code{\link[sp]{spDistsN1}} and \code{\link[sp]{SpatialPoints}} functions.
 Other values of dfunc parameter are slower. \cr\cr
 IMPORTANT: \cr\cr
 To create a proximity score for a block group, one can find the score for each block in the block group

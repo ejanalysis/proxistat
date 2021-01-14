@@ -3,7 +3,7 @@
 #' @description Returns all the distances from one set of geographic points to another set of points.
 #' Can return a matrix of distances (m x n points) or vector or data.frame with one row per pair.
 #' Lets you specify units and whether you need lat/lon etc, but essentially just a wrapper for
-#' the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions.
+#' the \pkg{sp} package for the \code{\link[sp]{spDistsN1}} and \code{\link[sp]{SpatialPoints}} functions.
 #' @details
 #' *** Probably slower than it needs to be partly by using data.frame instead of matrix class? Roughly 10-20% faster if as.df=FALSE than if TRUE.
 #' Just using get.distances.all is reasonably fast? (30-40 seconds for 100 million distances, but slow working with results so large),

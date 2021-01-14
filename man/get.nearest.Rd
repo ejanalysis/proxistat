@@ -46,7 +46,7 @@ By default, returns a vector of distances, but can return a matrix of numbers, w
 This function returns a vector of distances, 
 which are the distances from one set of points to the nearest single member (if any) of another set of points.
 Points are specified using latitude and longitude in decimal degrees.
-Relies on the \pkg{sp} package for the \code{\link[sp]{spDists}} and \code{\link[sp]{SpatialPoints}} functions. \cr \cr
+Relies on the \pkg{sp} package for the \code{\link[sp]{spDistsN1}} and \code{\link[sp]{SpatialPoints}} functions. \cr \cr
 
 A future version may use get.distances.all() but for performance only use it for distance pairs (pairs of points) that have been initially 
 quickly filtered using lat/lon to be not too far, in an attempt to go much faster in an initial pass.
