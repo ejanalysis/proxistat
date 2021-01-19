@@ -76,7 +76,7 @@
 #' x=get.distances.all(t10, t1k, units='km'); head(x);summary(x$d)
 #'
 #'\dontrun{
-#' require(UScensus2010blocks)
+#' require(UScensus2010blocks) # for the get.blocks() function and dataset
 #' blocks <- get.blocks(fields=c('fips','lat','lon'),charfips = FALSE)
 #' 
 #'}
