@@ -34,8 +34,12 @@ The population-weighted mean might not be the only statistic of interest. \cr
 }
 \examples{
 \dontrun{
-require(UScensus2010blocks); require(Hmisc); require(data.table); require(analyze.stuff); require(ejanalysis)
-blocks=get.blocks()
+# require(Hmisc); require(data.table)
+# require("devtools") # to obtain packages via devtools::github_install()
+#  These are on github.com/ejanalysis 
+# require(UScensus2010blocks) # for the get.blocks() function and dataset
+require(analyze.stuff); require(ejanalysis)
+blocks <- get.blocks()
 bgp <- proxistat.rollup(output=output, blocksfips=blocks$fips, blocksfipsbg=blocks$FIPS.BG, blockspop=blocks$pop)
 }
 }
