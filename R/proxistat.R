@@ -14,6 +14,7 @@
 #' The default proximity score, using 1/d, is the count of nearby points divided by the harmonic mean of their distances (n/harmean), 
 #' (but adjusted when distance is very small, and using the nearest single one if none are nearby). 
 #' This is the same as the sum of inverse distances. 
+#' Note that Inf is returned as score if 1/d used and distance is ever 0 like where to and from are same point. Does not do a 1/d score for only the ones at nonzero distance. 
 #' The harmonic mean distance (see \code{\link[analyze.stuff]{harmean}}) is the inverse of the arithmetic mean of the inverses, or n / (sum of inverses). \cr \cr
 #' Nearby is defined as a user-specified parameter, so only points within the specified distance are counted, except if none are nearby,
 #' the single nearest point (at any distance) is used. \cr\cr
@@ -96,19 +97,19 @@
 #'
 #' set.seed(999)
 #' t1=testpoints(1)
-#' t10=testpoints(10)
-#' t100=testpoints(100)
+#' t10=testpoints(10)  # t1=t10[3,] 
+#' t100=testpoints(100) # t10[2,] <- t100[5,] 
 #' t1k=testpoints(1e3)
 #' t10k=testpoints(1e4)
 #' t100k=testpoints(1e5)
 #' t1m=testpoints(1e6)
 #'
-#' proxistat(t1, t10k, radius=1, units='km')
+#' proxistat(t1, t10k, radius=50, units='km')
 #'
 #' proxistat(t10, t10k)
 #'
 #' subunitscores = proxistat(frompoints=test.from, topoints=test.to,
-#'   area=rep(0.2, length(test.from[,1])), radius=1, units='km')
+#'   area=rep(0.2, length(test.from[,1])), radius=50, units='km')
 #' print(subunitscores)
 #' subunitpop = rep(1000, length(test.from$lat))
 #' subunits = data.frame(FIPS=substr(rownames(test.from), 1, 5), 
@@ -161,7 +162,11 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
 	  if (any(area < 0)  ) {stop('area must be >= 0 ')}
 	}
   if (!(decay %in% c('1/d', '1/d^2', '1'))) {stop('invalid decay parameter')}
-  if (!missing(wts) & any( !is.numeric(wts) | !is.vector(wts) | length(wts) != length(topoints[,1]) )) {stop('If specified, wts must be a numeric vector of same length as number of topoints')} 
+  if (missing(wts)) {
+    # ok
+  } else {
+    if (!missing(wts) & any( !is.numeric(wts) | !is.vector(wts) | length(wts) != length(topoints[,1]) )) {stop('If specified, wts must be a numeric vector of same length as number of topoints')} 
+  }
 
   # handle cases where an input is only one row (one point)
   if (is.vector(frompoints)) {mycols <- names(frompoints); frompoints <- matrix(frompoints, nrow = 1); dimnames(frompoints)[[2]] = mycols }
@@ -219,7 +224,23 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   # which topoint was the nearest?
   # Accounts for maybe 10% of all time in this function
   #nearestone.d <-  rowMins(ddf) # this was a bit slower than method below
-  nearestone.colnum <- apply(ddf, 1, which.min)  # about 4 seconds for 10k x 10k matrix, for example
+  
+  if ((NROW(ddf) == 1) & (NCOL(ddf) != 1)) {
+    #IF frompoints is just 1 point but many to... ***********
+    nearestone.colnum <- 1 # which.min(ddf) 
+  } 
+    # nearestone.colnum <- apply(ddf, 1, which.min)  # about 4 seconds for 10k x 10k matrix, for example
+  
+  if ((NROW(ddf) != 1) & (NCOL(ddf) == 1)) {
+    #IF topoints is just 1 point but many from... ***********
+    nearestone.colnum <- 1 # which.min(ddf) 
+  } 
+  
+  if ((NROW(ddf) > 1) & (NCOL(ddf) > 1)) {
+    #IF topoints and frompoints are both >1 ***********
+    nearestone.colnum <- apply(ddf, 1, which.min)  # about 4 seconds for 10k x 10k matrix, for example
+  }
+  
   # how far away was that one nearest to each frompoint?
   nearestone.d <- ddf[ cbind(1:NROW(ddf), nearestone.colnum) ]
   
@@ -233,7 +254,11 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   
   if (return.count) {
     # record how many are within the radius (<<2% of all time is spent here)
-    count.near <- rowSums(!is.na(ddf))
+    if ((NROW(ddf) == 1) | (NCOL(ddf) == 1)) {
+      count.near <- sum(!is.na(ddf))
+    } else {
+      count.near <- rowSums(!is.na(ddf))
+    }
   }
 
   if (testing) {cat('ddf with final d adjusted up where was <min.dist, but dropped if adjusted to > radius: \n\n');print(ddf);cat('\n\n')}
@@ -247,12 +272,16 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   # use distance to nearest single topoint
   ######################################## #
   
-  # note which frompoints had zero within the radius (negligible time)
-  fromrow.0near <- which(rowSums(ddf, na.rm = TRUE) == 0)
-  
-  # put back in the distance that was the nearest one, but only for rows where none were within radius
-  # fast
-  ddf[ cbind(1:NROW(ddf), nearestone.colnum) ][fromrow.0near ] <- nearestone.d[fromrow.0near]
+  if ((NROW(ddf) == 1) | (NCOL(ddf) == 1)) {
+    fromrow.0near <- which(is.na(ddf))
+    ddf[fromrow.0near ] <- nearestone.d[fromrow.0near] # not tested ******
+  } else {
+    # note which frompoints had zero within the radius (negligible time)
+    fromrow.0near <- which(rowSums(ddf, na.rm = TRUE) == 0)
+    # put back in the distance that was the nearest one, but only for rows where none were within radius
+    # fast
+    ddf[ cbind(1:NROW(ddf), nearestone.colnum) ][fromrow.0near, ] <- nearestone.d[fromrow.0near] # one number per from point with 0 nearby
+  }
   
   if (testing) {cat('fromrow.0near = '); print(fromrow.0near)}
   if (testing) {cat('\nlength of fromrow.0near = ');print(length(fromrow.0near));cat('\n\n')}
@@ -265,10 +294,18 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   ##################################### #
   
   if (!missing(wts)) {
-    # wts is as long as a row of ddf (one for each of the topoints), so use t(t(ddf)*wts) to multiply by wts correctly
-    results <- cbind(scores = decayfunction(t(t(ddf) * wts)))
+    if (NROW(ddf) == 1 | NCOL(ddf) == 1) {
+      results <- cbind(scores = decayfunction(t(t( array(ddf, dim = c(NROW(ddf), NCOL(ddf)) )) * wts)))
+    } else {
+      # wts is as long as a row of ddf (one for each of the topoints), so use t(t(ddf)*wts) to multiply by wts correctly
+      results <- cbind(scores = decayfunction(t(t(ddf) * wts)))
+    }
   } else {
-    results <- cbind(scores = decayfunction(ddf))  # fast if unwtd
+    if (NROW(ddf) == 1 | NCOL(ddf) == 1) {
+      results <- cbind(scores = decayfunction( array(ddf, dim = c(NROW(ddf), NCOL(ddf))) ))  # fast if unwtd ... NOTE Inf returned if 1/d used and distance is 0 like where to and from are same point
+    } else {
+      results <- cbind(scores = decayfunction(ddf))  # fast if unwtd ... NOTE Inf returned if 1/d used and distance is 0 like where to and from are same point
+    }
   }
   
   if (return.count) {
@@ -279,9 +316,7 @@ proxistat <- function(frompoints, topoints, area=0, radius=5, units='km', decay=
   if (return.nearest) {
     results <- cbind(results, nearestone.d = nearestone.d)
   }
-
   return(results)
-
 }
 
 
