@@ -9,6 +9,11 @@
 #' @export
 #'
 #' @examples 
+#' #library(jsonlite)
+#' #library(httr)
+#' #library(tidyverse) # need magrittr
+#' #library(data.table)
+#' #library(sf)
 #' # pts <- proxistat::testpoints_block2010(10)
 #' # benchmark.start <- Sys.time()
 #' # outlist <- proxistat::bufferapi(pts$lon, lat=pts$lat, radius = 5)

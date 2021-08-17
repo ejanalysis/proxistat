@@ -6,25 +6,35 @@
 \usage{
 testpoints(
   n,
+  weighting = "area",
+  ST,
+  as.df = TRUE,
   minlat = 40,
   maxlat = 42,
   minlon = -125,
-  maxlon = -70,
-  as.df = TRUE
+  maxlon = -70
 )
 }
 \arguments{
 \item{n}{Numeric value, required, TRUE by default. Specifies how many testpoints to return. Must be an integer between zero and 50 million, and not NA.}
 
-\item{minlat}{Default 40. A number that is the minimum latitude in decimal degrees to use for generating random points within some range.}
+\item{weighting}{area or people or geo ... text indicating what type of weighting, by area or people or geo (each block or block group has equal chance).
+Default is area - a random square mile not a random residence or random Census geometry.}
 
-\item{maxlat}{Default 42. A number that is the maximum latitude in decimal degrees to use for generating random points within some range.}
-
-\item{minlon}{Default -125. A number that is the minimum longitude in decimal degrees to use for generating random points within some range.}
-
-\item{maxlon}{Default -70. A number that is the maximum longitude in decimal degrees to use for generating random points within some range.}
+\item{ST}{optional vector of 2 letter state abbreviations, to limit it to some state(s). Default is all USA (including PR I think).}
 
 \item{as.df}{Logical, default is TRUE, in which case returns a data.frame, otherwise a matrix.}
+
+\item{minlat}{not used anymore. Default 40. A number that is the minimum latitude in decimal degrees to use for generating random points within some range.}
+
+\item{maxlat}{not used anymore.Default 42. A number that is the maximum latitude in decimal degrees to use for generating random points within some range.}
+
+\item{minlon}{not used anymore.Default -125. A number that is the minimum longitude in decimal degrees to use for generating random points within some range.}
+
+\item{maxlon}{not used anymore.Default -70. A number that is the maximum longitude in decimal degrees to use for generating random points within some range.}
+
+\item{useblocks}{logical, whether to use the approx 11 mill. Census blocks if TRUE (from github package UScensus2010blocks), 
+or just the approx 220k block groups (from github package ejscreen) if FALSE which is faster}
 }
 \value{
 By default, returns a data.frame (or matrix if as.df=FALSE) that has 2 columns: lat and lon, in decimal degrees, with 1 row per point.
@@ -33,8 +43,13 @@ By default, returns a data.frame (or matrix if as.df=FALSE) that has 2 columns: 
 Generate a number of randomly placed points, as latitude/longitude values.
 }
 \details{
-This function returns n points at random locations using uniform distributions of latitude and longitude values, with specified ranges.
-Points are specified using latitude and longitude in decimal degrees.
+This function returns n points at random location latitude and longitude values, 
+weighted by area or by population count in block group, to be roughly representative of 
+either a random location (like throwing a dart, equal weight per square mile of land area - does not include water area in weighting but can return a point in water if bg has internal point in water?!)
+or where a randomly selected US resident lives (population weighted).
+Points are returned as latitude and longitude in decimal degrees. 
+For people weighted, it picks from the Census blockgroup internal points (2010), (or could change to use blocks?)
+ which are much more representative of where people live than a random square mile would be.
 }
 \examples{
 testpoints(19,minlat=47,maxlat=48)

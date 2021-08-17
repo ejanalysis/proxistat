@@ -16,6 +16,11 @@
 #' @export
 #'
 #' @examples 
+#' #library(jsonlite)
+#' #library(httr)
+#' #library(tidyverse) # need magrittr
+#' #library(data.table)
+#' #library(sf)
 #' # pts <- proxistat::testpoints_bg20(10)
 #' # benchmark.start <- Sys.time()
 #' # outlist <- proxistat::bufferapi(pts$lon, lat=pts$lat, radius = 5)
@@ -28,25 +33,25 @@
 testpoints_bg20 <- function(size, popwtd = TRUE) {
 
   if (popwtd) {
-    randomrows <- sample(1:length(bg20$pop), size = size, replace = FALSE, prob = ejscreen::bg20$pop)
+    randomrows <- sample(1:length(ejscreen::bg20$pop), size = size, replace = FALSE, prob = ejscreen::bg20$pop)
     #testpoints_x(x=ejscreen::bg20[ , c('lon', 'lat')], size = size, prob = ejscreen::bg20$pop)
   } else {
-    randomrows <- sample(1:length(bg20$pop), size = size, replace = FALSE)
+    randomrows <- sample(1:length(ejscreen::bg20$pop), size = size, replace = FALSE)
     #testpoints_x(x=ejscreen::bg20[ , c('lon', 'lat')], size = size, prob = NULL)
   }
-  pts <- data.frame(lon = bg20$lon[randomrows], lat= bg20$lat[randomrows])
+  pts <- data.frame(lon = ejscreen::bg20$lon[randomrows], lat= ejscreen::bg20$lat[randomrows])
   return(pts)
 }
 
 testpoints_bg21 <- function(size, popwtd = TRUE) {
   if (popwtd) {
-    randomrows <- sample(1:length(bg21$pop), size = size, replace = FALSE, prob = ejscreen::bg21$pop)
-    #testpoints_x(x=ejscreen::bg20[ , c('lon', 'lat')], size = size, prob = ejscreen::bg20$pop)
+    randomrows <- sample(1:length(ejscreen::bg21$pop), size = size, replace = FALSE, prob = ejscreen::bg21$pop)
+    #testpoints_x(x=ejscreen::bg21[ , c('lon', 'lat')], size = size, prob = ejscreen::bg21$pop)
   } else {
     randomrows <- sample(1:length(bg21$pop), size = size, replace = FALSE)
-    #testpoints_x(x=ejscreen::bg20[ , c('lon', 'lat')], size = size, prob = NULL)
+    #testpoints_x(x=ejscreen::bg21[ , c('lon', 'lat')], size = size, prob = NULL)
   }
-  pts <- data.frame(lon = bg21$lon[randomrows], lat= bg21$lat[randomrows])
+  pts <- data.frame(lon = ejscreen::bg21$lon[randomrows], lat= ejscreen::bg21$lat[randomrows])
   return(pts)
 }
 

@@ -8,6 +8,11 @@
 #' @export
 #'
 #' @examples 
+#' #library(jsonlite)
+#' #library(httr)
+#' #library(tidyverse) # need magrittr
+#' #library(data.table)
+#' #library(sf)
 #' # pts <- proxistat::testpoints_bg20(10)
 #' # benchmark.start <- Sys.time()
 #' # outlist <- proxistat::bufferapi(pts$lon, lat=pts$lat, radius = 5)
@@ -45,7 +50,8 @@ bufferapi <- function(lon, lat, radius=5) {
     # Only return data from calls without errors
     # Note: api doesn't return values for coords in highly nonpopulated areas.
     if (dim(ej.data)[2] > 100){
-      outlist[[i]] <- unique(ej.data[, geometry := NULL])
+      #outlist[[i]] <- unique(ej.data[, geometry := NULL]) # not sure why this line stopped working
+      outlist[[i]] <- unique(ej.data[, -166])
     }
     #rm(ej.data)
   } # end of loop over buffers

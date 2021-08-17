@@ -86,6 +86,7 @@ where d is the distance from census unit's internal point to user-defined point.
 The default proximity score, using 1/d, is the count of nearby points divided by the harmonic mean of their distances (n/harmean), 
 (but adjusted when distance is very small, and using the nearest single one if none are nearby). 
 This is the same as the sum of inverse distances. 
+Note that Inf is returned as score if 1/d used and distance is ever 0 like where to and from are same point. Does not do a 1/d score for only the ones at nonzero distance. 
 The harmonic mean distance (see \code{\link[analyze.stuff]{harmean}}) is the inverse of the arithmetic mean of the inverses, or n / (sum of inverses). \cr \cr
 Nearby is defined as a user-specified parameter, so only points within the specified distance are counted, except if none are nearby,
 the single nearest point (at any distance) is used. \cr\cr
@@ -132,19 +133,19 @@ test.to <- structure(list(tolat = c(38.9575019287, 38.9507043428, 38.9514152435)
 
 set.seed(999)
 t1=testpoints(1)
-t10=testpoints(10)
-t100=testpoints(100)
+t10=testpoints(10)  # t1=t10[3,] 
+t100=testpoints(100) # t10[2,] <- t100[5,] 
 t1k=testpoints(1e3)
 t10k=testpoints(1e4)
 t100k=testpoints(1e5)
 t1m=testpoints(1e6)
 
-proxistat(t1, t10k, radius=1, units='km')
+proxistat(t1, t10k, radius=50, units='km')
 
 proxistat(t10, t10k)
 
 subunitscores = proxistat(frompoints=test.from, topoints=test.to,
-  area=rep(0.2, length(test.from[,1])), radius=1, units='km')
+  area=rep(0.2, length(test.from[,1])), radius=50, units='km')
 print(subunitscores)
 subunitpop = rep(1000, length(test.from$lat))
 subunits = data.frame(FIPS=substr(rownames(test.from), 1, 5), 
