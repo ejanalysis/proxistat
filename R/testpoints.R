@@ -32,10 +32,10 @@
 #' @concept proximity
 #' @examples
 #' testpoints(19,minlat=47,maxlat=48)
-#' get.distances(testpoints(1000),testpoints[10],radius=999,return.rownums=TRUE,return.latlons=TRUE)
+#' get.distances(testpoints(100),testpoints[10],radius=999,return.rownums=TRUE,return.latlons=TRUE)
 #'     
 #' @export
-testpoints <- function(n, weighting='area', ST, as.df=TRUE, minlat=40, maxlat=42, minlon=-125, maxlon=-70) { 
+testpoints <- function(n, weighting='area', ST, as.df=TRUE, minlat=40, maxlat=42, minlon=-125, maxlon=-70, useblocks=FALSE) { 
   is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  abs(x - round(x)) < tol
   if (missing(n) || !is.numeric(n) || is.na(n) || !is.wholenumber(n) || is.infinite(n) || n < 0 || n > 5e7) {
     if (n == 1e6) {warning('a million is a lot')}

@@ -12,7 +12,8 @@ testpoints(
   minlat = 40,
   maxlat = 42,
   minlon = -125,
-  maxlon = -70
+  maxlon = -70,
+  useblocks = FALSE
 )
 }
 \arguments{
@@ -53,7 +54,7 @@ For people weighted, it picks from the Census blockgroup internal points (2010),
 }
 \examples{
 testpoints(19,minlat=47,maxlat=48)
-get.distances(testpoints(1000),testpoints[10],radius=999,return.rownums=TRUE,return.latlons=TRUE)
+get.distances(testpoints(100),testpoints[10],radius=999,return.rownums=TRUE,return.latlons=TRUE)
     
 }
 \seealso{

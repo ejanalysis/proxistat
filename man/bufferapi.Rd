@@ -2,20 +2,20 @@
 % Please edit documentation in R/bufferapi.R
 \name{bufferapi}
 \alias{bufferapi}
-\title{Use EJSCREEN API to get buffer results (conditions near each site)}
+\title{Title}
 \usage{
 bufferapi(lon, lat, radius = 5)
 }
 \arguments{
-\item{lon}{vector of longitudes in decimal degrees}
+\item{lon}{}
 
-\item{lat}{vector of latitudes in decimal degrees}
+\item{lat}{}
 
-\item{radius}{single number, for all buffer circles (distance from site) (meters?)}
+\item{radius}{}
 }
 \value{
-list of data.frames, one per buffer (one per site defined by a lat lon pair)
+
 }
 \description{
-Use EJSCREEN API to get buffer results (conditions near each site)
+Title
 }

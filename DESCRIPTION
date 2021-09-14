@@ -1,8 +1,8 @@
 Package: proxistat
 Title: Create a Proximity Score in Each Census Unit, Based on Distances to
     Specified Points
-Version: 1.0.0
-Date: 2020-01-01
+Version: 1.1
+Date: 2021-09-09
 Description: This package has functions helping to calculate distances between
     geographic points, such as the distances between all points, distances to
     all points within some maximum distance, distance to nearest single point,
@@ -21,7 +21,11 @@ Imports:
     sp,
     analyze.stuff,
     Hmisc,
-    data.table
+    data.table,
+    tidyverse,
+    sf,
+    httr,
+    jsonlite
 Suggests:
     matrixStats,
     UScensus2010blocks

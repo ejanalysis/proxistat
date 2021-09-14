@@ -20,13 +20,16 @@ Prints to console and returns rate of buffers per hour
 Print summary of speed in buffers per hour, given start and end times of batch
 }
 \examples{
-# pts <- proxistat::testpoints_block2010(10)
-# benchmark.start <- Sys.time()
-# outlist <- proxistat::bufferapi(pts$lon, lat=pts$lat, radius = 5)
-# benchmark.end <- Sys.time()
-# proxistat::speedsummary(benchmark.start, benchmark.end, NROW(pts))
+\dontrun{
+ pts <- proxistat::testpoints_block2010(10)
+ benchmark.start <- Sys.time()
+ outlist <- proxistat::bufferapi(pts$lon, lat=pts$lat, radius = 5)
+ benchmark.end <- Sys.time()
+ proxistat::speedsummary(benchmark.start, benchmark.end, NROW(pts))
  # VISUALIZE variability in speed
- # hist(as.numeric(unlist(lapply(outlist, FUN =function(x) x$timeSeconds)), na.rm = T),100, 
- #   main = 'Histogram of seconds per buffer', xlab='Seconds elapsed for a buffer query of API')
+ hist(as.numeric(unlist(lapply(outlist, FUN =function(x) x$timeSeconds)), na.rm = T),100, 
+    main = 'Histogram of seconds per buffer', xlab='Seconds elapsed for a buffer query of API')
+ cat('Note that results were unavailable for', sum(sapply(outlist, FUN = is.null)),'out of the', length(outlist), 'buffers.', '\n')
+}
 
 }

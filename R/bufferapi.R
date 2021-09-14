@@ -1,30 +1,12 @@
-#' Use EJSCREEN API to get buffer results (conditions near each site)
+#' Title
 #'
-#' @param lon vector of longitudes in decimal degrees
-#' @param lat vector of latitudes in decimal degrees
-#' @param radius single number, for all buffer circles (distance from site) (meters?)
+#' @param lon 
+#' @param lat 
+#' @param radius 
 #'
-#' @return list of data.frames, one per buffer (one per site defined by a lat lon pair)
+#' @return
 #' @export
 #'
-#' @examples 
-#' #library(jsonlite)
-#' #library(httr)
-#' #library(tidyverse) # need magrittr
-#' #library(data.table)
-#' #library(sf)
-#' # pts <- proxistat::testpoints_bg20(10)
-#' # benchmark.start <- Sys.time()
-#' # outlist <- proxistat::bufferapi(pts$lon, lat=pts$lat, radius = 5)
-#' # benchmark.end <- Sys.time()
-#' # proxistat::speedsummary(benchmark.start, benchmark.end, NROW(pts))
-#' 
-#'  # VISUALIZE variability in speed
-#'  # hist(as.numeric(unlist(lapply(outlist, FUN =function(x) x$timeSeconds)), na.rm = T),100, 
-#'  #   main = 'Histogram of seconds per buffer', xlab='Seconds elapsed for a buffer query of API')
-#'     
-#'  # api.datalist <- data.table::rbindlist(outlist, fill = T, idcol = 'id')
-#'  
 bufferapi <- function(lon, lat, radius=5) {
   
   benchmark.start <- Sys.time()
@@ -41,11 +23,10 @@ bufferapi <- function(lon, lat, radius=5) {
              pts$lon[[i]], ',"y":', pts$lat[[i]],
              '}&distance=', radius,'&unit=9035&areatype=&areaid=&f=pjson')
       #'}&distance=5&unit=9035&areatype=&areaid=&f=pjson')
-    )$content %>%
-      rawToChar() %>%
-      fromJSON() %>% 
-      as.data.table()
+    )$content
     
+    ej.data <- as.data.table(fromJSON(rawToChar(ej.data)))
+     
     # Not clear why this: 
     # Only return data from calls without errors
     # Note: api doesn't return values for coords in highly nonpopulated areas.
@@ -75,4 +56,3 @@ bufferapi <- function(lon, lat, radius=5) {
   
   return(outlist)
 }
-

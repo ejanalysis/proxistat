@@ -4,6 +4,10 @@ if (1 == 0) {
 # SCRIPT SHOWING EXAMPLE OF HOW ONE COULD USE THE EJSCREEN API TO GET BUFFER RESULTS
 #####################################################
 
+  # also just see the examples in  bufferapi()  
+  
+  
+  
 ### Preliminaries - clear memory, load packages
 rm(list=ls(all=TRUE))
 
@@ -25,10 +29,11 @@ library(EJSCREENbatch) # This is another draft buffering tool, for EJSCREENbatch
 # Specify test data points
 ## Draw random sample of lat/longs
 
-sample.count <- 1000
+sample.count <- 100
 pts <- proxistat::testpoints_block2010(sample.count)
 
 ####################################################
+
 
 ####################################
 # Use API and test it for speed 
