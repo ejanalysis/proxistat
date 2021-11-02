@@ -6,12 +6,18 @@
 #'
 #' @export
 #'
-#' @examples  sample.count <- 10
+#' @examples  
+#'   \dontrun{
+#'   sample.count <- 10
 #'   pts <- proxistat::testpoints_block2010(sample.count)
 #'   outlist <- proxistat::bufferapi(pts$lon, lat=pts$lat, radius = 3)
 #'   summary(outlist)
 #'   class(outlist[[1]])
 #'   names(outlist[[1]])
+#'   x <- do.call(rbind, outlist)
+#'   x[,c(1:18,162:173)]
+#'   t(x[1:2,]) 
+#'   }
 bufferapi <- function(lon, lat, radius=5) {
   
   benchmark.start <- Sys.time()

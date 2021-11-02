@@ -17,10 +17,16 @@ bufferapi(lon, lat, radius = 5)
 Use the EJSCREEN API to get standard report for each of one or more circular buffers
 }
 \examples{
- sample.count <- 10
+ 
+  \dontrun{
+  sample.count <- 10
   pts <- proxistat::testpoints_block2010(sample.count)
   outlist <- proxistat::bufferapi(pts$lon, lat=pts$lat, radius = 3)
   summary(outlist)
   class(outlist[[1]])
   names(outlist[[1]])
+  x <- do.call(rbind, outlist)
+  x[,c(1:18,162:173)]
+  t(x[1:2,]) 
+  }
 }
