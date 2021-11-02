@@ -62,6 +62,11 @@ if (1 == 0) {
   
   table(sapply(outlist, FUN = is.null))  # 40% were NULL, for example in one test
   
+     x <- do.call(rbind, outlist)
+     x[,c(1:18,162:173)]
+     t(x[1:2,]) 
+  
+  
   #####################################################
   
   
