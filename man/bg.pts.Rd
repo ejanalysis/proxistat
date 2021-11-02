@@ -21,7 +21,7 @@ Derived from Census Bureau, obtained early 2015.
 data('bg.pts')
 }
 \description{
-This data set provides a data.frame with 220740 block groups, with 5 variables.
+Needs to be updated to 2020 Census. This data set provides a data.frame with 220740 block groups, with 5 variables.
 }
 \seealso{
 \pkg{UScensus2010blocks} and  \pkg{acs}  

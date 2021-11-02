@@ -1,12 +1,17 @@
-#' Title
+#' Use the EJSCREEN API to get standard report for each of one or more circular buffers
 #'
-#' @param lon 
-#' @param lat 
-#' @param radius 
+#' @param lon Longitude numeric vector
+#' @param lat Latitude numeric vector
+#' @param radius radius of circular buffer - I think in miles but should confirm
 #'
-#' @return
 #' @export
 #'
+#' @examples  sample.count <- 10
+#'   pts <- proxistat::testpoints_block2010(sample.count)
+#'   outlist <- proxistat::bufferapi(pts$lon, lat=pts$lat, radius = 3)
+#'   summary(outlist)
+#'   class(outlist[[1]])
+#'   names(outlist[[1]])
 bufferapi <- function(lon, lat, radius=5) {
   
   benchmark.start <- Sys.time()
@@ -17,24 +22,30 @@ bufferapi <- function(lon, lat, radius=5) {
   for (i in 1:dim(pts)[1]){
     print(paste0('Iteration #: ', i))
     
-    ej.data <- GET(
+    # Not entirely sure this GET() is the one from the httr package, so I guessed
+    ej.data <- httr::GET(
       paste0('https://ejscreen.epa.gov/mapper/ejscreenRESTbroker.aspx?namestr=&',
              'geometry={"spatialReference":{"wkid":4326},"x":',
              pts$lon[[i]], ',"y":', pts$lat[[i]],
              '}&distance=', radius,'&unit=9035&areatype=&areaid=&f=pjson')
-      #'}&distance=5&unit=9035&areatype=&areaid=&f=pjson')
+      #    '}&distance=5&unit=9035&areatype=&areaid=&f=pjson')
     )$content
     
-    ej.data <- as.data.table(fromJSON(rawToChar(ej.data)))
-     
-    # Not clear why this: 
+    #
+    ### Not sure which package this fromJSON() was intended to be from...  (and not sure they are identical, ie if it matters)
+    # That same function name is used by RJSONIO and  jsonlite  and  rjson
+    # This use of fromJSON was I think from an example provided by Victoria S maybe
+    #
+    ej.data <- data.table::as.data.table(jsonlite::fromJSON(rawToChar(ej.data)))
+    
+    # Not clear why this:
     # Only return data from calls without errors
-    # Note: api doesn't return values for coords in highly nonpopulated areas.
+    # Note: api does not return values for coords in highly nonpopulated areas.
     if (dim(ej.data)[2] > 100){
-      #outlist[[i]] <- unique(ej.data[, geometry := NULL]) # not sure why this line stopped working
+      # outlist[[i]] <- unique(ej.data[, geometry := NULL]) # not sure why this line stopped working. was it relying on data.table or some other package? for the := maybe?
       outlist[[i]] <- unique(ej.data[, -166])
     }
-    #rm(ej.data)
+    # rm(ej.data)
   } # end of loop over buffers
   
   benchmark.end <- Sys.time()

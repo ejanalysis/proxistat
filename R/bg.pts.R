@@ -2,7 +2,7 @@
 #' @docType data
 #' @aliases bg.pts
 #' @title Block group internal points and areas (square meters) from Census Bureau for 2010 geographies
-#' @description This data set provides a data.frame with 220740 block groups, with 5 variables.
+#' @description Needs to be updated to 2020 Census. This data set provides a data.frame with 220740 block groups, with 5 variables.
 #' @seealso \pkg{UScensus2010blocks} and  \pkg{acs}  
 #'   and the Census 2010 packages \url{http://lakshmi.calit2.uci.edu/census2000/}  and \url{http://www.jstatsoft.org/v37/i06}
 #' @usage data('bg.pts')

@@ -2,20 +2,25 @@
 % Please edit documentation in R/bufferapi.R
 \name{bufferapi}
 \alias{bufferapi}
-\title{Title}
+\title{Use the EJSCREEN API to get standard report for each of one or more circular buffers}
 \usage{
 bufferapi(lon, lat, radius = 5)
 }
 \arguments{
-\item{lon}{}
+\item{lon}{Longitude numeric vector}
 
-\item{lat}{}
+\item{lat}{Latitude numeric vector}
 
-\item{radius}{}
-}
-\value{
-
+\item{radius}{radius of circular buffer - I think in miles but should confirm}
 }
 \description{
-Title
+Use the EJSCREEN API to get standard report for each of one or more circular buffers
+}
+\examples{
+ sample.count <- 10
+  pts <- proxistat::testpoints_block2010(sample.count)
+  outlist <- proxistat::bufferapi(pts$lon, lat=pts$lat, radius = 3)
+  summary(outlist)
+  class(outlist[[1]])
+  names(outlist[[1]])
 }
