@@ -1,23 +1,47 @@
-#' Use the EJSCREEN API to get standard report for each of one or more circular buffers
-#'
+#' Use EJSCREEN API to get stats on each circular buffer
+#' 
+#' Requests a standard EJSCREEN report for each of one or more circular buffers.
+#' Specify a radius and vector of latitude longitude points,
+#' and get for a buffer the population weighted mean value of each raw indicator
+#' like percent low-income, and total population count, and percentiles for those
+#' raw indicator scores, all from EJSCREEN, as in an EJSCREEN standard report. 
+#' 
 #' @param lon Longitude numeric vector
 #' @param lat Latitude numeric vector
-#' @param radius radius of circular buffer - I think in miles but should confirm
+#' @param radius radius of circular buffer - Probably in miles but should confirm
 #'
 #' @export
 #'
 #' @examples  
-#'   \dontrun{
-#'   sample.count <- 10
-#'   pts <- proxistat::testpoints_block2010(sample.count)
-#'   outlist <- proxistat::bufferapi(pts$lon, lat=pts$lat, radius = 3)
-#'   summary(outlist)
-#'   class(outlist[[1]])
-#'   names(outlist[[1]])
-#'   x <- do.call(rbind, outlist)
-#'   x[,c(1:18,162:173)]
-#'   t(x[1:2,]) 
-#'   }
+#'  \dontrun{
+#'  # Specify size of buffer circle and pick random points as example data
+#'  myradius <- 3
+#'  n <- 10
+#'  pts <- proxistat::testpoints_block2010(n)
+#'  
+#'  benchmark.start <- Sys.time()
+#'   outlist <- proxistat::bufferapi(pts$lon, lat=pts$lat, radius = myradius)
+#'  benchmark.end <- Sys.time()
+#'   
+#'  # Average speed
+#'  perhour <- proxistat::speedsummary(benchmark.start, benchmark.end, NROW(pts))
+#'  cat('\n', perhour, 'buffers per hour \n')
+#'  # Variability in speed, visualized
+#'  hist(as.numeric(unlist(lapply(outlist, FUN =function(x) x$timeSeconds)), na.rm = T),100,
+#'     main = 'Histogram of seconds per buffer', xlab='Seconds elapsed for a buffer query of API',
+#'     sub = paste('(Overall rate =', perhour, 'buffers per hour)') )
+#'     
+#'  # Format results as a single table
+#'  api.out.table <- data.table::rbindlist(outlist, fill = T, idcol = 'id')
+#'  names(api.out.table)
+#'  # See format and sampling of raw outputs
+#'  summary(outlist)
+#'  class(outlist[[1]])
+#'  names(outlist[[1]])
+#'  x <- do.call(rbind, outlist)
+#'  x[,c(1:18,162:173)]
+#'  t(x[1:2,]) 
+#'  }
 bufferapi <- function(lon, lat, radius=5) {
   
   benchmark.start <- Sys.time()
