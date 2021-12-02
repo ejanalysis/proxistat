@@ -8,20 +8,6 @@
 #' @return data.frame with columns lon and lat, in decimal degrees
 #' @export
 #'
-#' @examples 
-#' #library(jsonlite)
-#' #library(httr)
-#' #library(tidyverse) # need magrittr
-#' #library(data.table)
-#' #library(sf)
-#' # pts <- proxistat::testpoints_block2010(10)
-#' # benchmark.start <- Sys.time()
-#' # outlist <- proxistat::bufferapi(pts$lon, lat=pts$lat, radius = 5)
-#' # benchmark.end <- Sys.time()
-#' # proxistat::speedsummary(benchmark.start, benchmark.end, NROW(pts))
-#'  # VISUALIZE variability in speed
-#'  # hist(as.numeric(unlist(lapply(outlist, FUN =function(x) x$timeSeconds)), na.rm = T),100, 
-#'  #   main = 'Histogram of seconds per buffer', xlab='Seconds elapsed for a buffer query of API')
 #'  
 testpoints_block2010 <- function(size, popwtd = TRUE) {
   if (popwtd) {

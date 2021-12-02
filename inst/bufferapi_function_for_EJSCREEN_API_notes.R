@@ -5,7 +5,7 @@ if (1 == 0) {
   # USE THE EJSCREEN API TO GET BUFFER RESULTS
   #####################################################
   
-  # **** also just see the examples in  proxistat::bufferapi()   ****
+  # **** also just see the examples in  proxistat::ejscreenapi()   ****
   
   
   ### Preliminaries - clear memory, load packages
@@ -49,26 +49,17 @@ if (1 == 0) {
   # Use API and test it for speed 
   ####################################
   
-  outlist <- proxistat::bufferapi(pts$lon, lat=pts$lat, radius = 5)
+  out <- proxistat::ejscreenapi(pts$lon, lat=pts$lat, radius = 5)
   
   #####################################################
-  # see how the output is organized
-  # str(outlist[1]) 
-  summary(outlist)
-  class(outlist[[1]])
-  names(outlist[[1]])
   
   # Note many outputs are NULL, no data returned by API...  why?
   
-  table(sapply(outlist, FUN = is.null))  # 40% were NULL, for example in one test
-  
-     x <- do.call(rbind, outlist)
-     x[,c(1:18,162:173)]
-     t(x[1:2,]) 
+     out[,c(1:18,162:173)]
+     t(out[1:2,]) 
   
   
   #####################################################
-  
   
   
   
