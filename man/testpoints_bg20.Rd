@@ -35,11 +35,8 @@ Note this is not optimized for speed. can be slow if pop wtd.
 #library(sf)
 # pts <- proxistat::testpoints_bg20(10)
 # benchmark.start <- Sys.time()
-# outlist <- proxistat::bufferapi(pts$lon, lat=pts$lat, radius = 5)
+# outlist <- proxistat::ejscreenapi(pts$lon, lat=pts$lat, radius = 5)
 # benchmark.end <- Sys.time()
 # proxistat::speedsummary(benchmark.start, benchmark.end, NROW(pts))
- # VISUALIZE variability in speed
- # hist(as.numeric(unlist(lapply(outlist, FUN =function(x) x$timeSeconds)), na.rm = T),100, 
- #   main = 'Histogram of seconds per buffer', xlab='Seconds elapsed for a buffer query of API')
  
 }

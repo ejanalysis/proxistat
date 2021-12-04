@@ -19,19 +19,3 @@ data.frame with columns lon and lat, in decimal degrees
 Note this is not optimized for speed- it can take 30 seconds to pick just 1,000 points if pop wtd. 
  May recode this to allow wts to be pop (using blocks.pop), or area (using blocks.area), or none (no weight).
 }
-\examples{
-#library(jsonlite)
-#library(httr)
-#library(tidyverse) # need magrittr
-#library(data.table)
-#library(sf)
-# pts <- proxistat::testpoints_block2010(10)
-# benchmark.start <- Sys.time()
-# outlist <- proxistat::bufferapi(pts$lon, lat=pts$lat, radius = 5)
-# benchmark.end <- Sys.time()
-# proxistat::speedsummary(benchmark.start, benchmark.end, NROW(pts))
- # VISUALIZE variability in speed
- # hist(as.numeric(unlist(lapply(outlist, FUN =function(x) x$timeSeconds)), na.rm = T),100, 
- #   main = 'Histogram of seconds per buffer', xlab='Seconds elapsed for a buffer query of API')
- 
-}
