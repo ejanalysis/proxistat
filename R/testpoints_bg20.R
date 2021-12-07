@@ -23,7 +23,7 @@
 #' #library(sf)
 #' # pts <- proxistat::testpoints_bg20(10)
 #' # benchmark.start <- Sys.time()
-#' # outlist <- proxistat::ejscreenapi(pts$lon, lat=pts$lat, radius = 5)
+#' # outlist <- batch.summarizer::ejscreenapi(pts$lon, lat=pts$lat, radius = 5)
 #' # benchmark.end <- Sys.time()
 #' # proxistat::speedsummary(benchmark.start, benchmark.end, NROW(pts))
 #'  
