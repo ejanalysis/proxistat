@@ -5,34 +5,34 @@
 \title{Generate a number of randomly placed points, as latitude/longitude values.}
 \usage{
 testpoints(
-  n,
+  n = 1,
   weighting = "area",
   ST,
   as.df = TRUE,
-  minlat = 40,
-  maxlat = 42,
-  minlon = -125,
-  maxlon = -70,
+  minlat = 17.9,
+  maxlat = 71.25,
+  minlon = -175.89,
+  maxlon = 178.34,
   useblocks = FALSE
 )
 }
 \arguments{
-\item{n}{Numeric value, required, TRUE by default. Specifies how many testpoints to return. Must be an integer between zero and 50 million, and not NA.}
+\item{n}{Numeric value, 1 by default. Specifies how many testpoints to return. Must be an integer between zero and 50 million, and not NA.}
 
-\item{weighting}{area or people or geo ... text indicating what type of weighting, by area or people or geo (each block or block group has equal chance).
+\item{weighting}{area or people or geo or degrees   text indicating what type of weighting, by area or people or geo (each block or block group has equal chance).
 Default is area - a random square mile not a random residence or random Census geometry.}
 
 \item{ST}{optional vector of 2 letter state abbreviations, to limit it to some state(s). Default is all USA (including PR I think).}
 
 \item{as.df}{Logical, default is TRUE, in which case returns a data.frame, otherwise a matrix.}
 
-\item{minlat}{not used anymore. Default 40. A number that is the minimum latitude in decimal degrees to use for generating random points within some range.}
+\item{minlat}{the minimum latitude in decimal degrees to use for generating random points within some range.}
 
-\item{maxlat}{not used anymore.Default 42. A number that is the maximum latitude in decimal degrees to use for generating random points within some range.}
+\item{maxlat}{the maximum latitude in decimal degrees to use for generating random points within some range.}
 
-\item{minlon}{not used anymore.Default -125. A number that is the minimum longitude in decimal degrees to use for generating random points within some range.}
+\item{minlon}{the minimum longitude in decimal degrees to use for generating random points within some range.}
 
-\item{maxlon}{not used anymore.Default -70. A number that is the maximum longitude in decimal degrees to use for generating random points within some range.}
+\item{maxlon}{the maximum longitude in decimal degrees to use for generating random points within some range.}
 
 \item{useblocks}{logical, whether to use the approx 11 mill. Census blocks if TRUE (from github package UScensus2010blocks), 
 or just the approx 220k block groups (from github package ejscreen) if FALSE which is faster}
@@ -55,7 +55,7 @@ For people weighted, it picks from the Census blockgroup internal points (2010),
 \examples{
 testpoints(19,minlat=47,maxlat=48)
 get.distances(testpoints(100),testpoints[10],radius=999,return.rownums=TRUE,return.latlons=TRUE)
-    
+
 }
 \seealso{
 \code{\link{get.distances.all}} which allows you to get distances between all points,
