@@ -1,19 +1,32 @@
 Package: proxistat
 Title: Create a Proximity Score in Each Census Unit, Based on Distances to
-    Specified Points
-Version: 1.1
-Date: 2021-09-09
-Description: This package has functions helping to calculate distances between
-    geographic points, such as the distances between all points, distances to
-    all points within some maximum distance, distance to nearest single point,
-    etc. It also can create a proximity score for each spatial unit like a Census
-    block group, to quantify the distance-weighted count of nearby points. This
-    proximity score can be used in environmental justice (EJ) analysis, for example.
-    This package uses the sp package for the basic distance calculation.
-    Key functions include get.nearest() to find the one topoint nearest each frompoint,
-    get.distances() to find distances quickly within an optional search radius, and
-    get.distances.all() to find distances from all frompoints to alltopoints. The
-    function proxistat() creates a proximity score that quantifies, for each spatial
+    Specified Points (as in EPA's EJScreen tool, for example)
+Version: 1.2
+Date: 2022-04-22
+Description: This package can create a proximity score for each spatial unit 
+    like a Census block or block group or tract, to quantify the distances to -- 
+    and the distance-weighted count of -- nearby points of interest.
+    Those specified geographic points could be sources of air pollution, for example, 
+    where greater proximity could be a simple proxy for greater risk of exposure. 
+    The points could alternatively be amenities, where greater proximity is better. 
+    These proximity scores can be used in environmental justice (EJ) analysis
+    to analyze the distribution of or mean of proximities to hazardous waste sites, 
+    by community or for each demographic group. For example, one could explore 
+    whether and to what degree the average Hispanic or Latino individual compared to the 
+    rest of the US population on average lives closer to hazardous waste
+    treatment, storage, or disposal facilities. 
+    
+    This package uses the sp package for the basic distance calculation 
+    (and also had older functions to calculate distances).
+    Also see the EJAM package in development by EPA, for fast distance stats.
+    
+    distances between all points (from one list of points to another), 
+    distances to all points found within some maximum search radius, 
+    distance to and identity of the nearest single point, etc.
+    Key functions: 
+    get.distances() finds distances quickly within an optional search radius
+    get.distances.all() to find distances from all frompoints to alltopoints. 
+    The function proxistat() creates a proximity score that quantifies, for each spatial
     unit like a Census block group, how many topoints are nearby and how close
     they are.
     For any imported/suggested packages not on CRAN, see http://ejanalysis.github.io
