@@ -15,20 +15,18 @@ Description: This package can create a proximity score for each spatial unit
     whether and to what degree the average Hispanic or Latino individual compared to the 
     rest of the US population on average lives closer to hazardous waste
     treatment, storage, or disposal facilities. 
-    
-    This package uses the sp package for the basic distance calculation 
-    (and also had older functions to calculate distances).
-    Also see the EJAM package in development by EPA, for fast distance stats.
-    
-    distances between all points (from one list of points to another), 
-    distances to all points found within some maximum search radius, 
-    distance to and identity of the nearest single point, etc.
     Key functions: 
     get.distances() finds distances quickly within an optional search radius
     get.distances.all() to find distances from all frompoints to alltopoints. 
     The function proxistat() creates a proximity score that quantifies, for each spatial
     unit like a Census block group, how many topoints are nearby and how close
     they are.
+    This package uses the sp package for the basic distance calculation 
+    (and also had older functions to calculate distances).
+    Also see the EJAM package in development by EPA, for fast distance stats.
+    -distances between all points (from one list of points to another), 
+    -distances to all points found within some maximum search radius, 
+    -distance to and identity of the nearest single point, etc.
     For any imported/suggested packages not on CRAN, see http://ejanalysis.github.io
 Imports:
     sp,
@@ -46,7 +44,7 @@ Suggests:
 URL: http://ejanalysis.github.io, https://github.com/ejanalysis/proxistat, http://www.ejanalysis.com/
 BugReports: https://github.com/ejanalysis/proxistat/issues
 Depends: R (>= 3.1.0)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 License: MIT + file LICENSE
 Repository: GitHub
 Author: info@ejanalysis.com
