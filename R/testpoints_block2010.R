@@ -17,5 +17,5 @@ testpoints_block2010 <- function(size, popwtd = TRUE) {
   }
   pts <- data.frame(lon = UScensus2010blocks::blocks.lon[randomrows], lat = UScensus2010blocks::blocks.lat[randomrows])
   return(pts)
-  #testpoints_x(x=UScensus2010blocks::blocks.lon[ , c('lon', 'lat')], size = size, prob = ejscreen::bg20$pop)
+  #testpoints_x(x=UScensus2010blocks::blocks.lon[ , c('lon', 'lat')], size = size, prob = ejscreen::bg22$pop)
 }

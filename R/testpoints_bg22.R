@@ -21,36 +21,36 @@
 #' #library(tidyverse) # need magrittr
 #' #library(data.table)
 #' #library(sf)
-#' # pts <- proxistat::testpoints_bg20(10)
+#' # pts <- proxistat::testpoints_bg22(10)
 #' # benchmark.start <- Sys.time()
 #' # outlist <- batch.summarizer::ejscreenapi(pts$lon, lat=pts$lat, radius = 5)
 #' # benchmark.end <- Sys.time()
 #' # proxistat::speedsummary(benchmark.start, benchmark.end, NROW(pts))
 #'  
-testpoints_bg20 <- function(size, popwtd = TRUE) {
+testpoints_bg22 <- function(size, popwtd = TRUE) {
 
   if (popwtd) {
-    randomrows <- sample(1:length(ejscreen::bg20$pop), size = size, replace = FALSE, prob = ejscreen::bg20$pop)
-    #testpoints_x(x=ejscreen::bg20[ , c('lon', 'lat')], size = size, prob = ejscreen::bg20$pop)
+    randomrows <- sample(1:length(ejscreen::bg22$pop), size = size, replace = FALSE, prob = ejscreen::bg22$pop)
+    #testpoints_x(x=ejscreen::bg22[ , c('lon', 'lat')], size = size, prob = ejscreen::bg22$pop)
   } else {
-    randomrows <- sample(1:length(ejscreen::bg20$pop), size = size, replace = FALSE)
-    #testpoints_x(x=ejscreen::bg20[ , c('lon', 'lat')], size = size, prob = NULL)
+    randomrows <- sample(1:length(ejscreen::bg22$pop), size = size, replace = FALSE)
+    #testpoints_x(x=ejscreen::bg22[ , c('lon', 'lat')], size = size, prob = NULL)
   }
-  pts <- data.frame(lon = ejscreen::bg20$lon[randomrows], lat= ejscreen::bg20$lat[randomrows])
+  pts <- data.frame(lon = ejscreen::bg22$lon[randomrows], lat= ejscreen::bg22$lat[randomrows])
   return(pts)
 }
 
-testpoints_bg21 <- function(size, popwtd = TRUE) {
-  if (popwtd) {
-    randomrows <- sample(1:length(ejscreen::bg21$pop), size = size, replace = FALSE, prob = ejscreen::bg21$pop)
-    #testpoints_x(x=ejscreen::bg21[ , c('lon', 'lat')], size = size, prob = ejscreen::bg21$pop)
-  } else {
-    randomrows <- sample(1:length(bg21$pop), size = size, replace = FALSE)
-    #testpoints_x(x=ejscreen::bg21[ , c('lon', 'lat')], size = size, prob = NULL)
-  }
-  pts <- data.frame(lon = ejscreen::bg21$lon[randomrows], lat= ejscreen::bg21$lat[randomrows])
-  return(pts)
-}
+# testpoints_bg21 <- function(size, popwtd = TRUE) {
+#   if (popwtd) {
+#     randomrows <- sample(1:length(ejscreen::bg21$pop), size = size, replace = FALSE, prob = ejscreen::bg21$pop)
+#     #testpoints_x(x=ejscreen::bg21[ , c('lon', 'lat')], size = size, prob = ejscreen::bg21$pop)
+#   } else {
+#     randomrows <- sample(1:length(bg21$pop), size = size, replace = FALSE)
+#     #testpoints_x(x=ejscreen::bg21[ , c('lon', 'lat')], size = size, prob = NULL)
+#   }
+#   pts <- data.frame(lon = ejscreen::bg21$lon[randomrows], lat= ejscreen::bg21$lat[randomrows])
+#   return(pts)
+# }
 
 testpoints_x <- function(x, size, prob = NULL) {
   randomrows <- sample(1:NROW(x), size = size, replace = FALSE, prob = prob)

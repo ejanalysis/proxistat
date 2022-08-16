@@ -37,7 +37,7 @@
 #' @export
 testpoints <- function(n=1, weighting='area', ST, as.df=TRUE, minlat=17.9, maxlat=71.25, minlon=-175.89, maxlon=178.34, useblocks=FALSE) { 
   # box for default bounds is 
-  # summary(bg20[,c('lat', 'lon')])
+  # summary(bg22[,c('lat', 'lon')])
   # lat             lon         
   # Min.   :17.90   Min.   :-175.86  
   # Max.   :71.25   Max.   : 178.34  
@@ -84,7 +84,7 @@ testpoints <- function(n=1, weighting='area', ST, as.df=TRUE, minlat=17.9, maxla
   } else {
     # DO NOT USE BLOCKS - USE BLOCK GROUPS (UNLESS weighting is degrees)
     # use about 220,000 Census block GROUP points
-    # summary(bg20[,c('lat', 'lon')])
+    # summary(bg22[,c('lat', 'lon')])
     # lat             lon         
     # Min.   :17.90   Min.   :-175.86  
     # Max.   :71.25   Max.   : 178.34  
@@ -93,11 +93,11 @@ testpoints <- function(n=1, weighting='area', ST, as.df=TRUE, minlat=17.9, maxla
       colsneeded <- c(colsneeded, 'ST')
     }
     if (isTRUE(require('ejscreen'))) {
-      # if you have bg20, use it
-      places <- ejscreen::bg20[ , colsneeded]
+      # if you have bg22, use it
+      places <- ejscreen::bg22[ , colsneeded]
       # places <- bg.pts # did not have population counts, only areas. 
     } else {
-      # bg20 not available so warn and treat as if weighting is degrees, so use box min/max lat/lon
+      # bg22 not available so warn and treat as if weighting is degrees, so use box min/max lat/lon
       warning('blockgroups dataset not found so picking from rectangle via min and max lat and lon')
       weighting <- 'degrees'
     }
