@@ -1,34 +1,28 @@
-near_eachother <- function(lat, lon, distance=1) {
-  # another way to do a quick check for overlapping circular buffers
-  # i.e., are any of these points near each other?
-  
-  
-# distance in miles converted to decimal degrees
-meters_per_mile <- 1609.34
-radius_meters <- distance * meters_per_mile
-radius_in_lat_units <- proxistat::meters.per.degree.lat(radius_meters)
-
-# see if any 2 have similar latitudes
-latorder <- order(lat)
-latgaps <- diff(lat[latorder])
-longaps <- diff(lon[latorder])
-nearby_nextone_latorder <- (latgaps <= radius_in_lat_units) & (longaps <= radius_in_lat_units)
-# which(nearby_nextone_latorder)
-
-results <- data.frame(lat,lon,orignum=1:NROW(lat))[order(latorder), ]
-results$near1 <- c(nearby_nextone_latorder,0) * results$orignum
-results$near2[1:(NROW(results)-1)] <- results$orignum[2:NROW(results)]
-
-
-
-
-stop('not done')
-
-
-
-# near1 = c( * nearby_nextone_latorder, 0),
-near2 = 0  
-
-results[order(results[,'orignum']), ]
+#' which points are near any of the others in list?
+#'
+#' @param lon longitude
+#' @param lat latitude 
+#' @param distance distance between points in miles to check 
+#' @param or_tied if TRUE, checks if less than or equal to distance, otherwise if less than
+#' @export
+#'
+near_eachother <- function(lon, lat, distance, or_tied=FALSE) {
+  # returns logical vector the length of lon or lat, telling if the point is within distance of any other point in list
+# for example,  which sites have residents that might also be near others sites?
+df <- data.frame(lon=lon, lat=lat)
+  distance_pairs <- proxistat::get.distances.all(df, df)
+distance_pairs <- distance_pairs[distance_pairs$fromrow != distance_pairs$torow, ] # remove distance from point to itself
+# circles overlap if 2 facilities are twice the radius apart but we just want to check distance here
+is_near_any <- (distance_pairs$d < distance) 
+original_rownums_near_any <- 1:NROW(lon) %in% distance_pairs$fromrow[is_near_any] 
+return(original_rownums_near_any)
+# 
+# blah <- read.csv('./inst/testpoints_1000.csv')
+# nnn <- near_eachother(blah$lon, blah$lat, 10)
+# plot(blah$lon, blah$lat, main='red points are the ones near some other point')
+# points(blah$lon[nnn],blah$lat[nnn], col='red')
+# 
+# plot(blah$lon, blah$lat,  main='red points are the ones near some other point')
+# points(blah$lon[nnn],blah$lat[nnn], col='red')
 
 }
