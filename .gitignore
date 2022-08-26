@@ -12,3 +12,4 @@ countyinfo.txt
 *.Rproj
 *.Rproj
 docs
+*.Rhistory
