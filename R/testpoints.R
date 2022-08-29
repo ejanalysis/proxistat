@@ -9,8 +9,10 @@
 #' either a random location (like throwing a dart, equal weight per square mile of land area - does not include water area in weighting but can return a point in water if bg has internal point in water?!)
 #' or where a randomly selected US resident lives (population weighted).
 #' Points are returned as latitude and longitude in decimal degrees. 
+#' 
 #' For people weighted, it picks from the Census blockgroup internal points (2010), (or could change to use blocks?)
 #'  which are much more representative of where people live than a random square mile would be.
+#'  
 #' @param n Numeric value, 1 by default. Specifies how many testpoints to return. Must be an integer between zero and 50 million, and not NA.
 #' @param weighting area or people or geo or degrees   text indicating what type of weighting, by area or people or geo (each block or block group has equal chance).
 #'   Default is area - a random square mile not a random residence or random Census geometry. 

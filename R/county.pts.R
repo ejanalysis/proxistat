@@ -1,4 +1,4 @@
-#' approx lat lon of each US County by FIPS
+#' approx lat lon of each US County by FIPS - needs updating to 2020
 #'
 #' A dataset containing latitude and longitude approx of each US county,
 #'  created as average lat and average lon of all block group internal points.

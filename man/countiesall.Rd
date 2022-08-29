@@ -23,35 +23,13 @@ A data.frame of 3221 U.S. Counties or County equivalents, with 5 variables. \cr\
 3 AL       01005 Barbour County   Alabama Barbour County, Alabama\cr
   }
 }
-\source{
-Derived from Census Bureau, obtained 8/2021.
-}
 \description{
 This data set provides names and FIPS codes for U.S. Counties and County equivalents.
- \preformatted{
-# How the 2021 version of proxistat::countiesall was created:
-
-download.file( 'https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2021_Gazetteer/2021_Gaz_counties_national.zip' , 'countyinfo.zip')
-unzip('countyinfo.zip', '2021_Gaz_counties_national.txt')
-
-x <- readr::read_tsv(
-  '~/Downloads/2021_Gaz_counties_national.txt',
-  # We do not need all of these columns, and want to rename the 3 we want:
-  # col_names = c('USPS',  'GEOID', 'ANSICODE', 'NAME', 'ALAND', 'AWATER', 'ALAND_SQMI', 'AWATER_SQMI', 'INTPTLAT', 'INTPTLONG'),
-  # col_types = 'ccccnnnnnn', skip = 1
-  col_names = c('ST',  'FIPS.COUNTY',  'countyname'),
-  col_types = 'cc-c------', skip = 1
-)
-x <- as.data.frame(x)
-x$statename <- proxistat::lookup.states[ match(x[ , 'ST'], proxistat::lookup.states[ , 'ST']), 'statename']
-x$fullname <- apply( x[ , c('countyname', 'statename')] , 1, function(myrow) paste(myrow[1], myrow[2], sep=', '))
-countiesall <- x
-save(countiesall, file = '~/Downloads/countiesall.rdata')
-}
+  For how the 2021 version of proxistat::countiesall was created, 
+  see   proxistat/inst/SCRIPT_make_countiesall_county_names.R
 }
 \seealso{
 \code{\link[ejanalysis]{get.county.info}} from the \pkg{ejanalysis} package (\url{http://ejanalysis.github.io/ejanalysis/}), 
-  and the \pkg{UScensus2010county} package and the \pkg{acs} package
-  and the Census 2010 packages \url{http://lakshmi.calit2.uci.edu/census2000/} and \url{http://www.jstatsoft.org/v37/i06}
+  and maybe the \pkg{UScensus2010county} package and the \pkg{acs} package
 }
 \keyword{datasets}

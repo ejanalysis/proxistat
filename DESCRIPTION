@@ -1,8 +1,8 @@
 Package: proxistat
 Title: Create a Proximity Score in Each Census Unit, Based on Distances to
     Specified Points (as in EPA's EJScreen tool, for example)
-Version: 1.2
-Date: 2022-04-22
+Version: 2.1
+Date: 2022-07-07
 Description: This package can create a proximity score for each spatial unit 
     like a Census block or block group or tract, to quantify the distances to -- 
     and the distance-weighted count of -- nearby points of interest.
