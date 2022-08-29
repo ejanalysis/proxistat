@@ -49,6 +49,7 @@ weighted by area or by population count in block group, to be roughly representa
 either a random location (like throwing a dart, equal weight per square mile of land area - does not include water area in weighting but can return a point in water if bg has internal point in water?!)
 or where a randomly selected US resident lives (population weighted).
 Points are returned as latitude and longitude in decimal degrees. 
+
 For people weighted, it picks from the Census blockgroup internal points (2010), (or could change to use blocks?)
  which are much more representative of where people live than a random square mile would be.
 }

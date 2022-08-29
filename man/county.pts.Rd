@@ -3,7 +3,7 @@
 \docType{data}
 \name{county.pts}
 \alias{county.pts}
-\title{approx lat lon of each US County by FIPS}
+\title{approx lat lon of each US County by FIPS - needs updating to 2020}
 \format{
 A data frame with one row per county and FIPS.COUNTY, lat, lon as colnames
 }
