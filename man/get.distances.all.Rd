@@ -108,6 +108,8 @@ blocks <- get.blocks(fields=c('fips','lat','lon'),charfips = FALSE)
     tolon = c(-77.0892818598, -77.2, -90)),
     .Names = c("lat", "lon"), class = "data.frame",
     row.names = c("1", "2", "3"))
+ test.to.NA = rbind(c(NA,NA), test.to[2:3,])
+ test.from.NA = rbind(test.from[1,], c(NA,NA))
 
 get.distances.all(test.from, test.to)
 get.distances.all(test.from, test.to, return.crosstab=TRUE)
@@ -117,6 +119,9 @@ get.distances.all(test.from, test.to, return.latlons=FALSE, return.rownums=FALSE
 
      # test cases
 
+get.distances.all(test.from,    test.to.NA)
+get.distances.all(test.from.NA, test.to)
+get.distances.all(test.from.NA, test.to.NA)
 get.distances.all(test.from[1,],test.to[1,],return.rownums=F,return.latlons=F)
 get.distances.all(test.from[1,],test.to[1,],return.rownums=FALSE,return.latlons=TRUE)
 get.distances.all(test.from[1,],test.to[1,],return.rownums=TRUE,return.latlons=FALSE)

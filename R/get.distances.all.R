@@ -89,6 +89,8 @@
 #'     tolon = c(-77.0892818598, -77.2, -90)),
 #'     .Names = c("lat", "lon"), class = "data.frame",
 #'     row.names = c("1", "2", "3"))
+#'  test.to.NA = rbind(c(NA,NA), test.to[2:3,])
+#'  test.from.NA = rbind(test.from[1,], c(NA,NA))
 #'
 #' get.distances.all(test.from, test.to)
 #' get.distances.all(test.from, test.to, return.crosstab=TRUE)
@@ -98,6 +100,9 @@
 #'
 #'      # test cases
 #'
+#' get.distances.all(test.from,    test.to.NA)
+#' get.distances.all(test.from.NA, test.to)
+#' get.distances.all(test.from.NA, test.to.NA)
 #' get.distances.all(test.from[1,],test.to[1,],return.rownums=F,return.latlons=F)
 #' get.distances.all(test.from[1,],test.to[1,],return.rownums=FALSE,return.latlons=TRUE)
 #' get.distances.all(test.from[1,],test.to[1,],return.rownums=TRUE,return.latlons=FALSE)
@@ -145,10 +150,25 @@ get.distances.all <- function(frompoints, topoints, units='miles', return.crosst
   colnames(frompoints) <- latlon.colnames.check(frompoints)
   colnames(topoints)   <- latlon.colnames.check(topoints)
 
+  # ADD NA HANDLING 
+  from_na <- is.na(frompoints[ , 'lon']) | is.na(frompoints[ , 'lat'])
+  to_na   <- is.na(topoints[ , 'lon'])   | is.na(topoints[ , 'lat'])
+  originalfrom <- frompoints
+  originalto <- topoints
+  frompoints[from_na, ] <- c(0,0) # replace NA with 0 so that spatialpoints will not stop with error
+  topoints[to_na, ]     <- c(0,0)
+  
   frompoints.sp <- sp::SpatialPoints(coords = data.frame(x = frompoints[,'lon'], y = frompoints[,'lat']), proj4string=sp::CRS("+proj=longlat +datum=WGS84"))
   topoints.sp   <- sp::SpatialPoints(coords = data.frame(x = topoints[,'lon'],   y = topoints[,'lat']),   proj4string=sp::CRS("+proj=longlat +datum=WGS84"))
   results.matrix <- sp::spDists(frompoints.sp, topoints.sp, longlat=TRUE) # result is in kilometers so far
   rm(frompoints.sp, topoints.sp)
+
+  # NA HANDLING 
+  frompoints <- originalfrom
+  topoints    <- originalto
+  results.matrix[from_na, ] <- NA
+  results.matrix[ , to_na]  <- NA
+  rm(originalfrom, originalto)
 
   if (units=='miles') {results.matrix <- results.matrix / km.per.mile }
 
