@@ -13,10 +13,11 @@
 #'   The U.S. Minor Outlying Islands refers to certain small islands under U.S. jurisdiction in the Caribbean and Pacific:  
 #'     Baker Island, Howland Island, Jarvis Island, Johnston Atoll, Kingman Reef, Midway Islands, Navassa Island, Palmyra Atoll, and Wake Island.  
 #'     These areas usually are not part of standard data products.
-#' @seealso \code{\link[ejanalysis]{get.state.info}} in \pkg{ejanalysis} package (\url{http://ejanalysis.github.io/ejanalysis/}), and \code{\link{state.abb}} via \code{data(state)} 
-#'   and the Census 2010 packages \url{http://lakshmi.calit2.uci.edu/census2000/}  and \url{http://www.jstatsoft.org/v37/i06}
+#' @seealso \code{\link[ejanalysis]{get.state.info}} in \pkg{ejanalysis} package (\url{http://ejanalysis.github.io/ejanalysis/}),
+#'   and \code{\link{state.abb}} via \code{data(state)} 
 #' @source Derived from \url{https://www.census.gov/geo/reference/state-area.html} (for area data in square miles etc.)
-#'   obtained 4/2015, and FIPS codes from Census Bureau. 
+#'   obtained 4/2015, and FIPS codes from Census Bureau, but 
+#'   other than the exact areas in square km, this table would be the same for Census 2020. 
 #' @keywords datasets
 #' @format A data.frame with 58 rows (States etc.) and 26 columns (variables like statename). 
 #'   See \code{\link[ejanalysis]{get.state.info}} for more details.
