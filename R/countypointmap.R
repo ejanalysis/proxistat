@@ -1,17 +1,20 @@
 #' @title Simple map of color-coded counties, wrapper for county_choropleth
 #' 
 #' @description very simple mapping of color coded map of US counties.
-#'   This is just a wrapper for \code{\link[choroplethr]{county_choropleth}} 
+#' @details  This is just a wrapper for \code{\link[choroplethr]{county_choropleth}} 
 #'   but it is much more flexible in how the counties are specified.
 #'   While \code{\link[choroplethr]{county_choropleth}} requires statecounty fips numbers, 
 #'   and zooms in on a state defined by 2-digit fips, 
 #'   this wrapper lets you specify counties by full name like Cook County IL
-#'   or even one or more states 
+#'   or even one or more states.
+#'   It is buggy as drafted, however.
 #'   
 #'   Also note acs package is useful such as for
 #'   county_choropleth_acs('B01001', endyear = 2018, state_zoom = 'new york')
 #' @param x required vector of numeric values to plot
-#' @param query flexible way to define what locations - default is all US counties - a set of countyfips  - See \code{\link[ejanalysis]{get.county.info}}
+#' @param query flexible way to define what locations - default is all US counties.
+#'   Can be a set of countyfips or full names like Cook County IL or even one or more states -
+#'    See \code{\link[ejanalysis]{get.county.info}}
 #' @param state_zoom optional but more flexible than in county_choropleth, which requires it be 
 #'   the full state name all lowercase. This function instead accepts case-insensitive state name
 #'   or two letter state abbreviation or state fips as number or text.
@@ -21,7 +24,7 @@
 #' @return Just draws a map
 #' @seealso \code{\link[choroplethr]{county_choropleth}} \code{\link{pointmap}} 
 #' @export
-countypointmap <- function(x, query=NULL, state_zoom, title='', num_colors=1, ...) {
+countypointmap <- function(x, query=NULL, state_zoom=NULL, title='', num_colors=1, ...) {
 
   if (!missing(state_zoom)) {
     state_zoom <- tolower(ejanalysis::get.state.info(state_zoom)$statename)
