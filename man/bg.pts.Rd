@@ -3,28 +3,43 @@
 \docType{data}
 \name{bg.pts}
 \alias{bg.pts}
-\title{Block group internal points and areas (square meters) from Census Bureau for 2010 geographies}
+\title{Block group internal points from Census Bureau for 2020 geographies}
 \format{
-A data.frame of 220740 block groups, with 5 variables. \cr\cr
-\itemize{
- \item  [1,] "FIPS  (e.g., '010950302024')"  \cr\cr
- \item  [2,] "aland  numeric, land area in square meters" \cr\cr
- \item  [3,] "awater  numeric, water area in square meters" \cr\cr
- \item  [4,] "lat  numeric, latitude in decimal degrees" \cr\cr
- \item  [5,] "lon  numeric, longitude in decimal degrees" \cr\cr
+A data.frame of block groups, with these variables: \cr\cr
+\preformatted{
+'data.frame':	242335 obs. of  5 variables:
+ $ FIPS      : chr  "010010201001" "010010201002" "010010202001" "010010202002" ...
+ $ lat       : num  32.5 32.5 32.5 32.5 32.5 ...
+ $ lon       : num  -86.5 -86.5 -86.5 -86.5 -86.5 ...
+ $ bgid      : int  1 2 3 4 5 6 7 8 9 10 ...
+ $ blockcount: int  26 30 14 27 21 21 16 29 29 18 ...
+ - attr(*, "census_version")= num 2020
+ - attr(*, "acs_version")= chr "2016-2020"
+ - attr(*, "acs_releasedate")= chr "3/17/2022"
+ - attr(*, "ejscreen_version")= chr "2.1"
+ - attr(*, "ejscreen_releasedate")= chr "October 2022"
+ - attr(*, "ejscreen_pkg_data")= chr "bg22"
 }
 }
 \source{
-Derived from Census Bureau, obtained early 2015.
-}
-\usage{
-data('bg.pts')
+Derived from Census Bureau, obtained 10/2022. 
+  bg.pts <- as.data.frame(copy(EJAM::bgpts)) # see EJAM package for details 
+  names(bg.pts) <- c('bgid', 'lat','lon','FIPS','blockcount')
+  bg.pts <- bg.pts[ , c('FIPS', 'lat', 'lon', 'bgid', 'blockcount')]
+  bg.pts <- metadata_add(bg.pts)
+  usethis::use_data(bg.pts)
 }
 \description{
-Needs to be updated to 2020 Census. This data set provides a data.frame with 220740 block groups, with 5 variables.
+The population weighted mean of block internal points, 
+  within each block group.
+}
+\details{
+This data set provides a data.frame with 242,335 block groups, with 5 variables.
+  It has PR but lacks "AS" "GU" "MP" "VI" 
+  The population weighted mean not spatial mean was used
+  to summarize the lat lon values of all Census 2020 blocks in a given block group.
 }
 \seealso{
-\pkg{UScensus2010blocks} and  \pkg{acs}  
-  and the Census 2010 packages \url{http://lakshmi.calit2.uci.edu/census2000/}  and \url{http://www.jstatsoft.org/v37/i06}
+\pkg{EJAM::bgpts} and  \pkg{acs}  and for older data \pkg{UScensus2010blocks}
 }
 \keyword{datasets}

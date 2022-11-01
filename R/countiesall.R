@@ -1,13 +1,15 @@
 #' @name countiesall
 #' @docType data
 #' @aliases counties
-#' @title Counties information from U.S. Census Bureau from 2021 
-#' @description This data set provides names and FIPS codes for U.S. Counties and County equivalents.
-#'   For how the 2021 version of proxistat::countiesall was created, 
+#' @title Counties information from U.S. Census Bureau from 2022
+#' @description Names and FIPS codes for U.S. Counties/County equivalents. 
+#'   It has Puerto Rico but not American Samoa, Guam, Mariana Islands, and US Virgin Islands.
+#'    "AS" "GU" "MP" "PR" "VI"
+#' @details For how the 2022 version of proxistat::countiesall was created, 
 #'   see   proxistat/inst/SCRIPT_make_countiesall_county_names.R
 #' 
 #' @seealso \code{\link[ejanalysis]{get.county.info}} from the \pkg{ejanalysis} package (\url{http://ejanalysis.github.io/ejanalysis/}), 
-#'   and maybe the \pkg{UScensus2010county} package and the \pkg{acs} package
+#'   and maybe the \pkg{acs} package
 #' @keywords datasets
 #' @format A data.frame of 3221 U.S. Counties or County equivalents, with 5 variables. \cr\cr
 #' > str(countiesall) \cr

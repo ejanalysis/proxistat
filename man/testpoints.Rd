@@ -34,7 +34,7 @@ Default is area - a random square mile not a random residence or random Census g
 
 \item{maxlon}{the maximum longitude in decimal degrees to use for generating random points within some range.}
 
-\item{useblocks}{logical, whether to use the approx 11 mill. Census blocks if TRUE (from github package UScensus2010blocks), 
+\item{useblocks}{logical, whether to use the approx 11 mill. Census blocks if TRUE
 or just the approx 220k block groups (from github package ejscreen) if FALSE which is faster}
 }
 \value{
@@ -50,7 +50,7 @@ either a random location (like throwing a dart, equal weight per square mile of 
 or where a randomly selected US resident lives (population weighted).
 Points are returned as latitude and longitude in decimal degrees. 
 
-For people weighted, it picks from the Census blockgroup internal points (2010), (or could change to use blocks?)
+For people weighted, it picks from the Census blockgroup internal points, 
  which are much more representative of where people live than a random square mile would be.
 }
 \examples{

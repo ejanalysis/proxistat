@@ -151,7 +151,7 @@ subunitpop = rep(1000, length(test.from$lat))
 subunits = data.frame(FIPS=substr(rownames(test.from), 1, 5), 
   pop=subunitpop, stringsAsFactors=FALSE )
 unitscores = aggregate(subunits,
-  by=list(subunits$FIPS), FUN=function(x) {Hmisc::wtd.mean(x$score, wts=x$pop, na.rm=TRUE)}
+  by=list(subunits$FIPS), FUN=function(x) {Hmisc::wtd.mean(x$score, weights=x$pop, na.rm=TRUE)}
 )
 print(unitscores)
 \dontrun{

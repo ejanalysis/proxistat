@@ -10,13 +10,13 @@
 #' or where a randomly selected US resident lives (population weighted).
 #' Points are returned as latitude and longitude in decimal degrees. 
 #' 
-#' For people weighted, it picks from the Census blockgroup internal points (2010), (or could change to use blocks?)
+#' For people weighted, it picks from the Census blockgroup internal points, 
 #'  which are much more representative of where people live than a random square mile would be.
 #'  
 #' @param n Numeric value, 1 by default. Specifies how many testpoints to return. Must be an integer between zero and 50 million, and not NA.
 #' @param weighting area or people or geo or degrees   text indicating what type of weighting, by area or people or geo (each block or block group has equal chance).
 #'   Default is area - a random square mile not a random residence or random Census geometry. 
-#' @param useblocks logical, whether to use the approx 11 mill. Census blocks if TRUE (from github package UScensus2010blocks), 
+#' @param useblocks logical, whether to use the approx 11 mill. Census blocks if TRUE
 #'   or just the approx 220k block groups (from github package ejscreen) if FALSE which is faster
 #' @param ST optional vector of 2 letter state abbreviations, to limit it to some state(s). Default is all USA (including PR I think).
 #' @param minlat the minimum latitude in decimal degrees to use for generating random points within some range.

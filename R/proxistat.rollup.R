@@ -25,11 +25,11 @@
 #' \dontrun{
 #' # require(Hmisc); require(data.table)
 #' # require("devtools") # to obtain packages via devtools::github_install()
-#' #  These are on github.com/ejanalysis 
+#' #  These are on github.com/ejanalysis, e.g.  https://github.com/ejanalysis/UScensus2010blocks
+#' # require(analyze.stuff); require(ejanalysis)
 #' # require(UScensus2010blocks) # for the get.blocks() function and dataset
-#' require(analyze.stuff); require(ejanalysis)
-#' blocks <- get.blocks()
-#' bgp <- proxistat.rollup(output=output, blocksfips=blocks$fips, blocksfipsbg=blocks$FIPS.BG, blockspop=blocks$pop)
+#' # blocks <- UScensus2010blocks::get.blocks()
+#' # bgp <- proxistat.rollup(output=output, blocksfips=blocks$fips, blocksfipsbg=blocks$FIPS.BG, blockspop=blocks$pop)
 #' }
 #' @export
 proxistat.rollup <- function(output, blocksfips, blocksfipsbg, blockspop) {
