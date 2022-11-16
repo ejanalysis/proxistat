@@ -19,3 +19,6 @@ data.frame with columns lon and lat, in decimal degrees
 Note this is not optimized for speed- it can take 30 seconds to pick just 1,000 points if pop wtd. 
  May recode this to allow wts to be pop (using blocks.pop), or area (using blocks.area), or none (no weight).
 }
+\details{
+This is probably obsolete at this point.
+}

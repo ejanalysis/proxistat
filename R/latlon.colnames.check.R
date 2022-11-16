@@ -1,4 +1,4 @@
-#' @title Utility function to check for valid lat/lon columns
+#' @title obsolete - see latlon_is.valid()  
 #'
 #' @description Used by functions like \code{\link{get.distances}} to check input parameters frompoints and topoints
 #' @param mypoints A matrix or data.frame

@@ -2,7 +2,7 @@
 % Please edit documentation in R/latlon.colnames.check.R
 \name{latlon.colnames.check}
 \alias{latlon.colnames.check}
-\title{Utility function to check for valid lat/lon columns}
+\title{obsolete - see latlon_is.valid()}
 \usage{
 latlon.colnames.check(mypoints)
 }
