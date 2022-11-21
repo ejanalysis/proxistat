@@ -29,8 +29,8 @@ Description: This package can create a proximity score for each spatial unit
     -distance to and identity of the nearest single point, etc.
     For any imported/suggested packages not on CRAN, see http://ejanalysis.github.io
 Imports:
-    sp,
     analyze.stuff,
+    sp,
     Hmisc,
     data.table,
     tidyverse,
@@ -38,8 +38,15 @@ Imports:
     httr,
     jsonlite, 
     httr
+Remotes: 
+    github::ejanalysis/analyze.stuff,
+    github::USEPA/EJAM,
+    github::USEPA/EJAMblockdata,
+    github::UScensus2010blocks
 Suggests:
     matrixStats,
+    EJAM,
+    EJAMblockdata,
     UScensus2010blocks
 URL: http://ejanalysis.github.io, https://github.com/ejanalysis/proxistat, http://www.ejanalysis.com/
 BugReports: https://github.com/ejanalysis/proxistat/issues
