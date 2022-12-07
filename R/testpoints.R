@@ -74,6 +74,7 @@ testpoints <- function(n=1, weighting='area', ST, as.df=TRUE,
   if (!(weighting %in% c('area', 'people', 'geo', 'degrees'))) {stop('weighting must be a valid option. see help.')}
   
   colsneeded <- c('lat', 'lon')
+  
   if (weighting == 'people') {
     colsneeded <- c(colsneeded, 'pop')
   }
@@ -91,13 +92,13 @@ testpoints <- function(n=1, weighting='area', ST, as.df=TRUE,
     if (!missing(ST)) {
       colsneeded <- c(colsneeded, 'fips')
     }
-    # places <- UScensus2010blocks::get.blocks(fields = colsneeded)
+     places <- proxistat::blockpoints_area_pop
     
     if (!missing(ST)) {
-      if ('ST' %in% colnames(places)) {
-        places$ST <- get.state.info( get.fips.st(places$FIPS), fields = 'ST')[,'ST']
-      }
-      places$FIPS <- NULL
+      # if ('ST' %in% colnames(places)) {
+        places$ST <- get.state.info( get.fips.st(places$blockfips), fields = 'ST')[,'ST']
+      # }
+      # places$FIPS <- NULL
     }
     
   } else {

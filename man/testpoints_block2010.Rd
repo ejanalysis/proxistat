@@ -16,7 +16,7 @@ If FALSE, unweighted, so each block has equal chance of being selected.}
 data.frame with columns lon and lat, in decimal degrees
 }
 \description{
-Note this is not optimized for speed- it can take 30 seconds to pick just 1,000 points if pop wtd. 
+Note the 2010 version of this is not optimized for speed- it can take 30 seconds to pick just 1,000 points if pop wtd. 
  May recode this to allow wts to be pop (using blocks.pop), or area (using blocks.area), or none (no weight).
 }
 \details{
