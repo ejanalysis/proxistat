@@ -37,7 +37,8 @@ Imports:
     sf,
     httr,
     jsonlite, 
-    httr
+    httr, 
+    choroplethrMaps
 Remotes: 
     github::ejanalysis/analyze.stuff,
     github::USEPA/EJAM,

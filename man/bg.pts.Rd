@@ -40,6 +40,6 @@ This data set provides a data.frame with 242,335 block groups, with 5 variables.
   to summarize the lat lon values of all Census 2020 blocks in a given block group.
 }
 \seealso{
-\pkg{EJAM::bgpts} and  \pkg{acs}  and for older data \pkg{UScensus2010blocks}
+\pkg{EJAM::proxistat2}  \pkg{EJAM::bgpts} and  \pkg{acs}  and for older data \pkg{UScensus2010blocks}
 }
 \keyword{datasets}

@@ -9,7 +9,7 @@
 #'   The population weighted mean not spatial mean was used
 #'   to summarize the lat lon values of all Census 2020 blocks in a given block group.
 #'   
-#' @seealso \pkg{EJAM::bgpts} and  \pkg{acs}  and for older data \pkg{UScensus2010blocks}  
+#' @seealso \pkg{EJAM::proxistat2}  \pkg{EJAM::bgpts} and  \pkg{acs}  and for older data \pkg{UScensus2010blocks}  
 #' @source Derived from Census Bureau, obtained 10/2022. 
 #'   bg.pts <- as.data.frame(copy(EJAM::bgpts)) # see EJAM package for details 
 #'   names(bg.pts) <- c('bgid', 'lat','lon','FIPS','blockcount')
