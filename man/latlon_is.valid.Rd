@@ -4,19 +4,28 @@
 \alias{latlon_is.valid}
 \title{Validate latitudes and longitudes}
 \usage{
-latlon_is.valid(lat, lon)
+latlon_is.valid(lon, lat, quiet = TRUE)
 }
 \arguments{
-\item{lat}{vector of latitudes in decimal degrees}
-
 \item{lon}{numeric vector of longitudes in decimal degrees, same length}
+
+\item{lat}{vector of latitudes in decimal degrees}
 }
 \value{
 logical vector, one element per lat lon pair (location)
 }
 \description{
 Check each latitude and longitude value to see if they are 
-  NA or outside expected numeric ranges
+  NA or outside expected numeric ranges 
+  (based on approx ranges of lat lon seen among block internal points dataset)
+  lat must be between 17.5 and 71.5, and 
+  lon must be ( between -180 and -64) OR (between 172 and 180)
+}
+\examples{
+ \dontrun{
+ table(latlon_is.valid(lat =  frs$lat, lon =  frs$lon))
+ table(latlon_is.valid(lat =  blockpoints$lat, lon =  blockpoints$lon))
+  }
 }
 \seealso{
 latlon_df_clean() latlon_infer() latlon_is.valid() latlon_as.numeric()
