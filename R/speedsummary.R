@@ -5,15 +5,6 @@
 #' @param n how many buffers were done? 
 #'
 #' @return Prints to console and returns rate of buffers per hour
-#' @export
-#'
-#' @examples \dontrun{
-#'  pts <- proxistat::testpoints_block2010(10)
-#'  benchmark.start <- Sys.time()
-#'  outlist <- batch.summarizer::ejscreenapi(pts$lon, lat=pts$lat, radius = 5)
-#'  benchmark.end <- Sys.time()
-#'  proxistat::speedsummary(benchmark.start, benchmark.end, NROW(pts))
-#' }
 #' 
 speedsummary <- function(start, end, n) {
   

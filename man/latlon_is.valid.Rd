@@ -10,6 +10,8 @@ latlon_is.valid(lon, lat, quiet = TRUE)
 \item{lon}{numeric vector of longitudes in decimal degrees, same length}
 
 \item{lat}{vector of latitudes in decimal degrees}
+
+\item{quiet}{optional logical, if TRUE, show list of bad values in console}
 }
 \value{
 logical vector, one element per lat lon pair (location)

@@ -6,7 +6,7 @@
 #'   lon must be ( between -180 and -64) OR (between 172 and 180) 
 #' @param lon numeric vector of longitudes in decimal degrees, same length
 #' @param lat vector of latitudes in decimal degrees
-#' @quiet optional logical, if TRUE, show list of bad values in console
+#' @param quiet optional logical, if TRUE, show list of bad values in console
 #' @return logical vector, one element per lat lon pair (location)
 #' @seealso latlon_df_clean() latlon_infer() latlon_is.valid() latlon_as.numeric()
 #' @examples  \dontrun{

@@ -21,12 +21,7 @@
 #' #library(tidyverse) # need magrittr
 #' #library(data.table)
 #' #library(sf)
-#' # pts <- proxistat::testpoints_bg22(10)
-#' # benchmark.start <- Sys.time()
-#' # outlist <- batch.summarizer::ejscreenapi(pts$lon, lat=pts$lat, radius = 5)
-#' # benchmark.end <- Sys.time()
-#' # proxistat::speedsummary(benchmark.start, benchmark.end, NROW(pts))
-#'  
+#' # pts <- proxistat::testpoints_bg22(10)   
 testpoints_bg22 <- function(size, popwtd = TRUE) {
 
   if (popwtd) {

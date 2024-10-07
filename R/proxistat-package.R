@@ -70,4 +70,4 @@
 #' proxistat(t3, t10, radius = 300, units = "km", area = c(100001:100003)) 
 #' proxistat(  t3, t10, radius=300, units='km')
 #' 1/get.nearest(   t3, t10, radius=300, units='km')
-NULL
+"_PACKAGE"
