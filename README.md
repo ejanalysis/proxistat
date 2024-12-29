@@ -1,5 +1,7 @@
 # proxistat package
 
+Currently Obsolete as of 1/2025 - 
+
 ## The [proxistat package](http://ejanalysis.github.io/proxistat/) for R has functions helping to calculate distances between geographic points, such as the distances between all points, distances to all points within some maximum distance, distance to nearest single point, etc.
 
 This package also can create a proximity score for each spatial unit like a Census block group, to quantify the distance-weighted count of nearby points. This proximity score can be used in environmental justice (EJ) analysis, for example. This package uses the sp package for the basic distance calculation.  
